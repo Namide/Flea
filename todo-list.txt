@@ -1,0 +1,101 @@
+system
+	data
+		list
+			ElementList.php
+			LanguageList.php
+			PageList.php
+		Element.php
+		Page.php
+		DynamicPage.php	=> comme une page avec plusieurs URL et plusieurs VO
+		RequestPage.php
+		
+		General.php => currentLang, currentPage, currentUrl
+		
+	helpers
+		
+		common
+			InitUtil.php
+			BuildUtil.php
+			TemplateUtil.php [ mustache( $content, &$page ) => render( $content, $page = -1 ) ]
+			
+		miscellaneous
+			SearchEngine.php
+			? TradUtil.php
+		
+		system
+			Router.php
+			Cache.php
+			FileUtil.php
+			SaveUtil.php
+			UrlUtil.php
+			
+	init
+		start.php
+		imports.php
+		load.php
+		build.php
+		
+	plugin
+		admin
+		SEO-utils
+		content-utils
+		unit-testing
+		
+	
+content
+	initBegin.php
+	initLang.php
+	initPages.php
+	
+template
+
+
+
+
+
+TO-DO
+
+	namespace Flea {  }
+
+	DynamicElement (interface)
+	Element => Page => DynamicPage
+					=> RequestPage => DynamicRequestPage
+	
+	ElementList => PageList
+	
+	"mustache" après le template !
+	
+	Url
+		suppression du GET de la page
+		réatribution des autres GET (si URLRewritting)
+		transformation des GET ?a=b en a/b
+		rootURL = (domain + root directory) = http://google.com/analytics/
+		rootURL + pageURL + getURL = absURL
+		pageURL + getURL = relURL
+		
+	Router
+		composé avec UrlUtil
+		(gestion URL en premier lieu sans init pour décomposer et sécuriser actuelle)
+		phase avant init
+		phase cache
+		
+	singletons -> utilisable sans méthode getInstance() pour InitUtil, BuildUtil et TemplateUtil
+	language -> lang
+	
+	render (old mustache) !
+		{{rootPath}}
+		{{templatePath}}
+		{{contentPath}}
+		
+		{{currentLang}}
+		
+		{{currentPageContentPath}}
+		
+		{{idPageToAbsUrl:basic/homepage}}
+		? dynamic pages ?
+	
+	PageList
+		possibilité de stoquer les URLs et les tags
+		possibilité de fonctionner sans initialisation à partir des URL et des tags
+				
+	
