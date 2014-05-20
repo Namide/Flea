@@ -8,6 +8,7 @@ system
 		Page.php
 		DynamicPage.php	=> comme une page avec plusieurs URL et plusieurs VO
 		RequestPage.php
+		Saver.php
 		
 		General.php => currentLang, currentPage, currentUrl
 		
@@ -26,7 +27,7 @@ system
 			Router.php
 			Cache.php
 			FileUtil.php
-			SaveUtil.php
+			//SaveUtil.php
 			UrlUtil.php
 			
 	init
@@ -35,7 +36,7 @@ system
 		load.php
 		build.php
 		
-	plugin
+	admin
 		admin
 		SEO-utils
 		content-utils

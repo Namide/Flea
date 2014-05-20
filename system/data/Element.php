@@ -31,8 +31,9 @@ namespace Flea;
  *
  * @author Damien Doussaud (namide.com)
  */
-class Element
+class Element extends Saver
 {
+	
 	private $_lang;
 	/**
 	 * Language of the Element.
@@ -84,20 +85,7 @@ class Element
 	 */
     public function getType() { return $this->_type; }
 	
-    private $_name;
-	/**
-	 * Name of the element
-	 * 
-	 * @param string $name
-	 */
-    public function setName( $name ) { $this->_name = $name; }
-	/**
-	 * Name of the element
-	 * 
-	 * @return string
-	 */
-    public function getName() { return $this->_name; }
-	
+   
     private $_tags;
 	/**
 	 * Add a tag to the element.
@@ -164,6 +152,29 @@ class Element
         return $this->_tags;
     }
 	
+	/**
+	 * Remove all the tags
+	 * 
+	 * @return array
+	 */
+	public function removeTags()
+    {
+        $this->_tags = array();
+    }
+	
+	/**
+	 * Remove all the tags
+	 * 
+	 * @return array
+	 */
+	public function removeTag( $tag )
+    {
+        if ( $this->hasTag($tag) )
+		{
+			$key = array_search($tag, $this->_tags);
+			array_splice($this->_tags, $key, 1);
+		}
+    }
 	
 	private $_contents;
     /**
@@ -227,55 +238,49 @@ class Element
         return $this->_contents;
     }
 	
-	
-	/**
-	 * Get a script for create the same element
-	 * 
-	 * @return string
-	 */
-	public function getSave()
-	{
-		$c = get_called_class();
-		$obj = get_object_vars($this);
-		$output = $c.'::create(';
-		$output .= SaveUtil::arrayToStrConstructor($obj);
-		$output .= ')';
-		
-		return $output;
-	}
-	
-	/**
-	 * Create a new element by a saved object.
-	 * A saved object can by generate by the method getSave().
-	 * 
-	 * @param array $saveDatas
-	 * @return self
-	 */
-	public static function create( $saveDatas )
-	{
-		$c = get_called_class();
-		$element = new $c();
-		foreach ( $saveDatas as $varLabel => $varValue )
-		{
-			$element->$varLabel = $varValue;
-		}
-		return $element;
-	}
-	
 	/**
 	 * Create an element
 	 * 
 	 * @param type $lang
 	 */
-	public function __construct( $lang = NULL )
+	public function __construct( $lang = null )
     {
         if ( $lang === null )
 		{
 			$lang = LangList::getInstance()->getDefaultLang();
 		}
-		
 		$this->setLang( $lang );
 		$this->_contents = array();
 		$this->_tags = array();
     }
+
+	/**
+	 * Get a script for create the same object
+	 * 
+	 * @return string
+	 */
+	public function getSave()
+	{
+		return $this->constructSave( get_object_vars($this) );
+	}
+
+	/**
+	 * Update the object with a saved object.
+	 * A saved object can by generate by the method getSave().
+	 * 
+	 * @param array $saveDatas
+	 * @return self
+	 */
+	public function update( $saveDatas )
+	{
+		if ( count( $saveDatas ) > 0 )
+		{
+			foreach ( $saveDatas as $varLabel => $varValue )
+			{
+				$this->$varLabel = $varValue;
+			}
+		}
+		return $this;
+	}
+	
 }

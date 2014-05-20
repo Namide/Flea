@@ -24,11 +24,22 @@
  * THE SOFTWARE.
  */
 
-
+function resultTest( $valid )
+{
+	if ( $valid ) return '<span class="passed">true</span>';
+	return '<span class="error">false</span>';
+}
 function testString( $a, $b )
 {
-	if ( $a === $b ) return '<span class="passed">true</span>';
-	return '<span class="error">false</span>';
+	return resultTest( $a === $b );
+}
+function testArray( $a, $b )
+{
+	return resultTest(count( array_diff($a, $b) ) < 1);
+}
+function testObject( $a, $b )
+{
+	return resultTest( $a == $b ); 
 }
 
 function writeTest( $method, $resul )
@@ -37,6 +48,14 @@ function writeTest( $method, $resul )
 	echo '
 			<tr>
 				<td>'.$class.'</td><td>'.$method.'()</td><td>'.$resul.'</td>
+			</tr>';
+}
+function writeClass()
+{
+	global $class;
+	echo '
+			<tr>
+				<th colspan="3" align="center">'.$class.'</th>
 			</tr>';
 }
 
@@ -61,18 +80,32 @@ function writeTest( $method, $resul )
 			<tr>
 				<th>Class</th>
 				<th>method</th>
-				<td>passed</td>
+				<th>state</th>
 			</tr>
 			<?php
 	
-				
 				include_once 'config.php';
-				include_once _SYSTEM_DIRECTORY.'data/list/LangList.php';
-				include_once _SYSTEM_DIRECTORY.'data/Element.php';
-				$element = new \Flea\Element();
+				include_once _SYSTEM_DIRECTORY.'init/import.php';
+				
+				
+				$class = 'LangList';
+				writeClass();
+				$lang = \Flea\LangList::getInstance();
+				$lang->addDefaultLang('uk');
+				writeTest( 'addDefaultLang', testString( $lang->hasLang('uk'), true ) );
+				writeTest( 'getLangByNavigator', testString($lang->getLangByNavigator(), 'uk') );
+				$lang->addLang('fr');
+				writeTest( 'getLangByNavigator', testString($lang->getLangByNavigator(), 'fr') );
+				writeTest( 'getList', testArray($lang->getList(), array('all', 'uk', 'fr')) );
+				
+				
 				$class = 'Element';
+				writeClass();
+				$element = new \Flea\Element();
 				$element->addTags( array('a:b','bb','yohé\glitch', 2) );
 				writeTest( 'addTags', testString( $element->hasTag('yohé\glitch'), true ) );
+				$element->removeTag( 'bb' );
+				writeTest( 'removeTag', testArray( $element->getTags(), array('a:b','yohé\glitch', 2) ) );
 				$element->addTag( 'hum' );
 				writeTest( 'addTag', testString( $element->hasTag('yohé\glitch'), true ) );
 				writeTest( 'hasTag', testString( $element->hasTag('hum'), true ) );
@@ -80,40 +113,32 @@ function writeTest( $method, $resul )
 				writeTest( 'hasTag', testString( $element->hasTag('hum'), true ) );
 				writeTest( 'hasTags', testString( $element->hasTags(array('hum', 'yohé\glitch', 2)), true ) );
 				writeTest( 'hasTags', testString( $element->hasTags(array('no')), false ) );
+				$element->setId('the id!');
+				writeTest( 'setId', testString( $element->getId(), 'the id!' ) );
+				$element->setLang('uk');
+				writeTest( 'setLang', testString( $element->getLang(), 'uk' ) );
+				$element->setType('wall');
+				writeTest( 'setLang', testString( $element->getType(), 'wall' ) );
+				$save = $element->getSave();
+				$element2 = new \Flea\Element();
+				eval( '$element2 = '.$save.';');
+				writeTest( 'getSave', testObject( $element, $element2 ) );
+				writeTest( 'create', testObject( $element, $element2 ) );
+				$element->removeTags();
+				writeTest( 'removeTags', testArray( $element->getTags(), array() ) );
+				
+				
+				$class = 'ElementList';
+				writeClass();
+				$elementList = Flea\ElementList::getInstance();
+				$elementList->addElement($element);
+				writeTest( 'addElement', testObject( $elementList->getElements()[0], $element ) );
+				$element2->setLang('fr');
+				$elementList->addElement($element2);
+				writeTest( 'getElementsByLang', testObject( $elementList->getElementsByLang('fr')[0], $element2 ) );
 				
 			?>
-			<tr>
-				<th>Version</th>
-				<td><span itemprop="version">beta</span></td>
-			</tr>
-			<tr>
-				<th>Plate-forme</th>
-				<td>en ligne (Facebook / navigateurs)</td>
-			</tr>
-			<tr>
-				<th>Genre</th>
-				<td><span itemprop="genre">arcade</span>, <span itemprop="genre">plate-forme</span></td>
-			</tr>
-			<tr>
-				<th>Développement et graphisme</th>
-				<td>Damien Doussaud (<a href="http://namide.com" rel="author">Namide</a>)</td>
-			</tr>
-			<tr>
-				<th>Langage</th>
-				<td><a href="http://haxe.org/" target="_blank">Haxe</a></td>
-			</tr>
-			<tr>
-				<th>Testeurs</th>
-				<td><span itemprop="contributor">SMX</span>, <span itemprop="contributor">jems Kalagan</span>, <span itemprop="contributor">Greg</span></td>
-			</tr>
-			<tr>
-				<th>Contexte</th>
-				<td>Jeu créé en 50 heures<br />(sans compter les interactions avec Facebook).</td>
-			</tr>
-			<tr>
-				<th>Lien</th>
-				<td><a href="http://apps.facebook.com/tetrominos-killer/" class="button" itemprop="url" target="_blank">Tetrominos killer</a></td>
-			</tr>
+			
 		</tbody>
 	</table>
 	

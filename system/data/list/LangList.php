@@ -47,7 +47,8 @@ class LangList
 	
     final private function __construct()
     {
-        $this->_langs = array('all');
+		$this->_langs = array();
+        $this->addDefaultLang('all');
     }
     
 	/**
@@ -57,7 +58,7 @@ class LangList
 	 */
     public function addDefaultLang( $lang )
     {
-        $this->_defaultLang = $lang;
+		$this->_defaultLang = $lang;
         $this->addLang( $lang );
     }
     
@@ -93,7 +94,7 @@ class LangList
 	 */
 	public function hasLang( $lang )
 	{
-		return array_key_exists( $this->_langs, $lang );
+		return in_array($lang, $this->_langs);
 	}
 	
 	/**
