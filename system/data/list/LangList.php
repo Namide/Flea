@@ -137,7 +137,7 @@ class LangList
     {
         if( !isset( self::$_INSTANCE ) )
         {
-            self::$_INSTANCE = new LangList();
+            self::$_INSTANCE = new self;
         }
  
         return self::$_INSTANCE;

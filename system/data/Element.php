@@ -57,19 +57,19 @@ class Element extends Saver
 	 */
     public function getLang() { return $this->_lang; }
 
-    private $_id;
+    private $_name;
 	/**
 	 * ID of the Element
 	 * 
-	 * @param string $id
+	 * @param string $name
 	 */
-    public function setId( $id ) { $this->_id = $id; }
+    public function setName( $name ) { $this->_name = $name; }
 	/**
 	 * ID of the Element
 	 * 
 	 * @return string
 	 */
-    public function getId() { return $this->_id; }
+    public function getName() { return $this->_name; }
 	
 	private $_type;
 	/**
@@ -104,7 +104,7 @@ class Element extends Saver
 	 * 
 	 * @param array $tags
 	 */
-    public function addTags( $tags )
+    public function addTags( array $tags )
     {
         foreach ( $tags as $tag )
         {
@@ -130,7 +130,7 @@ class Element extends Saver
 	 * @param array $tag
 	 * @return boolean
 	 */
-    public function hasTags( $tags )
+    public function hasTags( array $tags )
     {
 		foreach ($tags as $tag)
 		{
@@ -184,11 +184,11 @@ class Element extends Saver
 	 * @param string $label
 	 * @param string $value
 	 */
-	public function addContent( $label, $value )
+	public function addContent( $label, &$value )
 	{
 		if ( _DEBUG && $this->hasContent($label) )
 		{
-			trigger_error( 'This content already exist: '.$label.' ('.$this->_id.', '.$this->_lang.')' , E_USER_ERROR);
+			trigger_error( 'This content already exist: '.$label.' ('.$this->_name.', '.$this->_lang.')' , E_USER_ERROR);
 		}
 		$this->_contents[$label] = $value;
 	}
@@ -198,7 +198,7 @@ class Element extends Saver
 	 * 
 	 * @param array $arrayOfContentByLabel
 	 */
-    public function addContents( $arrayOfContentByLabel )
+    public function addContents( array &$arrayOfContentByLabel )
     {
         foreach ( $arrayOfContentByLabel as $label => $content )
         {
@@ -243,7 +243,7 @@ class Element extends Saver
 	 * 
 	 * @param type $lang
 	 */
-	public function __construct( $lang = null )
+	public function __construct( $name = '', $lang = null )
     {
         if ( $lang === null )
 		{
@@ -252,6 +252,9 @@ class Element extends Saver
 		$this->setLang( $lang );
 		$this->_contents = array();
 		$this->_tags = array();
+		$this->_name = $name;
+		
+		$this->_type = '';
     }
 
 	/**
@@ -261,7 +264,8 @@ class Element extends Saver
 	 */
 	public function getSave()
 	{
-		return $this->constructSave( get_object_vars($this) );
+		$obj = get_object_vars($this);
+		return $this->constructSave( $obj );
 	}
 
 	/**
@@ -271,7 +275,7 @@ class Element extends Saver
 	 * @param array $saveDatas
 	 * @return self
 	 */
-	public function update( $saveDatas )
+	public function update( array $saveDatas )
 	{
 		if ( count( $saveDatas ) > 0 )
 		{

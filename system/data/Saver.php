@@ -27,7 +27,8 @@
 namespace Flea;
 
 /**
- * Description of Saver
+ * Base object used to generate a save of object.
+ * With this saving you can instantiate the same object.
  *
  * @author Namide
  */
@@ -46,7 +47,7 @@ abstract class Saver
 	 * @param type $getObjectVars
 	 * @return string
 	 */
-	protected function constructSave( $getObjectVars )
+	protected function constructSave( array $getObjectVars )
 	{
 		$c = get_called_class();
 		$output = $c.'::create(';
@@ -63,7 +64,7 @@ abstract class Saver
 	 * @param array $saveDatas
 	 * @return self
 	 */
-	public static function create( $saveDatas )
+	public static function create( array $saveDatas )
 	{
 		$c = get_called_class();
 		$element = new $c;
@@ -78,7 +79,7 @@ abstract class Saver
 	 * @param array $saveDatas
 	 * @return self
 	 */
-	abstract public function update( $saveDatas );
+	abstract public function update( array $saveDatas );
 	
 	/**
 	 * Return a string for instantiate the same data

@@ -62,6 +62,20 @@ class Page extends Element
 	 */
     public function getVisible() { return $this->_visible; }
 
+     protected $_getEnabled;
+	/**
+	 * Active or unactive the GET method
+	 * 
+	 * @param boolean $visible
+	 */
+    public function setGetEnabled( $enabled ) { $this->_getEnabled = $enabled; }
+	/**
+	 * If the GET is activated the page can have several URL with the same base
+	 * 
+	 * @return boolean
+	 */
+    public function getGetEnabled() { return $this->_getEnabled; }
+
     protected $_cachable;
 	/**
 	 * set the chability of the page
@@ -83,25 +97,13 @@ class Page extends Element
 	 * 
 	 * @param string $url
 	 */
-    public function setUrl( $url ) { $this->_url = $url; }
+    public function setPageUrl( $url ) { $this->_url = $url; }
 	/**
 	 * URL of the page
 	 * 
 	 * @return string
 	 */
-    public function getUrl() { return $this->_url; }
-
-    protected $_lang;
-	/**
-	 * 
-	 * @param string $lang
-	 */
-    public function setLang( $lang ) { $this->_lang = $lang; }
-	/**
-	 * 
-	 * @return string
-	 */
-    public function getLang() { return $this->_lang; }
+    public function getPageUrl() { return $this->_url; }
 
     protected $_HtmlHeader;
 	/**
@@ -189,197 +191,54 @@ class Page extends Element
 	 */
     public function getBuildFile() { return $this->_buildFile; }
 	
-??????
-	
-	protected $_requests;
-	/**
-	 * 
-	 * @param RequestPage $requestPage
-	 * @param string $content
-	 */
-	public function addRequest( &$requestPage )
-	{
-		if ( _DEBUG && $this->hasRequest( $requestPage->getUrl() ) )
-		{
-			trigger_error( 'This request already exist: '.$requestPage->getUrl().' ('.$this->_id.', '.$this->_lang.')', E_USER_ERROR );
-		}
-		$this->_requests[$requestPage->getUrl()] = $requestPage;
-	}
-	
-	/**
-	 * 
-	 * @param string $url
-	 * @return boolean
-	 */
-    public function hasRequest( $url )
+	public function __construct( $name = '', $lang = null )
     {
-        return array_key_exists( $url, $this->_requests );
-    }
+		parent::__construct($lang);
 		
-	/**
-	 * 
-	 * @param string $url
-	 * @return RequestPage
-	 */
-	public function getRequest( $url )
-    {
-		if ( !$this->hasRequest($url) )
-		{
-			trigger_error( 'This request don\'t exist: '.$url.' ('.$this->_id.', '.$this->_lang.')', E_USER_ERROR );
-		}
-        return $this->_requests[ $url ];
+        $this->_visible = true;
+        $this->_getEnabled = false;
+		$this->_cachable = true;
+		
+		$this->_url = '';
+		
+		$this->_htmlTitle = $name;
+		$this->_htmlDescription = $name;
+		$this->_HtmlHeader = '';
+		$this->_htmlBody = '';
+		
+        $this->_file2 = '';
+		$this->_template = '';
+		
+		$this->_phpHeader = '';
+		$this->_buildFile = '';
     }
 	
 	/**
-	 * 
-	 * @return array
-	 */
-	public function getRequests()
-    {
-        return $this->_requests;
-    }
-	
-	
-	protected $_contents;
-    /**
-	 * 
-	 * @param string $label
-	 * @param string $value
-	 */
-	public function addContent( $label, $value )
-	{
-		if ( $this->hasContent($label) )
-		{
-			trigger_error( 'This content already exist: '.$label.' ('.$this->id.', '.$this->language.')', E_USER_ERROR);
-		}
-		$this->_contents[$label] = $value;
-	}
-	
-	/**
-	 * 
-	 * @param array $arrayOfContentByLabel
-	 */
-    public function addContents( $arrayOfContentByLabel )
-    {
-        foreach ( $arrayOfContentByLabel as $label => $content )
-        {
-            $this->addContent( $label, $content );
-        }
-    }
-	
-	/**
-	 * 
-	 * @param string $label
-	 * @return boolean
-	 */
-    public function hasContent( $label )
-    {
-		return array_key_exists( $label, $this->_contents );
-    }
-	
-	/**
-	 * Content with mustache's process
-	 * 
-	 * @param string $label
-	 * @return string
-	 */
-	public function getContentFinal( $label )
-    {
-        return InitUtil::getInstance()->mustache($this->_contents[ $label ], $this);
-    }
-	
-	/**
-	 * Content without mustache's process
-	 * 
-	 * @param type $label
-	 * @return type
-	 */
-	public function getContent( $label )
-    {
-		return $this->_contents[ $label ];
-	}
-	
-	/**
-	 * Contents (in array of string) with mustache's process
-	 * 
-	 * @return string
-	 */
-	public function getContentsFinal()
-    {
-		$contents = array();
-		foreach ($this->_contents as $label => $content)
-		{
-			$contents[$label] = InitUtil::getInstance()->mustache($content, $this) ;
-		}
-        return $contents;
-    }
-	/**
-	 * Contents (in array of string) without mustache's process
-	 * 
-	 * @return array
-	 */
-	public function getContents()
-    {
-		return $this->_contents;
-    }
-	
-	/**
-	 * 
-	 * @param string $file
-	 * @return string
-	 */
-	public function getAbsoluteUrl( $file )
-    {
-        return _ROOT_URL._CONTENT_DIRECTORY.$this->getId().'/'.$file;
-    }
-    
-	
-	/**
+	 * Get a script for create the same object
 	 * 
 	 * @return string
 	 */
 	public function getSave()
 	{
-		$obj = get_object_vars($this);
-		$output = 'Page::update(new Page("'.$this->_id.'"),';
-		$output .= SaveUtil::arrayToStrConstructor($obj);
-		$output .= ')';
-		
-		return $output;
+		return $this->constructSave( get_object_vars($this) );
 	}
-	
+
 	/**
+	 * Update the object with a saved object.
+	 * A saved object can by generate by the method getSave().
 	 * 
-	 * @param Page $page
-	 * @param array $save
-	 * @return Page
+	 * @param array $saveDatas
+	 * @return self
 	 */
-	public static function update( &$page, $save )
+	public function update( $saveDatas )
 	{
-		foreach ($save as $key => $value)
+		if ( count( $saveDatas ) > 0 )
 		{
-			$page->$key = $value;
+			foreach ( $saveDatas as $varLabel => $varValue )
+			{
+				$this->$varLabel = $varValue;
+			}
 		}
-		return $page;
+		return $this;
 	}
-	
-	
-	public function __construct( $id )
-    {
-        $this->_id = $id;
-        $this->_tags = array();
-		$this->_contents = array();
-		$this->_requests = array();
-        $this->_visible = true;
-        
-        // DEFAULT
-        $this->_linkTitle = $id;
-        $this->_htmlTitle = $id;
-		$this->_htmlDescription = $id;
-        //$this->_template = 'default';
-		$this->_file2 = '';
-		$this->_cachable = true;
-		$this->_template = '';
-		$this->_phpHeader = '';
-    }
 }

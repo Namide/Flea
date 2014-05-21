@@ -1,0 +1,54 @@
+# 1and1
+# AddType x-mapp-php6 .php								# 1and1
+# AddHandler x-mapp-php6 .php							# 1and1
+
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ /namide-v3/index.php?_u=$1 [L,QSA]			# local
+# RewriteRule ^(.*)$ /index.php?u=$1 [L,QSA]		# 1and1
+</IfModule>
+
+
+# ErrorDocument 404 /error404.php
+
+# Entity tag
+FileETag Size
+
+
+
+# Expires headers
+<IfModule mod_expires.c>
+ExpiresActive on
+ExpiresByType image/jpg "access plus 24 hours"
+ExpiresByType image/png "access plus 24 hours"
+ExpiresByType image/jpeg "access plus 24 hours"
+ExpiresByType image/gif "access plus 24 hours"
+ExpiresByType image/png "access plus 24 hours"
+ExpiresByType text/ico "access plus 24 hours"
+ExpiresByType image/ico "access plus 24 hours"
+ExpiresByType image/icon "access plus 24 hours"
+ExpiresByType image/x-icon "access plus 24 hours"
+ExpiresByType application/x-shockwave-flash "modification plus 24 hours"
+ExpiresByType text/css "access plus 24 hours"
+ExpiresByType text/javascript "access plus 24 hours"
+ExpiresByType text/xml "modification plus 24 hours"
+ExpiresByType text/html "access plus 0 seconds"
+ExpiresByType application/xhtml+xml "access plus 0 seconds"
+ExpiresByType application/xhtml "access plus 0 seconds"
+ExpiresByType application/xml "access plus 0 seconds"
+ExpiresDefault "access plus 24 hours"
+BrowserMatch ^Mozilla/4 gzip-only-text/html BrowserMatch ^Mozilla/4\.0[678] no-gzip BrowserMatch \bMSIE !no-gzip !gzip-only-text/html BrowserMatch \bMSI[E] !no-gzip !gzip-only-text/htm Header append Vary User-Agent env=!dont-vary AddOutputFilterByType DEFLATE text/css application/x-javascript text/x-component text/html text/richtext image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon
+</IfModule>
+
+
+<IfModule mod_deflate.c>
+AddOutputFilterByType DEFLATE text/html text/xml text/css text/plain
+AddOutputFilterByType DEFLATE image/svg+xml application/xhtml+xml application/xml
+AddOutputFilterByType DEFLATE application/rdf+xml application/rss+xml application/atom+xml
+AddOutputFilterByType DEFLATE text/javascript application/javascript application/x-javascript
+AddOutputFilterByType DEFLATE application/x-font-ttf application/x-font-otf
+AddOutputFilterByType DEFLATE font/truetype font/opentype
+</IfModule>

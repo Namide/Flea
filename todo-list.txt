@@ -6,11 +6,11 @@ system
 			PageList.php
 		Element.php
 		Page.php
-		DynamicPage.php	=> comme une page avec plusieurs URL et plusieurs VO
-		RequestPage.php
+		//DynamicPage.php	=> remplacé par GET dans PAGES
+		//RequestPage.php	=> remplacé par GET dans PAGES
 		Saver.php
 		
-		General.php => currentLang, currentPage, currentUrl
+		General.php => currentLang, currentPage, currentUrl, state
 		
 	helpers
 		
@@ -59,8 +59,8 @@ TO-DO
 	namespace Flea {  }
 
 	DynamicElement (interface)
-	Element => Page => DynamicPage
-					=> RequestPage => DynamicRequestPage
+	Element => Page //=> DynamicPage
+					//=> RequestPage => DynamicRequestPage
 	
 	ElementList => PageList
 	

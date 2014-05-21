@@ -41,7 +41,7 @@ class ElementList extends Saver
 	 * 
 	 * @return array
 	 */
-	public function getElements() { return $this->_elements; }
+	public function getAll() { return $this->_elements; }
 	
 	final private function __construct()
     {
@@ -58,29 +58,68 @@ class ElementList extends Saver
 	 * 
 	 * @param Element $element
 	 */
-    public function addElement( &$element )
+    public function add( Element &$element, $key = null )
     {
         $lang = $element->getLang();
-		if( _DEBUG && $this->hasElement( $element, null ) )
+		if( _DEBUG && $this->has( $element, null ) )
 		{
 			trigger_error( 'The element ['.$element.'] already exist', E_USER_ERROR );
 		}
-		array_push($this->_elements, $element);
+		
+		if ( $key === null )
+		{
+			array_push($this->_elements, $element);
+		}
+		elseif ( _DEBUG && isset($this->_elements[$key]) )
+		{
+			trigger_error( 'The list has the same key ['.$key.'] for the element ['.$element.']', E_USER_ERROR );
+		}
+		else
+		{
+			$this->_elements[$key] = $element;
+		}
     }
+	
+	/**
+	 * Return the elements with this ID (all langues)
+	 * 
+	 * @param string $name
+	 * @param string $lang
+	 * @param array $tags
+	 * @return array
+	 */
+	public function getAllByName( $name )
+	{
+		$elements = array();
+		foreach ( $this->_elements as $element )
+        {
+			if( $element->getName() === $name )
+			{
+				array_push($elements, $element);
+			}
+        }
+		
+		if ( _DEBUG && count( $elements ) < 1 )
+		{
+			trigger_error( 'The Element ['.$name.'] don\'t exist', E_USER_ERROR );
+		}
+		
+		return $elements;
+	}
 	
 	/**
 	 * Return the element with this ID
 	 * 
-	 * @param string $id
+	 * @param string $name
 	 * @param string $lang
 	 * @param array $tags
 	 * @return type
 	 */
-	public function getElementById( $id, $lang )
+	public function getByName( $name, $lang )
 	{
 		foreach ( $this->_elements as $element )
         {
-			if( $element->getId() === $id &&
+			if( $element->getName() === $name &&
 				$element->getLang() === $lang )
 			{
 				return $element;
@@ -89,7 +128,7 @@ class ElementList extends Saver
 		
 		if ( _DEBUG )
 		{
-			trigger_error( 'The Element ['.$id.'] don\'t exist in the language '.$lang, E_USER_ERROR );
+			trigger_error( 'The Element ['.$name.'] don\'t exist in the language '.$lang, E_USER_ERROR );
 		}
 	}
 	
@@ -100,7 +139,7 @@ class ElementList extends Saver
 	 * @param string $lang
 	 * @return array
 	 */
-	public function getElementsByTag( $tag, $lang )
+	public function getByTag( $tag, $lang )
     {
 		$elements = array();
 		foreach ( $this->_elements as $element )
@@ -121,7 +160,7 @@ class ElementList extends Saver
 	 * @param string $lang
 	 * @return array
 	 */
-	public function getElementsWithOneOfTags( $tags, $lang )
+	public function getWithOneOfTags( array $tags, $lang )
     {
 		$elements = array();
         foreach ( $this->_elements as $element )
@@ -146,7 +185,7 @@ class ElementList extends Saver
 	 * @param string $lang
 	 * @return array
 	 */
-	public function getElementsWithAllTags( $tags, $lang )
+	public function getWithAllTags( array $tags, $lang )
     {
 		$elements = array();
         foreach ( $this->_elements as $element )
@@ -167,7 +206,7 @@ class ElementList extends Saver
 	 * @param string $lang
 	 * @return array
 	 */
-    public function getElementsByLang( $lang )
+    public function getByLang( $lang )
     {
         $elements = array();
         foreach ( $this->_elements as $element )
@@ -184,24 +223,53 @@ class ElementList extends Saver
 	/**
 	 * Test if the element with this ID and this language exist
 	 * 
-	 * @param string $id
+	 * @param string $name
 	 * @param string $lang
 	 * @return boolean
 	 */
-	public function hasElement( $id, $lang = null )
+	public function has( $name, $lang = null )
     {
 		foreach ( $this->_elements as $element )
         {
-            $idTemp = $element->getId();
+            $nameTemp = $element->getName();
             $langTemp = $element->getLang();
 			
-            if (	$idTemp === $id && ($langTemp === $lang || $lang === null ) )
+            if (	$nameTemp === $name && ($langTemp === $lang || $lang === null ) )
             {
                 return true;
             }
         }
         return false;
     }
+	
+	/**
+	 * Test if the element at this key exist
+	 * 
+	 * @param type $key
+	 * @return type
+	 */
+	public function hasKey($key)
+	{
+		return array_key_exists($key, $this->_elements);
+	}
+	
+	/**
+	 * Return the element for this key
+	 * 
+	 * @param string $url
+	 * @return Page
+	 */
+    public function getByKey( $key )
+    {
+		if ( _DEBUG && !$this->hasKey($key) )
+		{
+			trigger_error( 'The key ['.$key.'] don\'t exist in this list', E_USER_ERROR );
+		}
+		
+		return $this->_elements[$key];
+    }
+	
+	
 	
     final public function __clone()
     {
@@ -239,7 +307,7 @@ class ElementList extends Saver
 	 * @param array $saveDatas
 	 * @return self
 	 */
-	public function update( $saveDatas )
+	public function update( array $saveDatas )
 	{
 		if ( count( $saveDatas ) > 0 )
 		{

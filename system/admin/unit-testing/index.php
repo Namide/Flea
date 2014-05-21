@@ -87,7 +87,6 @@ function writeClass()
 				include_once 'config.php';
 				include_once _SYSTEM_DIRECTORY.'init/import.php';
 				
-				
 				$class = 'LangList';
 				writeClass();
 				$lang = \Flea\LangList::getInstance();
@@ -113,8 +112,8 @@ function writeClass()
 				writeTest( 'hasTag', testString( $element->hasTag('hum'), true ) );
 				writeTest( 'hasTags', testString( $element->hasTags(array('hum', 'yohé\glitch', 2)), true ) );
 				writeTest( 'hasTags', testString( $element->hasTags(array('no')), false ) );
-				$element->setId('the id!');
-				writeTest( 'setId', testString( $element->getId(), 'the id!' ) );
+				$element->setName('the id!');
+				writeTest( 'setId', testString( $element->getName(), 'the id!' ) );
 				$element->setLang('uk');
 				writeTest( 'setLang', testString( $element->getLang(), 'uk' ) );
 				$element->setType('wall');
@@ -131,11 +130,14 @@ function writeClass()
 				$class = 'ElementList';
 				writeClass();
 				$elementList = Flea\ElementList::getInstance();
-				$elementList->addElement($element);
-				writeTest( 'addElement', testObject( $elementList->getElements()[0], $element ) );
+				$elementList->add($element);
+				writeTest( 'add', testObject( $elementList->getAll()[0], $element ) );
 				$element2->setLang('fr');
-				$elementList->addElement($element2);
-				writeTest( 'getElementsByLang', testObject( $elementList->getElementsByLang('fr')[0], $element2 ) );
+				$element2->setName('whohoo-as\' /');
+				$elementList->add($element2);
+				writeTest( 'getElementsByLang', testObject( $elementList->getByLang('fr')[0], $element2 ) );
+				writeTest( 'getById', testObject( $elementList->getByName('whohoo-as\' /', 'fr'), $element2 ) );
+				
 				
 			?>
 			
