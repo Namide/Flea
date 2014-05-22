@@ -62,7 +62,7 @@ class Page extends Element
 	 */
     public function getVisible() { return $this->_visible; }
 
-     protected $_getEnabled;
+    protected $_getEnabled;
 	/**
 	 * Active or unactive the GET method
 	 * 
@@ -76,6 +76,25 @@ class Page extends Element
 	 */
     public function getGetEnabled() { return $this->_getEnabled; }
 
+	protected $_getExplicit;
+	/**
+	 * Active or unactive the explicit GET
+	 * 
+	 * @param boolean $visible
+	 */
+    public function setGetExplicit( $explicit ) { $this->_getExplicit = $explicit; }
+	/**
+	 * If the GET is explicit the URL contains the labels of values.
+	 * URL: www.flea.namide.com/games
+	 * GET: array( 'page'=>2, 'tag'=>'RTS' );
+	 * ( explicit ) www.flea.namide.com/games/page/2/tag/RTS
+	 * ( !explicit ) www.flea.namide.com/games/2/RTS
+	 * 
+	 * @return boolean
+	 */
+    public function getGetExplicit() { return $this->_getExplicit; }
+
+	
     protected $_cachable;
 	/**
 	 * set the chability of the page
@@ -105,6 +124,41 @@ class Page extends Element
 	 */
     public function getPageUrl() { return $this->_url; }
 
+	/**
+	 * Compare the URL, if this page accept GET it can accept others URL.
+	 * = -1 if the URL is different
+	 * = +x to x = the sames caracters
+	 * 
+	 * @param string $pageUrl
+	 * @return int
+	 */
+	public function comparePageUrl( $pageUrl )
+	{
+		$thisLength = strlen($this->_url);
+		if ( $this->_url == $pageUrl )
+		{
+			return $thisLength+1;
+		}
+		
+		if ( !$this->_getEnabled )
+		{
+			return -1;
+		}
+		
+		$otherLength = strlen($pageUrl);
+		if ( $thisLength > $otherLength )
+		{
+			return -1;
+		}
+		
+		if ( $this->_url == substr($pageUrl, 0, $thisLength) )
+		{
+			return $thisLength;
+		}
+		
+		return 0;
+	}
+	
     protected $_HtmlHeader;
 	/**
 	 * Set the header php
@@ -197,6 +251,7 @@ class Page extends Element
 		
         $this->_visible = true;
         $this->_getEnabled = false;
+		$this->_getExplicit = true;
 		$this->_cachable = true;
 		
 		$this->_url = '';

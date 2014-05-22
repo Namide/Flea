@@ -57,7 +57,14 @@ class General
 	 * 
 	 * @return string
 	 */
-	public function getCurrentPageName() { return $this->_currentPageName; }
+	public function getCurrentPageName()
+	{
+		if ( _DEBUG && !General::getInstance()->getPagesInitialised() )
+		{
+			trigger_error( 'You can\'t access to the current page name if the pages isn\'tinitialised', E_USER_ERROR );
+		}
+		return $this->_currentPageName;
+	}
 	
 	protected $_currentPage;
 	/**
@@ -65,7 +72,14 @@ class General
 	 * 
 	 * @return Page
 	 */
-	public function getCurrentPage() { return $this->_currentPage; }
+	public function getCurrentPage()
+	{
+		if ( _DEBUG && !General::getInstance()->getPagesInitialised() )
+		{
+			trigger_error( 'You can\'t access to the current page if the pages isn\'tinitialised', E_USER_ERROR );
+		}
+		return $this->_currentPage;
+	}
 	
 	protected $_currentLang;
 	/**
@@ -73,15 +87,14 @@ class General
 	 * 
 	 * @return string
 	 */
-	public function getCurrentLang() { return $this->_currentLang; }
-	
-	protected $_currentPageUrl;
-	/**
-	 * Current URL
-	 * 
-	 * @return string
-	 */
-	public function getCurrentPageUrl() { return $this->_currentPageUrl; }
+	public function getCurrentLang()
+	{
+		if ( _DEBUG && !General::getInstance()->getPagesInitialised() )
+		{
+			trigger_error( 'You can\'t access to the current language if the pages isn\'tinitialised', E_USER_ERROR );
+		}
+		return $this->_currentLang;
+	}
 	
 	protected $_currentGetUrl;
 	/**
@@ -89,15 +102,29 @@ class General
 	 * 
 	 * @return array
 	 */
-	public function getCurrentGetUrl() { return $this->_currentGetUrl; }
+	public function getCurrentGetUrl()
+	{
+		if ( _DEBUG && !General::getInstance()->getPagesInitialised() )
+		{
+			trigger_error( 'You can\'t access to the current language if the pages isn\'tinitialised', E_USER_ERROR );
+		}
+		return $this->_currentGetUrl;
+	}
 	
-	protected $_currentBaseUrl;
+	protected $_currentPageUrl;
 	/**
-	 * Current URL
+	 * Current page URL
 	 * 
 	 * @return string
 	 */
-	public function getCurrentBaseUrl() { return $this->_currentBaseUrl; }
+	public function getCurrentPageUrl()
+	{
+		if ( _DEBUG && !General::getInstance()->getPagesInitialised() )
+		{
+			trigger_error( 'You can\'t access to the current language if the pages isn\'tinitialised', E_USER_ERROR );
+		}
+		return $this->_currentPageUrl;
+	}
 	
 	/**
 	 * Change the current page
@@ -109,6 +136,7 @@ class General
 		$this->_currentPage = $page;
 		$this->_currentLang = $page->getLang();
 		$this->_currentPageName = $page->getName();
+		$this->_pagesInitialised = true;
 	}
 	
 	/**
@@ -123,7 +151,7 @@ class General
 			$getUrl = array();
 		}
 		
-		$this->_currentBaseUrl = $pageUrl;
+		$this->_currentPageUrl = $pageUrl;
 		$this->_currentGetUrl = $getUrl;
 	}
 	
@@ -131,11 +159,16 @@ class General
 	protected function __construct() { }
 	protected function __clone() { }
 
+	/**
+	 * Get the instance of General
+	 * 
+	 * @return General
+	 */
 	public static function getInstance()
 	{
 		if ( !isset(self::$_INSTANCE) )
 		{
-			self::$_INSTANCE = new self;
+			self::$_INSTANCE = new self();
 		}
 
 		return self::$_INSTANCE;

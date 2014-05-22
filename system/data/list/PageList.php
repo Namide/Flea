@@ -215,7 +215,7 @@ class PageList extends ElementList
 	 * Default page for the lang
 	 * 
 	 * @param string $lang
-	 * @return Page
+	 * @return /Flea/Page
 	 */
     public function getDefaultPage( $lang )
     {
@@ -280,7 +280,7 @@ class PageList extends ElementList
 	 * 
 	 * @param string $name
 	 * @param string $lang
-	 * @return Page
+	 * @return /Flea/Page
 	 */
     public function getByName( $name, $lang )
     {
@@ -335,9 +335,9 @@ class PageList extends ElementList
 	 * A saved object can by generate by the method getSave().
 	 * 
 	 * @param array $saveDatas
-	 * @return self
+	 * @return /Flea/Page
 	 */
-	public function update( $saveDatas )
+	public function update( array $saveDatas )
 	{
 		if ( count( $saveDatas ) > 0 )
 		{

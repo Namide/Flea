@@ -33,14 +33,62 @@ namespace Flea;
  */
 class Debug
 {
+	private static $_INSTANCE;
+	
+	private $_errorList;
 	
 	/**
-	 * Trigger an error message if debug mode activated
+	 * Save an error message
 	 * 
 	 * @param string $msg
 	 */
-	static public function error( $msg )
+	public function addError( $msg )
 	{
-		trigger_error( $msg, E_USER_ERROR );
+		array_push( $this->_errorList, $msg );
 	}
+	
+	/**
+	 * Dispatch all errors messages
+	 * 
+	 * @param string $msg
+	 */
+	public function dispatchErrors()
+	{
+		if ( count($this->_errorList) > 0 )
+		{
+			echo '<script>alert('.implode('\n', $this->_errorList).')</script>';
+		}
+	}
+	
+	final private function __construct()
+    {
+		$this->_errorList = array();
+    }
+	
+	/**
+	 * Unclonable
+	 */
+    final public function __clone()
+    {
+		if ( _DEBUG )
+		{
+			trigger_error( 'You can\'t clone.', E_USER_ERROR);
+		}
+    }
+	
+	/**
+	 * Instance of the langListObject
+	 * 
+	 * @return LangList
+	 */
+    final public static function getInstance()
+    {
+        if( !isset( self::$_INSTANCE ) )
+        {
+            self::$_INSTANCE = new self();
+        }
+ 
+        return self::$_INSTANCE;
+    }
+	
 }

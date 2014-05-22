@@ -24,6 +24,8 @@
  * THE SOFTWARE.
  */
 
+namespace Flea\admin;
+
 function resultTest( $valid )
 {
 	if ( $valid ) return '<span class="passed">true</span>';
@@ -50,12 +52,23 @@ function writeTest( $method, $resul )
 				<td>'.$class.'</td><td>'.$method.'()</td><td>'.$resul.'</td>
 			</tr>';
 }
-function writeClass()
+
+function writeClass( $className, $t = true )
 {
 	global $class;
-	echo '
-			<tr>
-				<th colspan="3" align="center">'.$class.'</th>
+	$class = $className;
+	global $time;
+	$totalTime = number_format( (microtime(true) - $time), 3);
+	$time = microtime(true);
+	//define('ADMIN_CLASS', $className);
+	if( $t )
+	{
+		echo '	<tr>
+				<td colspan="3" align="center">time:'.$totalTime.'ms</td>
+			</tr>';
+	}
+	echo '	<tr>
+				<th colspan="3" align="center">'.$className.'</th>
 			</tr>';
 }
 
@@ -84,11 +97,13 @@ function writeClass()
 			</tr>
 			<?php
 	
+				writeClass('include', false);
+				
+			
 				include_once 'config.php';
 				include_once _SYSTEM_DIRECTORY.'init/import.php';
 				
-				$class = 'LangList';
-				writeClass();
+				writeClass('LangList');
 				$lang = \Flea\LangList::getInstance();
 				$lang->addDefaultLang('uk');
 				writeTest( 'addDefaultLang', testString( $lang->hasLang('uk'), true ) );
@@ -98,8 +113,7 @@ function writeClass()
 				writeTest( 'getList', testArray($lang->getList(), array('all', 'uk', 'fr')) );
 				
 				
-				$class = 'Element';
-				writeClass();
+				writeClass('Element');
 				$element = new \Flea\Element();
 				$element->addTags( array('a:b','bb','yohé\glitch', 2) );
 				writeTest( 'addTags', testString( $element->hasTag('yohé\glitch'), true ) );
@@ -127,9 +141,8 @@ function writeClass()
 				writeTest( 'removeTags', testArray( $element->getTags(), array() ) );
 				
 				
-				$class = 'ElementList';
-				writeClass();
-				$elementList = Flea\ElementList::getInstance();
+				writeClass('ElementList');
+				$elementList = \Flea\ElementList::getInstance();
 				$elementList->add($element);
 				writeTest( 'add', testObject( $elementList->getAll()[0], $element ) );
 				$element2->setLang('fr');

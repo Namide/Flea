@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+if ( _DEBUG ) include _SYSTEM_DIRECTORY.'helpers/system/Debug.php';
 include _SYSTEM_DIRECTORY.'data/Saver.php';
 include _SYSTEM_DIRECTORY.'data/list/LangList.php';
 include _SYSTEM_DIRECTORY.'data/Element.php';

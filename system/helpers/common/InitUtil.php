@@ -41,7 +41,20 @@ class InitUtil
         $this->reset();
     }
 	
-    protected function reset() { }
+    protected function reset()
+	{
+		/*$general = General::getInstance();
+        $urlUtil = UrlUtil::getInstance();
+		
+		$urlUtil->
+        $general->setCurrentUrl(  , $getUrl)
+        
+        $page = $pageList->getPageByUrl( $pageUrl );
+        //$this->_page = $page;
+        //$this->_language = $page->getLanguage();
+		$general->setCurrentPage($page);*/
+		
+	}
 	
 	/**
 	 * Get an absolute URL for a file at the root of the website
@@ -75,69 +88,18 @@ class InitUtil
     {
        return _ROOT_URL._CONTENT_DIRECTORY.$file;
     }
-!!!!!!!!!!!!	
-	/**
-	 * Get the absoulte URL of a page by his page URL
-	 * 
-	 * @param string $url
-	 * @return string
-	 */
-    public function getAbsUrlByPageUrl( $url, array $gets = null )
-    {
-	    return _ROOT_URL.( (!_URL_REWRITING) ? (UrlUtil::$BASE_PAGE_URL) : '' ).$url;
-    }
-    
-	/**
-	 * 
-	 * @param string $idPage
-	 * @param string $lang
-	 * @return string
-	 */
-    public function getAbsUrlByIdLang( $idPage, $lang )
-    {
-		$pagesClass = PageList::getInstance();
-		$page = $pagesClass->getPage( $idPage, $lang );
-		
-         return _ROOT_URL.( (!_URL_REWRITING) ? (UrlUtil::$BASE_PAGE_URL) : '' ).$page->getPageUrl();
-    }
-    
-	/**
-	 * 
-	 * @param string $url
-	 * @return string
-	 */
-    public function urlToLang( $url )
-    {
-        $pagesClass = PageList::getInstance();
-        $pageClass = $pagesClass->getPageByUrl( $url );
-        return $pageClass->getLanguage();
-    }
 	
 	/**
 	 * 
-	 * @param string $text
-	 * @param Page $page
-	 * @return Page
+	 * @param string $url
+	 * @return string
 	 */
-	public function mustache( $text, &$page )
+    /*public function urlToLang( $url )
     {
-		$replacePage = preg_replace('/\{\{pathCurrentPage:(.*?)\}\}/', $page->getAbsoluteUrl('$1'), $text);
-		$replacePage = preg_replace('/\{\{urlPageToAbsoluteUrl:(.*?)\}\}/', $this->urlPageToAbsUrl('$1'), $replacePage);
-        $replacePage = preg_replace('/\{\{pathTemplate:(.*?)\}\}/', $this->getTemplateAbsUrl('$1'), $replacePage);
-		$replacePage = preg_replace('/\{\{pathContent:(.*?)\}\}/', $this->getContentAbsUrl('$1'), $replacePage);
-
-		$pageList = PageList::getInstance();
-		if ( $pageList->getInitialised() )
-		{
-			$replacePage = preg_replace_callback( '/\{\{idPageToAbsoluteUrl:(.*?)\}\}/', function ($matches) use($page)
-			{
-				$lang = $page->getLanguage();//$this->_language;//BuildUtil::getInstance()->getLang();
-				return InitUtil::getInstance()->getAbsUrlByIdLang( $matches[1], $lang );
-			}, $replacePage );
-		}
-
-        return $replacePage;
-    }
+        $pageList = PageList::getInstance();
+        $pageClass = $pageList->getPageByUrl( $url );
+        return $pageClass->getLanguage();
+    }*/
 	
 	final public function __clone()
     {

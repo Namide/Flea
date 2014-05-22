@@ -34,6 +34,23 @@ namespace Flea;
 class Element extends Saver
 {
 	
+	private $_date;
+	/**
+	 * Date of the Element
+	 * 
+	 * @param string $date
+	 */
+    public function setDate( $date )
+	{
+		$this->_date = $date;
+	}
+	/**
+	 * Date of the Element
+	 * 
+	 * @return string
+	 */
+    public function getDate() { return $this->$date; }
+	
 	private $_lang;
 	/**
 	 * Language of the Element.

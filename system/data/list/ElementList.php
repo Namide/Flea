@@ -56,9 +56,10 @@ class ElementList extends Saver
 	/**
 	 * Add an element in the list
 	 * 
-	 * @param Element $element
+	 * @param \Flea\Element $element
+	 * @param string $key
 	 */
-    public function add( Element &$element, $key = null )
+	public function add( Element &$element, $key = null )
     {
         $lang = $element->getLang();
 		if( _DEBUG && $this->has( $element, null ) )
@@ -113,7 +114,7 @@ class ElementList extends Saver
 	 * @param string $name
 	 * @param string $lang
 	 * @param array $tags
-	 * @return type
+	 * @return self
 	 */
 	public function getByName( $name, $lang )
 	{
@@ -277,8 +278,9 @@ class ElementList extends Saver
     }
  
 	/**
+	 * Instance of the list
 	 * 
-	 * @return ElementList
+	 * @return self
 	 */
     final public static function getInstance()
     {

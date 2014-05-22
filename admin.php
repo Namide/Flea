@@ -25,4 +25,5 @@
  */
 
 include 'config.php';
-include _SYSTEM_DIRECTORY.'admin/unit-testing/index.php';
+include _SYSTEM_DIRECTORY.'admin/core/index.php';
+if ( _DEBUG ) Flea\Debug::getInstance()->dispatchErrors();
