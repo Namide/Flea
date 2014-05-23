@@ -135,26 +135,12 @@ class Page extends Element
 	public function comparePageUrl( $pageUrl )
 	{
 		$thisLength = strlen($this->_url);
-		if ( $this->_url == $pageUrl )
-		{
-			return $thisLength+1;
-		}
-		
-		if ( !$this->_getEnabled )
-		{
-			return -1;
-		}
+		if ( $this->_url == $pageUrl )	{ return $thisLength+1; }
+		if ( !$this->_getEnabled )		{ return -1; }
 		
 		$otherLength = strlen($pageUrl);
-		if ( $thisLength > $otherLength )
-		{
-			return -1;
-		}
-		
-		if ( $this->_url == substr($pageUrl, 0, $thisLength) )
-		{
-			return $thisLength;
-		}
+		if ( $thisLength > $otherLength ) { return -1; }
+		if ( $this->_url == substr($pageUrl, 0, $thisLength) ) { return $thisLength; }
 		
 		return 0;
 	}
@@ -285,7 +271,7 @@ class Page extends Element
 	 * @param array $saveDatas
 	 * @return self
 	 */
-	public function update( $saveDatas )
+	public function update( array $saveDatas )
 	{
 		if ( count( $saveDatas ) > 0 )
 		{

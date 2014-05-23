@@ -60,9 +60,9 @@ class Element extends Saver
 	 */
     public function setLang( $lang )
 	{
-		if ( _DEBUG && !LangList::getInstance()->hasLang($lang) )
+		if ( _DEBUG && !LangList::getInstance()->has($lang) )
 		{
-			trigger_error( 'The Language '.$lang.' don\'t exist' , E_USER_ERROR);
+			Debug::getInstance()->addError( 'The Language '.$lang.' don\'t exist');
 		}
 		$this->_lang = $lang;
 	}
@@ -205,7 +205,7 @@ class Element extends Saver
 	{
 		if ( _DEBUG && $this->hasContent($label) )
 		{
-			trigger_error( 'This content already exist: '.$label.' ('.$this->_name.', '.$this->_lang.')' , E_USER_ERROR);
+			Debug::getInstance()->addError( 'This content already exist: '.$label.' ('.$this->_name.', '.$this->_lang.')' );
 		}
 		$this->_contents[$label] = $value;
 	}
@@ -264,7 +264,7 @@ class Element extends Saver
     {
         if ( $lang === null )
 		{
-			$lang = LangList::getInstance()->getDefaultLang();
+			$lang = LangList::getInstance()->getDefault();
 		}
 		$this->setLang( $lang );
 		$this->_contents = array();
@@ -290,7 +290,7 @@ class Element extends Saver
 	 * A saved object can by generate by the method getSave().
 	 * 
 	 * @param array $saveDatas
-	 * @return self
+	 * @return static
 	 */
 	public function update( array $saveDatas )
 	{

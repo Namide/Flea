@@ -24,15 +24,6 @@
  * THE SOFTWARE.
  */
 
-if ( _DEBUG ) include _SYSTEM_DIRECTORY.'helpers/system/Debug.php';
-include _SYSTEM_DIRECTORY.'data/Saver.php';
-include _SYSTEM_DIRECTORY.'data/list/LangList.php';
-include _SYSTEM_DIRECTORY.'data/Element.php';
-include _SYSTEM_DIRECTORY.'data/list/ElementList.php';
-include _SYSTEM_DIRECTORY.'data/Page.php';
-include _SYSTEM_DIRECTORY.'data/list/PageList.php';
-
-include _SYSTEM_DIRECTORY.'data/General.php';
-include _SYSTEM_DIRECTORY.'helpers/system/UrlUtil.php';
-include _SYSTEM_DIRECTORY.'helpers/common/InitUtil.php';
-include _SYSTEM_DIRECTORY.'helpers/common/BuildUtil.php';
+// Initialize the languages
+$lang->addDefault('en');
+$lang->add('fr');

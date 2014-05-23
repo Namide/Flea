@@ -103,11 +103,14 @@ class InitUtil
 	
 	final public function __clone()
     {
-        trigger_error( 'You can\'t clone.', E_USER_ERROR );
+        if ( _DEBUG )
+		{
+			Debug::getInstance()->addError( 'You can\'t clone a singleton' );
+		}
     }
 	
 	/**
-	 * @return InitUtil
+	 * @return static
 	 */
     public static function getInstance()
     {

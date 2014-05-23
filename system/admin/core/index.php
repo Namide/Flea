@@ -121,5 +121,8 @@ function adminBody()
 		<?=\flea\admin\adminBody()?>
 	</section>
 	
+	<?php include_once _SYSTEM_DIRECTORY.'init/import.php'; ?>
+	<?= \Flea\Debug::getInstance()->dispatchErrors(); ?>
+	
 </body>
 </html>

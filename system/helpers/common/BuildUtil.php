@@ -85,12 +85,12 @@ class BuildUtil extends InitUtil
 		$general = General::getInstance();
         if ( _DEBUG && !$general->getPagesInitialised() )
 		{
-			trigger_error( 'All pages must be initialised after use BuildUtil class', E_USER_ERROR );
+			Debug::getInstance()->addError( 'All pages must be initialised after use BuildUtil class' );
 		}
 		
         $pageUrl = $general->getCurrentPageUrl();
         
-        $page = $pageList->getPageByUrl( $pageUrl );
+        $page = $pageList->getByUrl( $pageUrl );
         //$this->_page = $page;
         //$this->_language = $page->getLanguage();
 		$general->setCurrentPage($page);
@@ -126,6 +126,7 @@ class BuildUtil extends InitUtil
 	
 	
 	/**
+	 * Converts the Flea.variables to real datas
 	 * 
 	 * @param string $text
 	 * @param Page $page
@@ -133,21 +134,31 @@ class BuildUtil extends InitUtil
 	 */
 	public function render( $text, Page &$page = null )
     {
-		if ( $page !== null )
+		/*if ( $page !== null )
 		{
-			$replacePage = preg_replace('/\{\{pathCurrentPage:(.*?)\}\}/', $page->getAbsoluteUrl('$1'), $text);
-		}
-		$replacePage = preg_replace('/\{\{urlPageToAbsoluteUrl:(.*?)\}\}/', $this->urlPageToAbsUrl('$1'), $replacePage);
+			$replacePage = preg_replace('/\{\{pathCurrentPage:(.*?)\}\}/', $buildUtil-> $page->getPageUrl('$1'), $text);
+		}*/
+		/*$replacePage = preg_replace('/\{\{urlPageToAbsoluteUrl:(.*?)\}\}/', $urlUtil('$1'), $replacePage);
         $replacePage = preg_replace('/\{\{pathTemplate:(.*?)\}\}/', $this->getTemplateAbsUrl('$1'), $replacePage);
-		$replacePage = preg_replace('/\{\{pathContent:(.*?)\}\}/', $this->getContentAbsUrl('$1'), $replacePage);
+		$replacePage = preg_replace('/\{\{pathContent:(.*?)\}\}/', $this->getContentAbsUrl('$1'), $replacePage);*/
+		
+		$replacePage = str_replace('{{rootPath}}', _ROOT_URL, $text);
+		$replacePage = str_replace('{{templatePath}}', _ROOT_URL._TEMPLATE_DIRECTORY, $replacePage);
+		$replacePage = str_replace('{{contentPath}}', _ROOT_URL._CONTENT_DIRECTORY, $replacePage);
+		
+		$general = General::getInstance();
+		$currentPage = $general->getCurrentPage();
+		
+		$replacePage = str_replace('{{currentLang}}', $general->getCurrentLang(), $replacePage);
+		$replacePage = str_replace('{{currentPageContentPath}}', _ROOT_URL._CONTENT_DIRECTORY.$currentPage->getName(), $replacePage);
 
-		$pageList = PageList::getInstance();
+		//$pageList = PageList::getInstance();
 		if ( General::getInstance()->getPagesInitialised() && $page !== null )
 		{
-			$replacePage = preg_replace_callback( '/\{\{idPageToAbsoluteUrl:(.*?)\}\}/', function ($matches) use($page)
+			$replacePage = preg_replace_callback( '/\{\{idPageToAbsUrl:(.*?)\}\}/', function ($matches) use($page)
 			{
 				$lang = $page->getLang();
-				return InitUtil::getInstance()->getAbsUrlByIdLang( $matches[1], $lang );
+				return BuildUtil::getInstance()->getAbsUrlByIdLang( $matches[1], $lang );
 			}, $replacePage );
 		}
 

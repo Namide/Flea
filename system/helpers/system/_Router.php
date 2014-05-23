@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * The MIT License
  *
  * Copyright 2014 Damien Doussaud (namide.com).
@@ -24,15 +24,14 @@
  * THE SOFTWARE.
  */
 
-if ( _DEBUG ) include _SYSTEM_DIRECTORY.'helpers/system/Debug.php';
-include _SYSTEM_DIRECTORY.'data/Saver.php';
-include _SYSTEM_DIRECTORY.'data/list/LangList.php';
-include _SYSTEM_DIRECTORY.'data/Element.php';
-include _SYSTEM_DIRECTORY.'data/list/ElementList.php';
-include _SYSTEM_DIRECTORY.'data/Page.php';
-include _SYSTEM_DIRECTORY.'data/list/PageList.php';
+namespace Flea;
 
-include _SYSTEM_DIRECTORY.'data/General.php';
-include _SYSTEM_DIRECTORY.'helpers/system/UrlUtil.php';
-include _SYSTEM_DIRECTORY.'helpers/common/InitUtil.php';
-include _SYSTEM_DIRECTORY.'helpers/common/BuildUtil.php';
+/**
+ * Description of Router
+ *
+ * @author Namide
+ */
+class Router
+{
+	
+}

@@ -44,7 +44,8 @@ class Debug
 	 */
 	public function addError( $msg )
 	{
-		array_push( $this->_errorList, $msg );
+		$error = $msg.'\n'.$this->getDebugBacktrace(1);
+		array_push( $this->_errorList, $error );
 	}
 	
 	/**
@@ -56,8 +57,23 @@ class Debug
 	{
 		if ( count($this->_errorList) > 0 )
 		{
-			echo '<script>alert('.implode('\n', $this->_errorList).')</script>';
+			echo '<script>'
+					. 'console.log("'.$this->delDoubleQuotes(implode('\n', $this->_errorList)).'");'
+					. 'alert("'.$this->delDoubleQuotes(implode('\n', $this->_errorList)).'");'
+					. '</script>';
+			echo $this->addHtmlReturns(implode( '<br>', $this->_errorList ));
+			
+			
 		}
+	}
+	
+	private function addHtmlReturns($str)
+	{
+		return str_replace('\n', '<br>', $str);
+	}
+	private function delDoubleQuotes($str)
+	{
+		return str_replace('"', '\"', $str);
 	}
 	
 	final private function __construct()
@@ -72,14 +88,14 @@ class Debug
     {
 		if ( _DEBUG )
 		{
-			trigger_error( 'You can\'t clone.', E_USER_ERROR);
+			Debug::getInstance()->addError( 'You can\'t clone a singleton' );
 		}
     }
 	
 	/**
-	 * Instance of the langListObject
+	 * Instance of the Debug object
 	 * 
-	 * @return LangList
+	 * @return self
 	 */
     final public static function getInstance()
     {
@@ -90,5 +106,41 @@ class Debug
  
         return self::$_INSTANCE;
     }
+	
+	protected function getDebugBacktrace( $traces_to_ignore = 1, $max_trace = 1 )
+	{
+		$traces = debug_backtrace();
+		$ret = array();
+		foreach($traces as $i => $call)
+		{
+			if ($i < $traces_to_ignore || $i > $traces_to_ignore + $max_trace - 1 )
+			{
+				continue;
+			}
+			/*$object = '';
+			if (isset($call['class']))
+			{
+				$object = $call['class'].$call['type'];
+				if (is_array($call['args']))
+				{
+					foreach ($call['args'] as &$arg)
+					{
+						//get_arg
+						func_get_arg($arg);
+					}
+				}
+			}    */   
+
+			$str = '';
+			if( $max_trace > 1 )
+			{
+				$str .= '#'.str_pad($i - $traces_to_ignore, 3, ' ');
+			}
+			//$str .= $object.$call['function'].'('.implode(', ', $call['args']).') ';
+			$str .= ' '.$call['file'].':'.$call['line'];
+			$ret[] = $str;
+		}
+		return implode("\n",$ret);
+	}
 	
 }

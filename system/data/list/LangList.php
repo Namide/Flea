@@ -35,7 +35,7 @@ class LangList
 {
 	private static $_INSTANCE;
 	
-	private $_defaultLang;
+	private $_default;
     
     private $_langs;
 	/**
@@ -48,7 +48,7 @@ class LangList
     final private function __construct()
     {
 		$this->_langs = array();
-        $this->addDefaultLang('all');
+        $this->addDefault('all');
     }
     
 	/**
@@ -56,10 +56,10 @@ class LangList
 	 * 
 	 * @param string $lang
 	 */
-    public function addDefaultLang( $lang )
+    public function addDefault( $lang )
     {
-		$this->_defaultLang = $lang;
-        $this->addLang( $lang );
+		$this->_default = $lang;
+        $this->add( $lang );
     }
     
 	/**
@@ -67,9 +67,9 @@ class LangList
 	 * 
 	 * @return string
 	 */
-	public function getDefaultLang()
+	public function getDefault()
     {
-        return $this->_defaultLang;
+        return $this->_default;
     }
 	
 	/**
@@ -77,11 +77,11 @@ class LangList
 	 * 
 	 * @param string $lang
 	 */
-    public function addLang( $lang )
+    public function add( $lang )
     {
-		if ( _DEBUG && $this->hasLang($lang) )
+		if ( _DEBUG && $this->has($lang) )
 		{
-			trigger_error( 'LangList->addLang() '.$lang.' already exist' , E_USER_ERROR);
+			Debug::getInstance()->addError( 'LangList->addLang() '.$lang.' already exist' );
 		}
         array_push( $this->_langs, $lang );
     }
@@ -92,7 +92,7 @@ class LangList
 	 * @param string $lang
 	 * @return boolean
 	 */
-	public function hasLang( $lang )
+	public function has( $lang )
 	{
 		return in_array($lang, $this->_langs);
 	}
@@ -109,12 +109,12 @@ class LangList
         $langList = explode( ',', $acceptedLanguages );
         $langLower = strtolower( substr( chop( $langList[0] ), 0, 2 ) );
 
-		if ( $this->hasLang($langLower) )
+		if ( $this->has($langLower) )
 		{
 			return $langLower;
 		}
 		
-        return $this->_defaultLang;
+        return $this->_default;
     }
     
 	/**
@@ -124,14 +124,14 @@ class LangList
     {
 		if ( _DEBUG )
 		{
-			trigger_error( 'You can\'t clone.', E_USER_ERROR);
+			Debug::getInstance()->addError( 'You can\'t clone a singleton' );
 		}
     }
 	
 	/**
 	 * Instance of the langListObject
 	 * 
-	 * @return LangList
+	 * @return self
 	 */
     final public static function getInstance()
     {

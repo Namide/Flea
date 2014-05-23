@@ -52,98 +52,91 @@ class UrlUtil
     }
 
 	/**
-	 * Reload the URL
+	 * Reload the URL.
+	 * This state compose the global GET and computes the currentPage
+	 * 
 	 */
 	public function reset()
 	{
 		if( _DEBUG && !General::getInstance()->getPagesInitialised() )
 		{
-			trigger_error( 'All pages must be initialised after use UrlUtil class', E_USER_ERROR );
+			Debug::getInstance()->addError( 'All pages must be initialised after use UrlUtil class' );
 		}
 		$this->_basePageUrl = 'index.php?'.$this->_arg.'=';
 		
-		$gets = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
-		$gets = $this->getCleanGets( $gets );
-		
-		$pageURL = '';
-		$pageGET = array();
-		
-		$general = General::getInstance();
-		
-		foreach ($array as $key => $value)
+		$navigatorGets = self::getNavigatorGets();
+		$relURL = '';
+		$pageGet = array();
+		foreach ($navigatorGets as $key => $value)
 		{
-			if ( $key === self::$_arg )
-			{
-				$pageURL = $value;
-			}
-			else
-			{
-				$pageGET[$key] = $general;
-			}
+			if ( $key === self::$_arg ) { $relURL = $value; }
+			else { $pageGet[$key] = $value; }
 		}
 		
-		$this->fixCurrentUrl($pageURL, $pageGET);
+		$page = PageList::getInstance()->getByUrl( $relURL );
+		$pageUrl = $this->dynamicPageUrlToPageUrl( $page, $relURL, $pageGet);
 		
-		
-		
+		General::getInstance()->setCurrentUrl($pageUrl, $pageGet);
+		General::getInstance()->setCurrentPage($page);
 	}
 	
-	private function fixCurrentUrl( &$pageURL, &$pageGET )
+	private static function getNavigatorGets()
 	{
-		$page = null;
-		$lang = null;
+		$navigatorGets = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
+		$navigatorGets = $this->getCleanGets( $navigatorGets );
 		
-		$pageList = PageList::getInstance();
-		$allPages = $pageList->getAll();
-		if ( !array_key_exists($pageURL, $allPages) )
+		return $navigatorGets;
+	}
+
+	/**
+	 * Get first relative URL, this URL does not represent a Page
+	 * 
+	 * @return string
+	 */
+	public static function getNavigatorRelUrl()
+	{
+		$navigatorGets = self::getNavigatorGets();
+		$relURL = '';
+		$pageGet = array();
+		foreach ($navigatorGets as $key => $value)
 		{
-			$bestPage = null;
-			$bestScore = -1;
-			
-			foreach ( $allPages as $pageTemp )
-			{
-				$score = $pageTemp->comparePageUrl($pageURL);
-				
-				if ( $score > $bestScore )
-				{
-					$bestScore = $score;
-					$bestPage = $pageTemp;
-				}
-			}
-			
-			if ( $bestPage === null )
-			{
-				$lang = LangList::getInstance()->getLangByNavigator();
-				$page = $pageList->getByName($pageList->getError404PageName(), $lang);
-			}
-			else
-			{
-				$page = $bestPage;
-				$lang = $page->getLang();
-						
-				$this->explodeUrlToGet($page, $pageURL, $pageGET);
-			}
+			if ( $key === self::$_arg ) { $relURL = $value; }
+			else { $pageGet[$key] = $value; }
+		}
+		foreach ($pageGet as $key => $value)
+		{
+			$relURL .= '/'.$key.'/'.$value;
 		}
 		
-		General::getInstance()->setCurrentUrl($pageURL, $pageGET);
+		return $relURL;
 	}
 	
-	private function explodeUrlToGet( Page &$page, &$pageURL, array &$pageGET )
+	private function dynamicPageUrlToPageUrl(Page &$page, $relUrl, &$pageGet)
 	{
-		$url = $page->getPageUrl();
-		$rest = substr( $pageURL, strlen($url) );
-		if ( $page->getGetExplicit() )
+		$pageUrl = $page->getPageUrl();
+		if( substr($relUrl, 0, strlen($pageUrl)) == $pageUrl &&
+			$page->getGetEnabled() )
 		{
-			$getTemp = explode( '/', $rest );
-			foreach ($getTemp as $key => $value)
+			$restUrl = substr($relUrl, strlen($pageUrl));
+			$this->explodeDynamicUrlToGet( $restUrl, $pageGet, $page->getGetExplicit() );
+		}
+		return $pageUrl;
+	}
+	
+	private function explodeDynamicUrlToGet( $restUrl, array &$pageGet, $isExplicit )
+	{
+		$getTemp = explode( '/', $restUrl );
+		if ( $isExplicit )
+		{
+			$l = count( $getTemp ) - 1;
+			for ( $i = 0; $i<$l; $i+2 )
 			{
-				array_push($pageGET, $value);
+				$pageGet[$getTemp[$i]] = $getTemp[$i+1];
 			}
 		}
 		else
 		{
-			$get = explode( '/', $rest );
-			array_merge( $pageGET, $get );
+			array_merge( $pageGet, $getTemp );
 		}
 	}
 	
@@ -248,7 +241,10 @@ class UrlUtil
 	
 	final public function __clone()
     {
-        trigger_error( 'You can\'t clone.', E_USER_ERROR );
+        if ( _DEBUG )
+		{
+			Debug::getInstance()->addError( 'You can\'t clone a singleton' );
+		}
     }
  
 	/**

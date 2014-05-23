@@ -94,7 +94,7 @@ class PageList extends ElementList
 	 * @param string $folderName
 	 * @return array
 	 */
-	public function add( $folderName )
+	public function createPage( $folderName )
     {
         $pages = array();
         
@@ -107,16 +107,12 @@ class PageList extends ElementList
             
             if( file_exists ( $filename ) )
             {
-				include $filename;
-				
-				if ( _DEBUG && !isset($page) )
-				{
-					trigger_error( 'The page ['.$filename.'] is don\'t declared', E_USER_ERROR );
-					$page = new Page();
-				}
-				
+				$page = new Page();
 				$page->setLang( $lang );
 				$page->setName( $folderName );
+				
+				$this->initPage($page, $filename);
+				
 				
 				$buildFile = _CONTENT_DIRECTORY.$folderName.'/'.$lang.'-build.php';
 				if( file_exists ( $buildFile ) )
@@ -131,6 +127,41 @@ class PageList extends ElementList
         }
         
 		return $pages;
+    }
+	
+	private function initPage( Page &$page, $filename )
+    {
+		include $filename;
+		
+		if (	_DEBUG && !isset($url) )
+		{
+			Debug::getInstance()->addError( 'The initialisation of a page must to have an URL' );
+		}
+		
+		if ( isset($url) )				{ $page->setPageUrl($url) ; }
+		if ( isset($template) )			{ $page->setTemplate($template) ; }
+		
+		if ( isset($visible) )			{ $page->setVisible($visible) ; }
+		if ( isset($cachable) )			{ $page->setCachable($cachable) ; }
+		
+		if ( isset($getEnabled) )		{ $page->setGetEnabled($getEnabled) ; }
+		if ( isset($getExplicit) )		{ $page->setGetExplicit($getExplicit) ; }
+		if ( isset($date) )				{ $page->setDate($date) ; }
+		
+		if ( isset($htmlBody) )			{ $page->setHtmlBody($htmlBody) ; }
+		if ( isset($htmlDescription) )	{ $page->setHtmlDescription($htmlDescription) ; }
+		if ( isset($htmlHeader) )		{ $page->setHtmlHeader($htmlHeader) ; }
+		if ( isset($htmlTitle) )		{ $page->setHtmlTitle($htmlTitle) ; }
+				
+		if ( isset($type) )				{ $page->setType($type) ; }
+		if ( isset($phpHeader) )		{ $page->setPhpHeader($phpHeader) ; }
+		
+		if ( isset($tags) )				{ $page->addTags($tags) ; }
+		if ( isset($tag) )				{ $page->addTag($tag) ; }
+		if ( isset($contents) )			{ $page->addContents($contents) ; }
+		if ( isset($content) )			{ $page->addContent($content) ; }
+		
+        return $page;
     }
 	
 	/**
@@ -156,37 +187,54 @@ class PageList extends ElementList
 	}
 
 	/**
-	 * Get the page by URL
+	 * Get the page by relative URL
 	 * 
-	 * @param string $url
+	 * @param string $relURL
 	 * @return Page
 	 */
-    public function getByUrl( $url )
+    public function getByUrl( $relURL )
     {
-		// EXIST
-		if ( $this->hasKey($url) )
+		if( _DEBUG && !General::getInstance()->getPagesInitialised() )
 		{
-			return parent::getByKey($url);
+			Debug::getInstance()->addError( 'All pages must be initialised after use getByUrl()' );
+		}
+		
+		// EXIST
+		if ( $this->hasKey($relURL) )
+		{
+			return parent::getByKey($relURL);
 		}
 		
 		// EXIST WITHOUT "/" AT THE END
-		if ( $url[strlen($url)-1] === '/' )
+		if ( strlen($relURL) > 0 && $relURL[strlen($relURL)-1] === '/' )
 		{
-			$urlTemp = substr( $url, 0, strlen($url)-1 );
+			$urlTemp = substr( $relURL, 0, strlen($relURL)-1 );
 			if ( $this->hasKey($urlTemp) )
 			{
 				return parent::getByKey($urlTemp);
 			}
 		}
 		
-        // IS DEFAULT PAGE
-		if( $url === '' || $url === '/' )
-        {
-			return $this->getDefaultPage();
-        }
-        
-        // IS ERROR 404
+		// IS DEFAULT PAGE
 		$lang = LangList::getInstance()->getLangByNavigator();
+		if( ($relURL === '' || $relURL === '/') && !empty($this->_default) )
+        {
+			return $this->getDefaultPage($lang);
+        }
+		
+		// IS DYNAMIC PAGE
+		$bestScore = 0;
+		foreach ( $this->_elements as $pageTemp )
+		{
+			$scoreTemp = $pageTemp->comparePageUrl($relURL);
+			if ( $scoreTemp > $bestScore )
+			{
+				$bestScore = $scoreTemp;
+				$page = $pageTemp;
+			}
+		}
+		
+        // IS ERROR 404
 		if ( !empty( $this->_error404 ) )
 		{
 			foreach ( $this->_elements as $page )
@@ -202,10 +250,10 @@ class PageList extends ElementList
         
         // CREATE PAGE ERROR 404
 			$page = new Page();
-			$page->setHeader( '<title>Error 404 - Not found</title>
+			$page->setHtmlHeader( '<title>Error 404 - Not found</title>
 					<meta name="robots" content="noindex,nofollow" />
 					<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />' );
-			$page->setBody( '<h1>Error 404 - Not found</h1>' );
+			$page->setHtmlBody( '<h1>Error 404 - Not found</h1>' );
 			$this->makeError404Page($page);
 			return $page;
         //

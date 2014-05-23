@@ -42,6 +42,7 @@ class General
 	 * @return bool
 	 */
 	public function getPagesInitialised() { return $this->_pagesInitialised; }
+	public function setPagesInitialised( $initialised ) { $this->_pagesInitialised = $initialised; }
 	
 	protected $_pageBuilded = false;
 	/**
@@ -61,7 +62,7 @@ class General
 	{
 		if ( _DEBUG && !General::getInstance()->getPagesInitialised() )
 		{
-			trigger_error( 'You can\'t access to the current page name if the pages isn\'tinitialised', E_USER_ERROR );
+			Debug::getInstance()->addError( 'You can\'t access to the current page name if the pages isn\'tinitialised' );
 		}
 		return $this->_currentPageName;
 	}
@@ -76,7 +77,7 @@ class General
 	{
 		if ( _DEBUG && !General::getInstance()->getPagesInitialised() )
 		{
-			trigger_error( 'You can\'t access to the current page if the pages isn\'tinitialised', E_USER_ERROR );
+			Debug::getInstance()->addError( 'You can\'t access to the current page if the pages isn\'tinitialised' );
 		}
 		return $this->_currentPage;
 	}
@@ -91,7 +92,7 @@ class General
 	{
 		if ( _DEBUG && !General::getInstance()->getPagesInitialised() )
 		{
-			trigger_error( 'You can\'t access to the current language if the pages isn\'tinitialised', E_USER_ERROR );
+			Debug::getInstance()->addError( 'You can\'t access to the current language if the pages isn\'tinitialised' );
 		}
 		return $this->_currentLang;
 	}
@@ -106,7 +107,7 @@ class General
 	{
 		if ( _DEBUG && !General::getInstance()->getPagesInitialised() )
 		{
-			trigger_error( 'You can\'t access to the current language if the pages isn\'tinitialised', E_USER_ERROR );
+			Debug::getInstance()->addError( 'You can\'t access to the current language if the pages isn\'tinitialised' );
 		}
 		return $this->_currentGetUrl;
 	}
@@ -121,7 +122,7 @@ class General
 	{
 		if ( _DEBUG && !General::getInstance()->getPagesInitialised() )
 		{
-			trigger_error( 'You can\'t access to the current language if the pages isn\'tinitialised', E_USER_ERROR );
+			Debug::getInstance()->addError( 'You can\'t access to the current language if the pages isn\'tinitialised' );
 		}
 		return $this->_currentPageUrl;
 	}

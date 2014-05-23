@@ -64,7 +64,7 @@ class ElementList extends Saver
         $lang = $element->getLang();
 		if( _DEBUG && $this->has( $element, null ) )
 		{
-			trigger_error( 'The element ['.$element.'] already exist', E_USER_ERROR );
+			Debug::getInstance()->addError( 'The element ['.$element.'] already exist' );
 		}
 		
 		if ( $key === null )
@@ -73,7 +73,7 @@ class ElementList extends Saver
 		}
 		elseif ( _DEBUG && isset($this->_elements[$key]) )
 		{
-			trigger_error( 'The list has the same key ['.$key.'] for the element ['.$element.']', E_USER_ERROR );
+			Debug::getInstance()->addError( 'The list has the same key ['.$key.'] for the element ['.$element.']' );
 		}
 		else
 		{
@@ -102,7 +102,7 @@ class ElementList extends Saver
 		
 		if ( _DEBUG && count( $elements ) < 1 )
 		{
-			trigger_error( 'The Element ['.$name.'] don\'t exist', E_USER_ERROR );
+			Debug::getInstance()->addError( 'The Element ['.$name.'] don\'t exist' );
 		}
 		
 		return $elements;
@@ -129,7 +129,7 @@ class ElementList extends Saver
 		
 		if ( _DEBUG )
 		{
-			trigger_error( 'The Element ['.$name.'] don\'t exist in the language '.$lang, E_USER_ERROR );
+			Debug::getInstance()->addError( 'The Element ['.$name.'] don\'t exist in the language '.$lang );
 		}
 	}
 	
@@ -264,7 +264,7 @@ class ElementList extends Saver
     {
 		if ( _DEBUG && !$this->hasKey($key) )
 		{
-			trigger_error( 'The key ['.$key.'] don\'t exist in this list', E_USER_ERROR );
+			Debug::getInstance()->addError( 'The key ['.$key.'] don\'t exist in this list' );
 		}
 		
 		return $this->_elements[$key];
@@ -274,13 +274,16 @@ class ElementList extends Saver
 	
     final public function __clone()
     {
-        trigger_error( 'You can\'t clone.', E_USER_ERROR );
+		if ( _DEBUG )
+		{
+			Debug::getInstance()->addError( 'You can\'t clone a singleton' );
+		}
     }
  
 	/**
 	 * Instance of the list
 	 * 
-	 * @return self
+	 * @return static
 	 */
     final public static function getInstance()
     {
@@ -307,7 +310,7 @@ class ElementList extends Saver
 	 * A saved object can by generate by the method getSave().
 	 * 
 	 * @param array $saveDatas
-	 * @return self
+	 * @return static
 	 */
 	public function update( array $saveDatas )
 	{

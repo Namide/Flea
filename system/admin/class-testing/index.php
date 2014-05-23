@@ -73,90 +73,73 @@ function writeClass( $className, $t = true )
 }
 
 ?>
-<!doctype html>
-<html>
-<head>
-	<meta charset="UTF-8">
-	<title>Unit test</title>
-	<style type="text/css">
-	.error { color: red; }
-	.passed { color: green; }
-	</style>
-</head>
 
-<body>
-	
-	
-	
-	<table>
-		<tbody>
-			<tr>
-				<th>Class</th>
-				<th>method</th>
-				<th>state</th>
-			</tr>
-			<?php
-	
-				writeClass('include', false);
-				
-			
-				include_once 'config.php';
-				include_once _SYSTEM_DIRECTORY.'init/import.php';
-				
-				writeClass('LangList');
-				$lang = \Flea\LangList::getInstance();
-				$lang->addDefaultLang('uk');
-				writeTest( 'addDefaultLang', testString( $lang->hasLang('uk'), true ) );
-				writeTest( 'getLangByNavigator', testString($lang->getLangByNavigator(), 'uk') );
-				$lang->addLang('fr');
-				writeTest( 'getLangByNavigator', testString($lang->getLangByNavigator(), 'fr') );
-				writeTest( 'getList', testArray($lang->getList(), array('all', 'uk', 'fr')) );
-				
-				
-				writeClass('Element');
-				$element = new \Flea\Element();
-				$element->addTags( array('a:b','bb','yohé\glitch', 2) );
-				writeTest( 'addTags', testString( $element->hasTag('yohé\glitch'), true ) );
-				$element->removeTag( 'bb' );
-				writeTest( 'removeTag', testArray( $element->getTags(), array('a:b','yohé\glitch', 2) ) );
-				$element->addTag( 'hum' );
-				writeTest( 'addTag', testString( $element->hasTag('yohé\glitch'), true ) );
-				writeTest( 'hasTag', testString( $element->hasTag('hum'), true ) );
-				$element->addTag( 'hum' );
-				writeTest( 'hasTag', testString( $element->hasTag('hum'), true ) );
-				writeTest( 'hasTags', testString( $element->hasTags(array('hum', 'yohé\glitch', 2)), true ) );
-				writeTest( 'hasTags', testString( $element->hasTags(array('no')), false ) );
-				$element->setName('the id!');
-				writeTest( 'setId', testString( $element->getName(), 'the id!' ) );
-				$element->setLang('uk');
-				writeTest( 'setLang', testString( $element->getLang(), 'uk' ) );
-				$element->setType('wall');
-				writeTest( 'setLang', testString( $element->getType(), 'wall' ) );
-				$save = $element->getSave();
-				$element2 = new \Flea\Element();
-				eval( '$element2 = '.$save.';');
-				writeTest( 'getSave', testObject( $element, $element2 ) );
-				writeTest( 'create', testObject( $element, $element2 ) );
-				$element->removeTags();
-				writeTest( 'removeTags', testArray( $element->getTags(), array() ) );
-				
-				
-				writeClass('ElementList');
-				$elementList = \Flea\ElementList::getInstance();
-				$elementList->add($element);
-				writeTest( 'add', testObject( $elementList->getAll()[0], $element ) );
-				$element2->setLang('fr');
-				$element2->setName('whohoo-as\' /');
-				$elementList->add($element2);
-				writeTest( 'getElementsByLang', testObject( $elementList->getByLang('fr')[0], $element2 ) );
-				writeTest( 'getById', testObject( $elementList->getByName('whohoo-as\' /', 'fr'), $element2 ) );
-				
-				
-			?>
-			
-		</tbody>
-	</table>
-	
-</body>
-</html>
+<table>
+	<tbody>
+		<tr>
+			<th>Class</th>
+			<th>method</th>
+			<th>state</th>
+		</tr>
+		<?php
 
+			writeClass('include', false);
+
+
+			include_once 'config.php';
+			include_once _SYSTEM_DIRECTORY.'init/import.php';
+
+			writeClass('LangList');
+			$lang = \Flea\LangList::getInstance();
+			$lang->addDefault('uk');
+			writeTest( 'addDefaultLang', testString( $lang->has('uk'), true ) );
+			writeTest( 'getLangByNavigator', testString($lang->getLangByNavigator(), 'uk') );
+			$lang->add('fr');
+			writeTest( 'getLangByNavigator', testString($lang->getLangByNavigator(), 'fr') );
+			writeTest( 'getList', testArray($lang->getList(), array('all', 'uk', 'fr')) );
+
+			$a = \Flea\UrlUtil::getInstance();
+			
+			writeClass('Element');
+			$element = new \Flea\Element();
+			$element->addTags( array('a:b','bb','yohé\glitch', 2) );
+			writeTest( 'addTags', testString( $element->hasTag('yohé\glitch'), true ) );
+			$element->removeTag( 'bb' );
+			writeTest( 'removeTag', testArray( $element->getTags(), array('a:b','yohé\glitch', 2) ) );
+			$element->addTag( 'hum' );
+			writeTest( 'addTag', testString( $element->hasTag('yohé\glitch'), true ) );
+			writeTest( 'hasTag', testString( $element->hasTag('hum'), true ) );
+			$element->addTag( 'hum' );
+			writeTest( 'hasTag', testString( $element->hasTag('hum'), true ) );
+			writeTest( 'hasTags', testString( $element->hasTags(array('hum', 'yohé\glitch', 2)), true ) );
+			writeTest( 'hasTags', testString( $element->hasTags(array('no')), false ) );
+			$element->setName('the id!');
+			writeTest( 'setId', testString( $element->getName(), 'the id!' ) );
+			$element->setLang('uk');
+			writeTest( 'setLang', testString( $element->getLang(), 'uk' ) );
+			$element->setType('wall');
+			writeTest( 'setLang', testString( $element->getType(), 'wall' ) );
+			$save = $element->getSave();
+			$element2 = new \Flea\Element();
+			eval( '$element2 = '.$save.';');
+			writeTest( 'getSave', testObject( $element, $element2 ) );
+			writeTest( 'create', testObject( $element, $element2 ) );
+			$element->removeTags();
+			writeTest( 'removeTags', testArray( $element->getTags(), array() ) );
+
+
+			writeClass('ElementList');
+			$elementList = \Flea\ElementList::getInstance();
+			$elementList->add($element);
+			writeTest( 'add', testObject( $elementList->getAll()[0], $element ) );
+			$element2->setLang('fr');
+			$element2->setName('whohoo-as\' /');
+			$elementList->add($element2);
+			writeTest( 'getElementsByLang', testObject( $elementList->getByLang('fr')[0], $element2 ) );
+			writeTest( 'getById', testObject( $elementList->getByName('whohoo-as\' /', 'fr'), $element2 ) );
+
+
+		?>
+
+	</tbody>
+</table>
