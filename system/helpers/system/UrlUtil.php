@@ -41,7 +41,7 @@ class UrlUtil
 	 * 
 	 * @return string
 	 */
-    private $_arg = '_u';
+    private static $_arg = '_u';
 	//public function getPageGetArg() { return self::$_arg; }
 	
 	private $_basePageUrl;
@@ -62,7 +62,7 @@ class UrlUtil
 		{
 			Debug::getInstance()->addError( 'All pages must be initialised after use UrlUtil class' );
 		}
-		$this->_basePageUrl = 'index.php?'.$this->_arg.'=';
+		$this->_basePageUrl = 'index.php?'.self::$_arg.'=';
 		
 		$navigatorGets = self::getNavigatorGets();
 		$relURL = '';
@@ -82,8 +82,15 @@ class UrlUtil
 	
 	private static function getNavigatorGets()
 	{
-		$navigatorGets = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
-		$navigatorGets = $this->getCleanGets( $navigatorGets );
+		$navigatorGets = array();
+		
+		foreach ($_GET as $key => $value)
+		{
+			$navigatorGets[$key] = filter_input( INPUT_GET, $key, FILTER_SANITIZE_STRING );
+		}
+		
+		//$navigatorGets = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
+		//$navigatorGets = self::getCleanGets( $navigatorGets );
 		
 		return $navigatorGets;
 	}
@@ -140,9 +147,9 @@ class UrlUtil
 		}
 	}
 	
-	private function getCleanGets( &$gets )
+	private static function getCleanGets( &$gets )
 	{
-		$getsStr = implode('&', $gets);
+		/*$getsStr = implode('&', $gets);
 		$getsStr = str_replace('?', '&', $getsStr);
 		$getsStr = str_replace('&&', '&', $getsStr);
 		
@@ -156,7 +163,7 @@ class UrlUtil
 			{
 				$gets[$get[0]] = $get[1];
 			}
-		}
+		}*/
 		
 		return $gets;
 	}

@@ -24,3 +24,7 @@
  * THE SOFTWARE.
  */
 
+namespace Flea;
+
+$page = General::getInstance()->getCurrentPage();
+PageList::getInstance()->updatePage( $page );

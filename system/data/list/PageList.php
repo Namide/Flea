@@ -55,25 +55,25 @@ class PageList extends ElementList
 	 * 
 	 * @param string $name
 	 */
-	public function addDefault( $name )
+	/*public function addDefault( $name )
     {
 		$this->_default = $name;
         $this->add($name);
-    }
+    }*/
 
 	/**
 	 * Add an error 404 page (you can only have 1 by language)
 	 * 
 	 * @param string $name
 	 */
-    public function addError404( $name )
+    /*public function addError404( $name )
     {
         $this->_error404 = $name;
 		foreach ( $this->addPage($name) as $page)
 		{
 			$this->makeError404Page( $page );
 		}
-    }
+    }*/
 	
 	/**
 	 * Edit the page to convert in error page
@@ -124,6 +124,7 @@ class PageList extends ElementList
 				parent::add( $page, $url );
 				array_push( $pages, $page );
             }
+			
         }
         
 		return $pages;
@@ -133,7 +134,7 @@ class PageList extends ElementList
     {
 		include $filename;
 		
-		if (	_DEBUG && !isset($url) )
+		if ( _DEBUG && !isset($url) )
 		{
 			Debug::getInstance()->addError( 'The initialisation of a page must to have an URL' );
 		}
@@ -153,13 +154,25 @@ class PageList extends ElementList
 		if ( isset($htmlHeader) )		{ $page->setHtmlHeader($htmlHeader) ; }
 		if ( isset($htmlTitle) )		{ $page->setHtmlTitle($htmlTitle) ; }
 				
-		if ( isset($type) )				{ $page->setType($type) ; }
 		if ( isset($phpHeader) )		{ $page->setPhpHeader($phpHeader) ; }
 		
 		if ( isset($tags) )				{ $page->addTags($tags) ; }
 		if ( isset($tag) )				{ $page->addTag($tag) ; }
 		if ( isset($contents) )			{ $page->addContents($contents) ; }
 		if ( isset($content) )			{ $page->addContent($content) ; }
+		
+		if ( isset($type) )	
+		{
+			$page->setType($type);
+			if ( $type == 'default' )	{ $this->_default = $page->getName(); }
+			if ( $type == 'error404' )
+			{
+				$this->_error404 = $page->getName();
+				$page->setVisible( false );
+				$page->setCachable( false );
+				$page->setPhpHeader( 'HTTP/1.0 404 Not Found' );
+			}
+		}
 		
         return $page;
     }

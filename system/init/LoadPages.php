@@ -31,7 +31,7 @@ include_once _CONTENT_DIRECTORY.'init-lang.php';
 
 $pageList = PageList::getInstance();
 $langs = $lang->getList();
-addPagesRecurs( _CONTENT_DIRECTORY, $lang, $pageList );
+addPagesRecurs( _CONTENT_DIRECTORY, $lang, $pageList, '' );
 //include_once _CONTENT_DIRECTORY.'pages.php';
 //$pageList->go();
 //UrlUtil::getInstance();
@@ -39,24 +39,22 @@ General::getInstance()->setPagesInitialised(true);
 
 // HELPERS FOR TEMPLATES
 //include_once _SYSTEM_DIRECTORY.'helpers/BuildUtil.php';
+UrlUtil::getInstance();
 BuildUtil::getInstance();
 
-function addPagesRecurs( $dir, &$langs, PageList &$pageList )
+function addPagesRecurs( $dir, &$langs, PageList &$pageList, $fileDirRel )
 {
-	if ( !file_exists($dir) )
-	{
-		return;
-	}
+	if ( !file_exists($dir) ) { return; }
 	
 	$dirOpen = opendir($dir);
     while($file = @readdir($dirOpen))
     {
-		if ($file == "." || $file == "..") continue;
+		if ($file == "." || $file == "..") { continue; }
 
         if( is_dir($dir.'/'.$file) )
         {
-            addPagesRecurs( $dir.'/'.$file.'/', $langs, $pageList );
-			$pageList->createPage( $dir.'/'.$file );
+            addPagesRecurs( $dir.'/'.$file.'/', $langs, $pageList, $fileDirRel.'/'.$file );
+			$pageList->createPage( (($fileDirRel != '')?$fileDirRel.'/':'').$file );
         }
     }
     closedir($dirOpen);
