@@ -74,7 +74,7 @@ class UrlUtil
 		}
 		
 		$page = PageList::getInstance()->getByUrl( $relURL );
-		$pageUrl = $this->dynamicPageUrlToPageUrl( $page, $relURL, $pageGet);
+		$pageUrl = $this->dynamicPageUrlToPageUrl( $page, $relURL, $pageGet );
 		
 		General::getInstance()->setCurrentUrl($pageUrl, $pageGet);
 		General::getInstance()->setCurrentPage($page);
@@ -118,13 +118,14 @@ class UrlUtil
 		return $relURL;
 	}
 	
-	private function dynamicPageUrlToPageUrl(Page &$page, $relUrl, &$pageGet)
+	private function dynamicPageUrlToPageUrl(Page &$page, $relUrl, array &$pageGet)
 	{
 		$pageUrl = $page->getPageUrl();
+		
 		if( substr($relUrl, 0, strlen($pageUrl)) == $pageUrl &&
 			$page->getGetEnabled() )
 		{
-			$restUrl = substr($relUrl, strlen($pageUrl));
+			$restUrl = substr($relUrl, strlen($pageUrl)+1);
 			$this->explodeDynamicUrlToGet( $restUrl, $pageGet, $page->getGetExplicit() );
 		}
 		return $pageUrl;
@@ -132,18 +133,19 @@ class UrlUtil
 	
 	private function explodeDynamicUrlToGet( $restUrl, array &$pageGet, $isExplicit )
 	{
-		$getTemp = explode( '/', $restUrl );
+		$getTemp = explode( '/', $restUrl );print_r($getTemp);
 		if ( $isExplicit )
 		{
 			$l = count( $getTemp ) - 1;
-			for ( $i = 0; $i<$l; $i+2 )
+			
+			for ( $i = 0; $i<$l; $i+=2 )
 			{
 				$pageGet[$getTemp[$i]] = $getTemp[$i+1];
 			}
 		}
 		else
 		{
-			array_merge( $pageGet, $getTemp );
+			$pageGet = array_merge( $pageGet, $getTemp );
 		}
 	}
 	
@@ -178,7 +180,7 @@ class UrlUtil
 	 */
 	public function getRelUrlByIdLang( \Flea\Page &$page, $lang, array $getUrl = null )
     {
-		$page = $PageList->getByName( $idPage, $lang );
+		$page = PageList::getInstance()->getByName( $page->getName(), $lang );
 		$url = $this->getRelUrlByPageUrl( $page->getPageUrl(), $getUrl, $page->getGetExplicit() );
 		
 		return $url;

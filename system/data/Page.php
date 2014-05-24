@@ -145,20 +145,20 @@ class Page extends Element
 		return 0;
 	}
 	
-    protected $_HtmlHeader;
+    protected $_htmlHeader;
 	/**
 	 * Set the header php
 	 * 
 	 * @param string $header
 	 */
-    public function setHtmlHeader( $header ) { $this->_HtmlHeader = $header; }
+    public function setHtmlHeader( $header ) { $this->_htmlHeader = $header; }
 	
 	/**
 	 * HTML content in the header
 	 * 
 	 * @return type
 	 */
-	public function getHtmlHeader() { return $this->_HtmlHeader; }
+	public function getHtmlHeader() { return $this->_htmlHeader; }
 	
     protected $_htmlBody;
 	/**
@@ -231,6 +231,41 @@ class Page extends Element
 	 */
     public function getBuildFile() { return $this->_buildFile; }
 	
+	/**
+	 * Echo the page (with template and Flea variables {{...}} transformed
+	 */
+	public function render()
+	{
+		if ( $this->_phpHeader != '' )
+		{
+			header( $this->_phpHeader );
+		}
+
+		if ( $this->_template != '' )
+		{
+			ob_start();
+			include _TEMPLATE_DIRECTORY.$this->_template.'.php';
+			$content = ob_get_clean();
+			echo BuildUtil::getInstance()->replaceFleaVars( $content, $this );
+		}
+		else
+		{
+			echo '<!doctype html>';
+			echo '<html><head>' , BuildUtil::getInstance()->replaceFleaVars( $this->_htmlHeader, $this );
+			if ( $this->_htmlTitle != '' )
+			{
+				echo '<title>', BuildUtil::getInstance()->replaceFleaVars( $this->_htmlTitle, $this ), '</title>';
+			}
+			if ( $this->_htmlDescription != '' )
+			{
+				echo '<meta name="description" content="', BuildUtil::getInstance()->replaceFleaVars( $this->_htmlDescription, $this ), '"/>';
+			}
+			echo '</head><body>' , BuildUtil::getInstance()->replaceFleaVars( $this->_htmlBody, $this );
+			echo '</body></html>';
+		}
+	}
+
+	
 	public function __construct( $name = '', $lang = null )
     {
 		parent::__construct($lang);
@@ -244,7 +279,7 @@ class Page extends Element
 		
 		$this->_htmlTitle = $name;
 		$this->_htmlDescription = $name;
-		$this->_HtmlHeader = '';
+		$this->_htmlHeader = '';
 		$this->_htmlBody = '';
 		
         $this->_file2 = '';

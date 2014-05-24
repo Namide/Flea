@@ -48,6 +48,7 @@ if ( _CACHE )
 		if ( _DEBUG )
 		{
 			echo '<!-- load cache time: ', number_format( microtime(true) - $timestart , 3) , 'ms -->';
+			Debug::getInstance()->dispatchErrors();
 		}
 		exit();
 	}
@@ -64,9 +65,9 @@ if ( _CACHE )
 		if ( $cache->isCachable( $page ) )
 		{
 			$cache->startSave();
-				echoPage( $page );
+				$page->render();
 			$cache->stopSave();
-			$content = BuildUtil::getInstance()->render( $cache->getSaved(), $page );
+			$content = BuildUtil::getInstance()->replaceFleaVars( $cache->getSaved(), $page );
 			$cache->setSaved( $content );
 			$cache->writesCache( $fileName );
 			echo $cache->getSaved();
@@ -75,11 +76,12 @@ if ( _CACHE )
 			if ( _DEBUG )
 			{
 				echo '<!-- execute PHP and write cache time: ', number_format( microtime(true) - $timestart , 3), 'ms -->';
+				Debug::getInstance()->dispatchErrors();
 			}
 		}
 		else
 		{
-			echoPage( $page );
+			$page->render();
 		}
 		exit();
 	}
@@ -89,35 +91,10 @@ include_once _SYSTEM_DIRECTORY.'init/import.php';
 include_once _SYSTEM_DIRECTORY.'init/loadPages.php';
 include_once _SYSTEM_DIRECTORY.'init/buildPage.php';
 $page = General::getInstance()->getCurrentPage();
-echoPage( $page );
+$page->render();
 
 if ( _DEBUG )
 {
 	echo '<!-- execute PHP time: ', number_format( microtime(true) - $timestart , 3),'ms -->';
+	Debug::getInstance()->dispatchErrors();
 }
-
-function echoPage( Page &$page )
-{
-	if ( $page->getPhpHeader() != '' )
-	{
-		header( $page->getPhpHeader() );
-	}
-
-	if ( $page->getTemplate() != '' )
-	{
-		ob_start();
-		include _TEMPLATE_DIRECTORY.$page->getTemplate().'.php';
-		$content = ob_get_clean();
-		echo BuildUtil::getInstance()->render( $content, $page );
-	}
-	else
-	{
-		echo '<!doctype html>';
-		echo '<html><head>' , BuildUtil::getInstance()->render( $page->getHtmlHeader(), $page );
-		echo '</head><body>' , BuildUtil::getInstance()->render( $page->getHtmlBody(), $page );
-		echo '</body></html>';
-	}
-}
-
-
-

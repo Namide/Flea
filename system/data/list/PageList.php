@@ -134,7 +134,7 @@ class PageList extends ElementList
     {
 		include $filename;
 		
-		if ( _DEBUG && !isset($url) )
+		if ( _DEBUG && empty($page->getPageUrl()) && !isset($url) )
 		{
 			Debug::getInstance()->addError( 'The initialisation of a page must to have an URL' );
 		}
@@ -193,8 +193,8 @@ class PageList extends ElementList
 		
 		ob_start();
 		$page = $this->initPage( $page, $page->getBuildFile() );
-		$page->startBuild();
-		$page->setBody( ob_get_clean() );
+		//$page->startBuild();
+		$page->setHtmlBody( ob_get_clean() );
 		
 		return $page;
 	}
@@ -237,6 +237,7 @@ class PageList extends ElementList
 		
 		// IS DYNAMIC PAGE
 		$bestScore = 0;
+		$page = null;
 		foreach ( $this->_elements as $pageTemp )
 		{
 			$scoreTemp = $pageTemp->comparePageUrl($relURL);
@@ -246,6 +247,7 @@ class PageList extends ElementList
 				$page = $pageTemp;
 			}
 		}
+		if ( $page != null ) { return $page; }
 		
         // IS ERROR 404
 		if ( !empty( $this->_error404 ) )
@@ -285,7 +287,7 @@ class PageList extends ElementList
         foreach ( $this->_elements as $page )
         {
 			if (	$page->getName() === $name &&
-					$page->getLanguage() === $lang )
+					$page->getLang() === $lang )
             {
                 return $page;
             }

@@ -82,6 +82,20 @@ class ElementList extends Saver
     }
 	
 	/**
+	 * Sort the elements by their dates
+	 */
+	public function sortByDate()
+	{
+		usort($this->_elements, 'cmpDate');
+	}
+	
+	private function cmpDate($a, $b)
+	{
+		if ($a == $b) {	return 0; }
+		return ($a < $b) ? -1 : 1;
+	}
+
+	/**
 	 * Return the elements with this ID (all langues)
 	 * 
 	 * @param string $name

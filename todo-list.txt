@@ -17,10 +17,10 @@ system
 		common
 			InitUtil.php
 			BuildUtil.php
-			TemplateUtil.php [ mustache( $content, &$page ) => render( $content, $page = -1 ) ]
+			_TemplateUtil.php [ mustache( $content, &$page ) => render( $content, $page = -1 ) ]
 			
 		miscellaneous
-			SearchEngine.php
+			SearchEngine.php // indexes...
 			? TradUtil.php
 		
 		system
@@ -58,14 +58,6 @@ TO-DO
 
 	sort the Pages by date
 
-	namespace Flea {  }
-
-	DynamicElement (interface)
-	Element => Page //=> DynamicPage
-					//=> RequestPage => DynamicRequestPage
-	
-	ElementList => PageList
-	
 	"mustache" après le template !
 	
 	Url
@@ -85,7 +77,7 @@ TO-DO
 	singletons -> utilisable sans méthode getInstance() pour InitUtil, BuildUtil et TemplateUtil
 	language -> lang
 	
-	render (old mustache) !
+	Flea variables (old mustache) !
 		{{rootPath}}
 		{{templatePath}}
 		{{contentPath}}
@@ -101,4 +93,4 @@ TO-DO
 		possibilité de stoquer les URLs et les tags
 		possibilité de fonctionner sans initialisation à partir des URL et des tags
 				
-	
+	echoPage() ( routing.php ) => dans Classe

@@ -98,8 +98,6 @@ function writeClass( $className, $t = true )
 			writeTest( 'getLangByNavigator', testString($lang->getLangByNavigator(), 'fr') );
 			writeTest( 'getList', testArray($lang->getList(), array('all', 'uk', 'fr')) );
 
-			$a = \Flea\UrlUtil::getInstance();
-			
 			writeClass('Element');
 			$element = new \Flea\Element();
 			$element->addTags( array('a:b','bb','yohé\glitch', 2) );

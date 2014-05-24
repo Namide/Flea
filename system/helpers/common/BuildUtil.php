@@ -132,7 +132,7 @@ class BuildUtil extends InitUtil
 	 * @param Page $page
 	 * @return Page
 	 */
-	public function render( $text, Page &$page = null )
+	public function replaceFleaVars( $text, Page &$page = null )
     {
 		/*if ( $page !== null )
 		{

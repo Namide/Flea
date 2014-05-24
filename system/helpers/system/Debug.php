@@ -44,7 +44,7 @@ class Debug
 	 */
 	public function addError( $msg )
 	{
-		$error = $msg.'\n'.$this->getDebugBacktrace(1);
+		$error = $msg.'\n'.$this->getDebugBacktrace(1, 10);
 		array_push( $this->_errorList, $error );
 	}
 	
@@ -73,7 +73,9 @@ class Debug
 	}
 	private function delDoubleQuotes($str)
 	{
-		return str_replace('"', '\"', $str);
+		$str = str_replace(array('"', '\\'), array('\"', '\\\\'), $str);
+		$str = str_replace(array('\\\n'), array('\n'), $str);
+		return $str;
 	}
 	
 	final private function __construct()
@@ -134,13 +136,13 @@ class Debug
 			$str = '';
 			if( $max_trace > 1 )
 			{
-				$str .= '#'.str_pad($i - $traces_to_ignore, 3, ' ');
+				$str .= '	#'.str_pad($i - $traces_to_ignore, 3, ' ');
 			}
 			//$str .= $object.$call['function'].'('.implode(', ', $call['args']).') ';
-			$str .= ' '.$call['file'].':'.$call['line'];
+			$str .= '	'.$call['file'].':'.$call['line'];
 			$ret[] = $str;
 		}
-		return implode("\n",$ret);
+		return implode('\n',$ret);
 	}
 	
 }
