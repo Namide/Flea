@@ -22,6 +22,8 @@ system
 		miscellaneous
 			SearchEngine.php // indexes...
 			? TradUtil.php
+			ImgUtil.php
+			DateUtil.php
 		
 		system
 			Router.php
@@ -88,6 +90,10 @@ TO-DO
 		
 		{{idPageToAbsUrl:basic/homepage}}
 		? dynamic pages ?
+
+		!title
+		!description
+		!date
 	
 	PageList
 		possibilité de stoquer les URLs et les tags

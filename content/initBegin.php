@@ -3,7 +3,7 @@
 /* 
  * The MIT License
  *
- * Copyright 2014 Damien Doussaud (namide.com).
+ * Copyright 2014 Damien.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,40 +24,4 @@
  * THE SOFTWARE.
  */
 
-namespace Flea;
-
-include _CONTENT_DIRECTORY.'initBegin.php';
-
-$lang = LangList::getInstance();
-include _CONTENT_DIRECTORY.'initLang.php';
-
-$pageList = PageList::getInstance();
-$langs = $lang->getList();
-addPagesRecurs( _CONTENT_DIRECTORY, $lang, $pageList, '' );
-//include_once _CONTENT_DIRECTORY.'pages.php';
-//$pageList->go();
-//UrlUtil::getInstance();
-General::getInstance()->setPagesInitialised(true);
-
-// HELPERS FOR TEMPLATES
-//include_once _SYSTEM_DIRECTORY.'helpers/BuildUtil.php';
-UrlUtil::getInstance();
-BuildUtil::getInstance();
-
-function addPagesRecurs( $dir, &$langs, PageList &$pageList, $fileDirRel )
-{
-	if ( !file_exists($dir) ) { return; }
-	
-	$dirOpen = opendir($dir);
-    while($file = @readdir($dirOpen))
-    {
-		if ($file == "." || $file == "..") { continue; }
-
-        if( is_dir($dir.'/'.$file) )
-        {
-            addPagesRecurs( $dir.'/'.$file.'/', $langs, $pageList, $fileDirRel.'/'.$file );
-			$pageList->createPage( (($fileDirRel != '')?$fileDirRel.'/':'').$file );
-        }
-    }
-    closedir($dirOpen);
-}
+// Your code before the pages initialisation here
