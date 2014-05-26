@@ -1,14 +1,14 @@
 # 1and1
-# AddType x-mapp-php6 .php								# 1and1
-# AddHandler x-mapp-php6 .php							# 1and1
+AddType x-mapp-php6 .php								# 1and1
+AddHandler x-mapp-php6 .php							# 1and1
 
 
 <IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ /index.php?_u=$1 [L,QSA]			# local
-# RewriteRule ^(.*)$ /index.php?u=$1 [L,QSA]		# 1and1
+# RewriteRule ^(.*)$ /index.php?_u=$1 [L,QSA]			# local
+RewriteRule ^(.*)$ /index.php?u=$1 [L,QSA]		# 1and1
 </IfModule>
 
 

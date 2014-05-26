@@ -5,7 +5,7 @@
  */
 
 // Absolute URL of the website
-define( '_ROOT_URL', 'http://localhost/Flea/' );
+define( '_ROOT_URL', 'http://flea.namide.com/' );
 
 // Directory name of the system's files
 // It is better to be outside of the www directory
@@ -30,7 +30,7 @@ define( '_TEMP_DIRECTORY', 'temp-files/' );
  */
 
 // URL rewriting activated => TRUE, deactivated => FALSE
-define( '_URL_REWRITING', false );
+define( '_URL_REWRITING', true );
 
 // Debug mode activated => TRUE, deactivated => FALSE
 define( '_DEBUG', true );
