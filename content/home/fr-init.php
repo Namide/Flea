@@ -21,5 +21,4 @@ $type = 'default'; // error404
 
 // $tags				
 // $tag				
-$contents = array( 'test01'=>'youhou ! ! !', 'test02'=>'hoé???' );		
-// $content			
+$contents = array( 'test01'=>'youhou ! ! !', 'test02'=>'hoé???' );

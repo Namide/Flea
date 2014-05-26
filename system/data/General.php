@@ -36,27 +36,26 @@ class General
 	protected static $_INSTANCE;
 
 	protected $_pagesInitialised = false;
+	
 	/**
 	 * All page initialised
 	 * 
-	 * @return bool
+	 * @return bool		true if the pages are initialised, otherwise false
 	 */
 	public function getPagesInitialised() { return $this->_pagesInitialised; }
-	public function setPagesInitialised( $initialised ) { $this->_pagesInitialised = $initialised; }
 	
-	protected $_pageBuilded = false;
 	/**
-	 * Current page build
+	 * All page initialised
 	 * 
-	 * @return bool
+	 * @param bool $initialised		true if the pages are initialised, otherwise false
 	 */
-	public function getPagesBuilded() { return $this->_pageBuilded; }
+	public function setPagesInitialised( $initialised ) { $this->_pagesInitialised = $initialised; }
 	
 	protected $_currentPageName;
 	/**
 	 * Name of the current page
 	 * 
-	 * @return string
+	 * @return string	Current page name
 	 */
 	public function getCurrentPageName()
 	{
@@ -71,7 +70,7 @@ class General
 	/**
 	 * Current page
 	 * 
-	 * @return Page
+	 * @return Page		Current page
 	 */
 	public function getCurrentPage()
 	{
@@ -86,7 +85,7 @@ class General
 	/**
 	 * Current language
 	 * 
-	 * @return string
+	 * @return string		Current language
 	 */
 	public function getCurrentLang()
 	{
@@ -101,7 +100,7 @@ class General
 	/**
 	 * Current $_GET
 	 * 
-	 * @return array
+	 * @return array		GET variables
 	 */
 	public function getCurrentGetUrl()
 	{
@@ -116,7 +115,7 @@ class General
 	/**
 	 * Current page URL
 	 * 
-	 * @return string
+	 * @return string		Current page URL
 	 */
 	public function getCurrentPageUrl()
 	{
@@ -130,7 +129,7 @@ class General
 	/**
 	 * Change the current page
 	 * 
-	 * @param Page $page
+	 * @param Page $page	Current page
 	 */
 	public function setCurrentPage( &$page )
 	{
@@ -143,7 +142,8 @@ class General
 	/**
 	 * Change the current URL
 	 * 
-	 * @param Page $page
+	 * @param type $pageUrl		URL of the page
+	 * @param array $getUrl		List of the global variables GET
 	 */
 	public function setCurrentUrl( $pageUrl, array $getUrl = null )
 	{
@@ -163,7 +163,7 @@ class General
 	/**
 	 * Get the instance of General
 	 * 
-	 * @return General
+	 * @return General		Object instancied
 	 */
 	public static function getInstance()
 	{

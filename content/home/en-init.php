@@ -21,5 +21,4 @@ $type = 'default'; // error404
 
 // $tags				
 // $tag				
-// $contents			
-// $content			
+// $contents	

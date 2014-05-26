@@ -88,7 +88,7 @@ TO-DO
 	singletons -> utilisable sans méthode getInstance() pour InitUtil, BuildUtil et TemplateUtil
 	language -> lang
 	
-	Flea variables (old mustache) !
+	Flea.variables (old mustache) !
 		{{rootPath}}
 		{{templatePath}}
 		{{contentPath}}

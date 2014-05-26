@@ -28,7 +28,7 @@ namespace Flea\admin;
 
 function resultTest( $valid )
 {
-	if ( $valid ) return '<span class="passed">true</span>';
+	if ( $valid ) { return '<span class="passed">true</span>'; }
 	return '<span class="error">false</span>';
 }
 function testString( $a, $b )
@@ -37,33 +37,33 @@ function testString( $a, $b )
 }
 function testArray( $a, $b )
 {
+	return resultTest( sameArray( $a, $b ) );
+}
+function sameArray( $a, $b )
+{
 	foreach($a as $key => $value)
     {
         if(is_array($value))
         {
-              if(!isset($b[$key]))
+              if( !isset($b[$key]) )
               {
-                  $difference[$key] = $value;
+                  return false;
               }
               elseif(!is_array($b[$key]))
               {
-                  $difference[$key] = $value;
+                  return false;
               }
               else
               {
-                  $new_diff = testArray($value, $b[$key]);
-                  if($new_diff != false)
-                  {
-                        $difference[$key] = $new_diff;
-                  }
+                  return sameArray($value, $b[$key]);
               }
           }
           elseif(!isset($b[$key]) || $b[$key] != $value)
           {
-              $difference[$key] = $value;
+              return false;
           }
     }
-    return !isset($difference) ? 0 : $difference; 
+    return true; 
 }
 function testObject( $a, $b )
 {

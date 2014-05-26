@@ -36,9 +36,9 @@ class BuildUtil extends InitUtil
 	/**
 	 * Get the page with the pageName
 	 * 
-	 * @param string $pageId
-	 * @param string $lang
-	 * @return Page
+	 * @param string $pageName		Name of the page
+	 * @param string $lang			Language of the page (if null it's the current language)
+	 * @return Page					Instance of the Page
 	 */
 	public function getPage( $pageName, $lang = null )
 	{
@@ -52,8 +52,8 @@ class BuildUtil extends InitUtil
 	/**
 	 * Get the absoulte URL of a page by his page URL
 	 * 
-	 * @param string $url
-	 * @return string
+	 * @param string $url		Page URL
+	 * @return string			Absolute URL of the page
 	 */
     public function getAbsUrlByPageUrl( $url, array $gets = null, $explicitGet = true )
     {
@@ -65,10 +65,10 @@ class BuildUtil extends InitUtil
 	/**
 	 * Absolute URL for a page
 	 * 
-	 * @param string $pageName
-	 * @param string $lang
-	 * @param array $getUrl
-	 * @return string
+	 * @param string $pageName		Name of the page
+	 * @param string $lang			Language of the page
+	 * @param array $getUrl			Array of GET of the page (optional)
+	 * @return string				Absolute URL
 	 */
 	public function getAbsUrlByIdLang( $pageName, $lang, array $getUrl = null )
     {
@@ -79,6 +79,9 @@ class BuildUtil extends InitUtil
         return _ROOT_URL.$relUrl;
     }
 	
+	/**
+	 * Reset the object (new evaluation of current page)
+	 */
 	public function reset()
 	{
 		$pageList = PageList::getInstance();
@@ -87,61 +90,70 @@ class BuildUtil extends InitUtil
 		{
 			Debug::getInstance()->addError( 'All pages must be initialised after use BuildUtil class' );
 		}
-		
         $pageUrl = $general->getCurrentPageUrl();
-        
         $page = $pageList->getByUrl( $pageUrl );
-        //$this->_page = $page;
-        //$this->_language = $page->getLanguage();
 		$general->setCurrentPage($page);
 	}
     
 	/**
 	 * Absolute URL for a page
 	 * 
-	 * @param string $pageName
-	 * @return string
+	 * @param string $pageName	Name of the page
+	 * @return string			Absolute URL of the page		
 	 */
     public function getAbsUrl( $pageName )
     {
-		$lang = General::getInstance()->getCurrentLang(); //$this->getLang();
-        //return PageUtils::getAbsoluteUrl($idPage, $lang);
+		$lang = General::getInstance()->getCurrentLang();
+		
 		return $this->getAbsUrlByIdLang($pageName, $lang);
     }
 	
 	/**
+	 * Simple method to create a link.
+	 * Ex:
+	 * <code>
+	 * - $pageName = 'home';
+	 * - $tagBefore = '<em>';
+	 * - $tagAfter = '</em>';
+	 * - $attInA = ' class="link-home blue"';
+	 * =>  <a href="http://flea.namide.com/en/home" class="link-home blue">Home page<em></em></a>
+	 * </code>
 	 * 
-	 * @param string $idPage
-	 * @param string $tagBefore
-	 * @param string $tagAfter
-	 * @return string
+	 * @param string $pageName		Name of the page to linked
+	 * @param string $tagBefore		Tag before the title of the page (in the tag <a></a>)
+	 * @param string $tagAfter		Tag after the title of the page (in the tag <a></a>)
+	 * @param string $attInA		Additionnal attribute to the tag <a></a>
+	 * @return string				HTML link generated	
 	 */
-	public function getLink( $idPage, $tagBefore = '', $tagAfter = '', $argsInA = '' )
+	public function getLink( $pageName, $tagBefore = '', $tagAfter = '', $attInA = '' )
 	{
 		$lang = General::getInstance()->getCurrentLang();
 		$pageList = PageList::getInstance();
 		$page = $pageList->getPage( $idPage, $lang );
-		return '<a href="'.$this->urlPageToAbsUrl( $page->getUrl() ).'"'.$argsInA.'>'.$tagBefore.$page->getTitle().$tagAfter.'</a>';
+		return '<a href="'.$this->urlPageToAbsUrl( $page->getUrl() ).'" '.$attInA.'>'.$tagBefore.$page->getTitle().$tagAfter.'</a>';
 	}
 	
-	
 	/**
-	 * Converts the Flea.variables to real datas
+	 * Format the text by converting the Flea variables to real datas.
+	 * List of Flea variables :
+	 * - {{rootPath}}			=> URL of the root
+	 * - {{templatePath}}		=> URL of the template directory
+	 * - {{contentPath}}		=> URL of the content directory
+	 * - {{pageContentPath}}	=> URL of the page in the content directory
+	 * - {{lang}}				=> current language
+	 * - {{title}}				=> title of the current page
+	 * - {{header}}				=> HTML header of the current page
+	 * - {{body}}				=> HTML body of the current page
+	 * - {{description}}		=> HTML description of the current page
+	 * - {{content:additionnal-label-content}}	=> $currentPage->getContent('additionnal-label-content');
+	 * - {{pageNameToAbsUrl:page-name}}			=> $buildUtil->getAbsUrlByIdLang( ‘page-name', $currentLanguage );	
 	 * 
-	 * @param string $text
-	 * @param Page $page
-	 * @return Page
+	 * @param string $text		Original text
+	 * @param Page $page		Current page
+	 * @return string			Formated text				
 	 */
 	public function replaceFleaVars( $text, Page &$page = null )
     {
-		/*if ( $page !== null )
-		{
-			$replacePage = preg_replace('/\{\{pathCurrentPage:(.*?)\}\}/', $buildUtil-> $page->getPageUrl('$1'), $text);
-		}*/
-		/*$replacePage = preg_replace('/\{\{urlPageToAbsoluteUrl:(.*?)\}\}/', $urlUtil('$1'), $replacePage);
-        $replacePage = preg_replace('/\{\{pathTemplate:(.*?)\}\}/', $this->getTemplateAbsUrl('$1'), $replacePage);
-		$replacePage = preg_replace('/\{\{pathContent:(.*?)\}\}/', $this->getContentAbsUrl('$1'), $replacePage);*/
-		
 		$replacePage = str_replace('{{rootPath}}', _ROOT_URL, $text);
 		$replacePage = str_replace('{{templatePath}}', _ROOT_URL._TEMPLATE_DIRECTORY, $replacePage);
 		$replacePage = str_replace('{{contentPath}}', _ROOT_URL._CONTENT_DIRECTORY, $replacePage);
@@ -157,17 +169,16 @@ class BuildUtil extends InitUtil
 		$replacePage = str_replace('{{body}}', $currentPage->getHtmlBody(), $replacePage);
 		$replacePage = str_replace('{{description}}', $currentPage->getHtmlDescription(), $replacePage);
 		
-		$replacePage = preg_replace_callback( '/\{\{content:(.*?)\}\}/', function ($matches) use($page)
-		{
-			$currentPage = General::getInstance()->getCurrentPage();
-			return $currentPage->getContent($matches[1]);
-		}, $replacePage );
 			
-			
-		//$pageList = PageList::getInstance();
 		if ( General::getInstance()->getPagesInitialised() && $page !== null )
 		{
-			$replacePage = preg_replace_callback( '/\{\{idPageToAbsUrl:(.*?)\}\}/', function ($matches) use($page)
+			$replacePage = preg_replace_callback( '/\{\{content:(.*?)\}\}/', function ($matches) use($page)
+			{
+				$currentPage = General::getInstance()->getCurrentPage();
+				return $currentPage->getContent($matches[1]);
+			}, $replacePage );
+		
+			$replacePage = preg_replace_callback( '/\{\{pageNameToAbsUrl:(.*?)\}\}/', function ($matches) use($page)
 			{
 				$lang = $page->getLang();
 				return BuildUtil::getInstance()->getAbsUrlByIdLang( $matches[1], $lang );

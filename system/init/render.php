@@ -29,13 +29,6 @@ namespace Flea;
 $timestart = microtime(true);
 $initTime = 0;
 
-if ( _DEBUG )
-{
-	include_once _SYSTEM_DIRECTORY.'helpers/system/Debug.php';
-	if (!ini_get('display_errors')) { ini_set('display_errors', '1'); }
-	error_reporting(E_ALL);
-}
-
 if ( _CACHE )
 {
 	include_once _SYSTEM_DIRECTORY.'helpers/system/DataUtil.php';
@@ -50,6 +43,7 @@ if ( _CACHE )
 		$cache->echoSaved($fileName);
 		if ( _DEBUG )
 		{
+			include_once _SYSTEM_DIRECTORY.'helpers/system/Debug.php';
 			echo '<!-- load cache time: ', number_format( microtime(true) - $timestart , 3) , 's -->';
 			Debug::getInstance()->dispatchErrors();
 		}
@@ -57,7 +51,6 @@ if ( _CACHE )
 	}
 	else
 	{
-		
 		include_once _SYSTEM_DIRECTORY.'init/import.php';
 		include_once _SYSTEM_DIRECTORY.'init/loadPages.php';
 		include_once _SYSTEM_DIRECTORY.'init/buildPage.php';

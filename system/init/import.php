@@ -24,6 +24,13 @@
  * THE SOFTWARE.
  */
 
+if ( _DEBUG )
+{
+	include_once _SYSTEM_DIRECTORY.'helpers/system/Debug.php';
+	if (!ini_get('display_errors')) { ini_set('display_errors', '1'); }
+	error_reporting(E_ALL);
+}
+
 include_once _SYSTEM_DIRECTORY.'data/Saver.php';
 include_once _SYSTEM_DIRECTORY.'data/list/LangList.php';
 include_once _SYSTEM_DIRECTORY.'data/Element.php';
