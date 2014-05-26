@@ -9,19 +9,19 @@ Lightweight PHP framework
 - Lightweight
 
 
-Initialize
+Initialize the languages
 ------------------------
 
 ##### list of languages
 `content/initLang.php`
 
 ```php
-$language->addDefaultLanguage('en');
-$language->addLanguage('fr');
+$lang->addDefault('en');
+$lang->add('fr');
 ```
 
 
-Configure page
+Initialize the page
 ------------------------
 
 ##### initialization
@@ -57,18 +57,26 @@ $htmlHeader = '<meta name="robots" content="all" />';
 // title of the page
 $htmlTitle = 'accueil';
 
-// Type of the page, '', 'default' if it's the default page, 'error404' if it's the error 404 page
+// Type of the page: 
+// - ''
+// - 'default' if it's the default page
+// - 'error404' if it's the error 404 page
 $type = 'default';
-// Arguments to the php function header() of the page (for other type than HTML, like XML)
+// Arguments to the php function header()
+// of the page (for other type than HTML, like XML)
 //$phpHeader = 'Content-Type: application/xml; charset=utf-8';	
 
 // Add tags to the page
 $tags = array('importantPage', 'mainlyPage');
 // Add 1 tag to the page		
 $tag = 'konamiCodeEnabled';
-// Add additionals contents accessible (from other pages or with the template)
+// Add additionals contents accessible
+// (from other pages or with the template)
 $contents = array( 'resume'=>'Home page', 'important'=>3 );
 ```
+
+Content of the page
+------------------------
 
 ##### content
 `content/home/{language}-build.php`
@@ -89,15 +97,36 @@ of init page `content/home/{language}-init.php`
 or template
 
 ```php
-{{rootPath}} // URL of the root
-{{templatePath}} // URL of the template directory
-{{contentPath}} // URL of the content directory
-{{pageContentPath}} // URL of the page in the content directory
-{{lang}} // Current language
-{{title}} // Title of the current page
-{{header}} // HTML header of the current page
-{{body}} // HTML body of the current page
-{{description}} // HTML description of the current page
-{{content:additionnal-label-content}} // $currentPage->getContent('additionnal-label-content');
-{{pageNameToAbsUrl:page-name}} // $buildUtil->getAbsUrlByIdLang( ‘page-name', $currentLanguage );
+{{rootPath}}
+// URL of the root
+
+{{templatePath}}
+// URL of the template directory
+
+{{contentPath}}
+// URL of the content directory
+
+{{pageContentPath}}
+// URL of the page in the content directory
+
+{{lang}}
+// Current language
+
+{{title}}
+// Title of the current page
+
+{{header}}
+// HTML header of the current page
+
+{{body}}
+// HTML body of the current page
+
+{{description}}
+// HTML description of the current page
+
+{{content:additionnal-label-content}}
+// $currentPage->getContent('additionnal-label-content');
+
+{{pageNameToAbsUrl:page-name}}
+// $buildUtil->getAbsUrlByIdLang( ‘page-name', $currentLanguage );
 ```
