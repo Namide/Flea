@@ -93,15 +93,16 @@ TO-DO
 		{{templatePath}}
 		{{contentPath}}
 		
-		{{currentLang}}
-		
-		{{currentPageContentPath}}
+		{{lang}}
+		{{description}}
+		{{title}}
+		{{body}}
+
+		{{pageContentPath}}
 		
 		{{idPageToAbsUrl:basic/homepage}}
 		? dynamic pages ?
 
-		!title
-		!description
 		!date
 	
 	PageList

@@ -104,7 +104,7 @@ class BuildUtil extends InitUtil
 	 */
     public function getAbsUrl( $pageName )
     {
-		$lang = $this->getLang();
+		$lang = General::getInstance()->getCurrentLang(); //$this->getLang();
         //return PageUtils::getAbsoluteUrl($idPage, $lang);
 		return $this->getAbsUrlByIdLang($pageName, $lang);
     }
@@ -149,9 +149,21 @@ class BuildUtil extends InitUtil
 		$general = General::getInstance();
 		$currentPage = $general->getCurrentPage();
 		
-		$replacePage = str_replace('{{currentLang}}', $general->getCurrentLang(), $replacePage);
-		$replacePage = str_replace('{{currentPageContentPath}}', _ROOT_URL._CONTENT_DIRECTORY.$currentPage->getName(), $replacePage);
+		$replacePage = str_replace('{{lang}}', $general->getCurrentLang(), $replacePage);
+		$replacePage = str_replace('{{pageContentPath}}', _ROOT_URL._CONTENT_DIRECTORY.$currentPage->getName(), $replacePage);
 
+		$replacePage = str_replace('{{title}}', $currentPage->getHtmlTitle(), $replacePage);
+		$replacePage = str_replace('{{header}}', $currentPage->getHtmlHeader(), $replacePage);
+		$replacePage = str_replace('{{body}}', $currentPage->getHtmlBody(), $replacePage);
+		$replacePage = str_replace('{{description}}', $currentPage->getHtmlDescription(), $replacePage);
+		
+		$replacePage = preg_replace_callback( '/\{\{content:(.*?)\}\}/', function ($matches) use($page)
+		{
+			$currentPage = General::getInstance()->getCurrentPage();
+			return $currentPage->getContent($matches[1]);
+		}, $replacePage );
+			
+			
 		//$pageList = PageList::getInstance();
 		if ( General::getInstance()->getPagesInitialised() && $page !== null )
 		{

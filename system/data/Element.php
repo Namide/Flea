@@ -242,6 +242,10 @@ class Element extends Saver
 	 */
 	public function getContent( $label )
     {
+		if ( !$this->hasContent($label) )
+		{
+			return '';
+		}
         return $this->_contents[ $label ];
     }
 	

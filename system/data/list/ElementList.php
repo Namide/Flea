@@ -43,6 +43,27 @@ class ElementList extends Saver
 	 */
 	public function getAll() { return $this->_elements; }
 	
+	/**
+	 * List of elements in the language
+	 * 
+	 * @param string $lang
+	 * @return array
+	 */
+	public function getAllByLang( $lang )
+	{
+		$elements = array();
+		
+		foreach ( $this->_elements as $element )
+        {
+			if( $element->getLang() === $lang )
+			{
+				$elements[] = $element;
+			}
+        }
+		
+		return $elements;
+	}
+	
 	final private function __construct()
     {
         $this->reset();

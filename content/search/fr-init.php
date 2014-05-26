@@ -1,7 +1,7 @@
 <?php
 
 $url = 'fr/recherche';		
-$template = '';
+$template = 'default';
 
 $visible = true;	
 $cachable = true;

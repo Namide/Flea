@@ -134,7 +134,8 @@ class PageList extends ElementList
     {
 		include $filename;
 		
-		if ( _DEBUG && empty($page->getPageUrl()) && !isset($url) )
+		$pageUrlTemp = $page->getPageUrl();
+		if ( _DEBUG && empty($pageUrlTemp) && !isset($url) )
 		{
 			Debug::getInstance()->addError( 'The initialisation of a page must to have an URL' );
 		}

@@ -31,28 +31,31 @@ $initTime = 0;
 
 if ( _DEBUG )
 {
+	include_once _SYSTEM_DIRECTORY.'helpers/system/Debug.php';
 	if (!ini_get('display_errors')) { ini_set('display_errors', '1'); }
 	error_reporting(E_ALL);
 }
 
 if ( _CACHE )
 {
+	include_once _SYSTEM_DIRECTORY.'helpers/system/DataUtil.php';
 	include_once _SYSTEM_DIRECTORY.'helpers/system/Cache.php';
+	include_once _SYSTEM_DIRECTORY.'helpers/system/UrlUtil.php';
 	$cache = new Cache( _CACHE_DIRECTORY.'pages/' );
 	
 	$fileName = UrlUtil::urlPageToStr( UrlUtil::getNavigatorRelUrl() );
 	
-	if( $cache->isWrite( $fileName ) )
+	if( $cache->isWrited( $fileName ) )
 	{
 		$cache->echoSaved($fileName);
 		if ( _DEBUG )
 		{
-			echo '<!-- load cache time: ', number_format( microtime(true) - $timestart , 3) , 'ms -->';
+			echo '<!-- load cache time: ', number_format( microtime(true) - $timestart , 3) , 's -->';
 			Debug::getInstance()->dispatchErrors();
 		}
 		exit();
 	}
-	elseif( $cache->isCachable( $fileName ) )
+	else
 	{
 		
 		include_once _SYSTEM_DIRECTORY.'init/import.php';
@@ -61,21 +64,20 @@ if ( _CACHE )
 		
 		$page = General::getInstance()->getCurrentPage();
 		
-		$cache->isCachable( $page );
-		if ( $cache->isCachable( $page ) )
+		if ( $cache->isPageCachable( $page ) )
 		{
 			$cache->startSave();
 				$page->render();
 			$cache->stopSave();
 			$content = BuildUtil::getInstance()->replaceFleaVars( $cache->getSaved(), $page );
 			$cache->setSaved( $content );
-			$cache->writesCache( $fileName );
+			$cache->writeCache( $fileName );
 			echo $cache->getSaved();
 
 
 			if ( _DEBUG )
 			{
-				echo '<!-- execute PHP and write cache time: ', number_format( microtime(true) - $timestart , 3), 'ms -->';
+				echo '<!-- execute PHP and write cache time: ', number_format( microtime(true) - $timestart , 3), 's -->';
 				Debug::getInstance()->dispatchErrors();
 			}
 		}
@@ -95,6 +97,6 @@ $page->render();
 
 if ( _DEBUG )
 {
-	echo '<!-- execute PHP time: ', number_format( microtime(true) - $timestart , 3),'ms -->';
+	echo '<!-- execute PHP time: ', number_format( microtime(true) - $timestart , 3),'s -->';
 	Debug::getInstance()->dispatchErrors();
 }

@@ -34,6 +34,12 @@ namespace Flea;
 class DataUtil
 {
 	protected $_dir = '';
+	/**
+	 * Directory to save the files
+	 * 
+	 * @return string
+	 */
+	public function getDir() { return $this->_dir; }
 	
 	/**
 	 * Initialise the "connection" with the directory of data files
@@ -166,7 +172,7 @@ class DataUtil
 			//default: $ctype="application/force-download";
 		}
 		
-		readfile( $key );
+		readfile( $this->_dir.$key );
 	}
 	
 }

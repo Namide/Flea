@@ -34,13 +34,8 @@ include _CONTENT_DIRECTORY.'initLang.php';
 $pageList = PageList::getInstance();
 $langs = $lang->getList();
 addPagesRecurs( _CONTENT_DIRECTORY, $lang, $pageList, '' );
-//include_once _CONTENT_DIRECTORY.'pages.php';
-//$pageList->go();
-//UrlUtil::getInstance();
 General::getInstance()->setPagesInitialised(true);
 
-// HELPERS FOR TEMPLATES
-//include_once _SYSTEM_DIRECTORY.'helpers/BuildUtil.php';
 UrlUtil::getInstance();
 BuildUtil::getInstance();
 

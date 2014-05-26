@@ -64,7 +64,21 @@ class Cache
 	 */
 	public function isWrited( $fileName )
 	{
-		return $this->_dataUtil->has($fileName);//file_exists( $this->_rootDir.$fileName );
+		return $this->_dataUtil->has($fileName);
+	}
+	
+	/**
+	 * Write the file in the directory
+	 * 
+	 * @param string $fileName
+	 */
+	public function writeCache( $fileName, &$content = null )
+	{
+		if ( $content === null )
+		{
+			$content = $this->_content;
+		}
+		$this->_dataUtil->add( $fileName, $this->_content );
 	}
 	
 	/**
@@ -97,7 +111,7 @@ class Cache
 	 */
 	public function isPageCachable( Page &$page )
 	{
-		if ( self::getNumFilesSaved( $this->_rootDir ) < _MAX_PAGE_CACHE )
+		if ( self::getNumFilesSaved( $this->_dataUtil->getDir() ) < _MAX_PAGE_CACHE )
 		{
 			return $page->getCachable();
 		}
