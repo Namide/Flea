@@ -29,6 +29,15 @@ system
 			Router.php
 			Cache.php
 			FileUtil.php
+			DataUtil.php
+				_construct( dir, name )
+				add( key, content, type = file /* json */ );
+				update( key, content );
+				get( key )
+				getType( key )
+				has( key )
+				render( key )
+
 			//SaveUtil.php
 			UrlUtil.php
 			

@@ -33,8 +33,10 @@ namespace Flea;
  */
 class Cache
 {
-	private $_rootDir;
+	//private $_rootDir;
 	private $_content;
+	private $_dataUtil;
+	
 	
 	/**
 	 * Directory for write the file(s)
@@ -49,16 +51,9 @@ class Cache
 		}
 		
 		if ( substr( $rootDir, -1, 1 ) != '/' ) { $rootDir .= '/'; }
-		$this->_rootDir = $rootDir;
+		//$this->_rootDir = $rootDir;
+		$this->_dataUtil = new DataUtil($rootDir);
 		$this->_content = '';
-		/*$this->initFile = _CACHE_DIRECTORY.'init/start.php';
-		include_once _SYSTEM_DIRECTORY.'helpers/UrlUtil.php';
-		$this->pageFile = UrlUtil::getURICacheID();
-		$path = explode( "/", $this->pageFile );
-		if ( count( explode( ".", array_pop($path) ) ) < 2 )
-		{
-			$this->pageFile .= '/index.html';
-		}*/
     }
 	
 	/**
@@ -69,7 +64,7 @@ class Cache
 	 */
 	public function isWrited( $fileName )
 	{
-		return file_exists( $this->_rootDir.$fileName );
+		return $this->_dataUtil->has($fileName);//file_exists( $this->_rootDir.$fileName );
 	}
 	
 	/**
@@ -77,7 +72,7 @@ class Cache
 	 */
 	public function echoSaved( $fileName )
 	{
-		$file_extension = strtolower( substr( strrchr( $fileName ,"." ), 1 ) );
+		/*$file_extension = strtolower( substr( strrchr( $fileName ,"." ), 1 ) );
 
 		switch ($file_extension)
 		{
@@ -87,7 +82,8 @@ class Cache
 			//default: $ctype="application/force-download";
 		}
 		
-		readfile( $this->_rootDir.$fileName );
+		readfile( $this->_rootDir.$fileName );*/
+		$this->_dataUtil->render($fileName);
 	}
 	
 	/**
@@ -164,50 +160,6 @@ allow from all
 		$this->_content = $content;
 		return $content;
 	}
-	
-	/**
-	 * 
-	 * @param string $newContent
-	 * @param string $file
-	 */
-	/*public function writesCache( &$content, $fileName )
-	{
-		$page = BuildUtil::getInstance()->getCurrentPage();
-		if ( $page->getCachable() )
-		{
-			if ( count( explode( ".", $file ) ) < 2 )
-			{
-				if ( substr($file, -1, 1) !== '/' ) $file .= '/';
-				$file .= 'index.html';
-			}
-			
-			FileUtil::writeFile($pageContent, $file);
-			//$this->writesCacheFile( $pageContent, $file );
-		}
-	}*/
-	
-	
-	/*public function cacheInit()
-	{
-		include_once _SYSTEM_DIRECTORY.'core/ElementList.php';
-		
-		$content = '<?php'."\r\n";
-		$content .= LanguageList::getInstance()->getSave().';'."\r\n";
-		$content .= 'include_once "'._SYSTEM_DIRECTORY.'core/ElementList.php";'."\r\n";
-		$content .= ElementList::getInstance()->getSave().';'."\r\n";
-		$content .= PageList::getInstance()->getSave().';'."\r\n";
-		
-		$this->writesCacheFile( $content, $this->initFile );
-	}*/
-
-	/*public function isInitCached()
-	{
-		if ( !file_exists($this->initFile) ) return false;
-		include_once $this->initFile;
-		return true;
-	}*/
-
-	
 	
 	/**
 	 * Num of files saved
