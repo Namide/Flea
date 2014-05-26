@@ -41,26 +41,13 @@ class InitUtil
         $this->reset();
     }
 	
-    protected function reset()
-	{
-		/*$general = General::getInstance();
-        $urlUtil = UrlUtil::getInstance();
-		
-		$urlUtil->
-        $general->setCurrentUrl(  , $getUrl)
-        
-        $page = $pageList->getPageByUrl( $pageUrl );
-        //$this->_page = $page;
-        //$this->_language = $page->getLanguage();
-		$general->setCurrentPage($page);*/
-		
-	}
+    protected function reset() { }
 	
 	/**
 	 * Get an absolute URL for a file at the root of the website
 	 * 
-	 * @param string $file
-	 * @return string
+	 * @param string $file		Name of the file
+	 * @return string			Absolute URL of the file
 	 */
 	public function getRootAbsUrl( $file )
     {
@@ -70,8 +57,8 @@ class InitUtil
 	/**
 	 * Get an absolute URL for a file in the template directory
 	 * 
-	 * @param string $file
-	 * @return string
+	 * @param string $file		Name of the file
+	 * @return string			Absolute URL of the file
 	 */
     public function getTemplateAbsUrl( $file )
     {
@@ -81,8 +68,8 @@ class InitUtil
 	/**
 	 * Get an absolute URL for a file in the content directory
 	 * 
-	 * @param string $file
-	 * @return string
+	 * @param string $file		Name of the file
+	 * @return string			Absolute URL of the file
 	 */
     public function getContentAbsUrl( $file )
     {
@@ -90,17 +77,8 @@ class InitUtil
     }
 	
 	/**
-	 * 
-	 * @param string $url
-	 * @return string
+	 * Unclonable (singleton)
 	 */
-    /*public function urlToLang( $url )
-    {
-        $pageList = PageList::getInstance();
-        $pageClass = $pageList->getPageByUrl( $url );
-        return $pageClass->getLanguage();
-    }*/
-	
 	final public function __clone()
     {
         if ( _DEBUG )
@@ -110,7 +88,9 @@ class InitUtil
     }
 	
 	/**
-	 * @return static
+	 * Instance of the object
+	 * 
+	 * @return static		Instance of the object InitUtil
 	 */
     public static function getInstance()
     {

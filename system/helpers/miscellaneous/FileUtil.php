@@ -37,8 +37,8 @@ class FileUtil
 	 * Writes the content in a file.
 	 * If the directory doesn't exist, it's automatically created.
 	 * 
-	 * @param string &$content
-	 * @param string $fileName
+	 * @param string &$content		Content of the file
+	 * @param string $fileName		Name of the file
 	 */
 	public static function writeFile( &$content, $fileName )
 	{
@@ -49,7 +49,7 @@ class FileUtil
 	/**
 	 * Writes recursively the directories of a files if it doesn't exist
 	 * 
-	 * @param string $fileName
+	 * @param string $fileName		Name of the file
 	 */
 	public static function writeDirOfFile( $fileName )
 	{
@@ -62,19 +62,19 @@ class FileUtil
 	 * Writes a directory if it doesn't exist.
 	 * It works recursively.
 	 * 
-	 * @param string $dir
+	 * @param string $dirName		Directory to write
 	 */
-	public static function writeDir( $dir )
+	public static function writeDir( $dirName )
 	{
-		$path = explode( '/', $dir );
+		$path = explode( '/', $dirName );
 		
-		$dir = '';
+		$dirName = '';
 		while ( count($path) > 0 )
 		{
-			$dir .= $path[0].'/';
-			if ( !file_exists($dir) )
+			$dirName .= $path[0].'/';
+			if ( !file_exists($dirName) )
 			{
-				mkdir( $dir, 0777 );
+				mkdir( $dirName, 0777 );
 			}
 			array_shift($path);
 		}
@@ -84,13 +84,13 @@ class FileUtil
 	/**
 	 * Size of the directory in octets
 	 * 
-	 * @param string $directory
-	 * @return float
+	 * @param string $dir		Directory to mesure
+	 * @return float			Size of the directory in octet
 	 */
-	public static function getDirSize($directory)
+	public static function getDirSize($dirName)
 	{
 		$size = 0;
-		foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory)) as $file)
+		foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dirName)) as $file)
 		{
 			$size += $file->getSize();
 		}
@@ -98,15 +98,15 @@ class FileUtil
 	} 
 	
 	/**
-	 * size of the directory in string with type (bytes, kilo-bytes...)
+	 * Size of the directory in string with type (bytes, kilo-bytes...)
 	 * 
-	 * @param string $path
-	 * @param bool $color
-	 * @return string
+	 * @param string $dirName				Directory to mesure
+	 * @param int $round				Number to float
+	 * @return string					Formated size of the directory
 	 */
-	public static function getFormatedSize( $path, $round = 2 )
+	public static function getFormatedSize( $dirName, $round = 2 )
 	{
-		$size = self::getDirSize($path);
+		$size = self::getDirSize($dirName);
 		
 		//Size must be bytes!
 		$sizes = array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
@@ -118,50 +118,48 @@ class FileUtil
 	/**
 	 * Delete a directory and his content
 	 * 
-	 * @param string $dir
-	 * @return int
+	 * @param string $dirName		Directory to delete		
+	 * @return int					true on success or false on failure			
 	 */
-	public static function delDirRecursively( $dir )
+	public static function delDirRecursively( $dirName )
 	{
-		if ( !file_exists($dir) )
-		{
-			return 0;//echo 'error: No such file or directory "'.$dir.'"';
-		}
+		if ( !file_exists($dirName) ) { return 0; }
 
-		$files = array_diff( scandir($dir), array('.','..') );
+		$files = array_diff( scandir($dirName), array('.','..') );
 		foreach ($files as $file)
 		{
-			if (is_dir($dir.'/'.$file))
+			if (is_dir($dirName.'/'.$file))
 			{
-				self::delDirRecursively($dir.'/'.$file);
+				self::delDirRecursively($dirName.'/'.$file);
 			}
 			else
 			{
-				unlink($dir.'/'.$file);
+				unlink($dirName.'/'.$file);
 			}
 		}
-		return rmdir($dir);
+		
+		return rmdir($dirName);
 	}
 	
 	/**
 	 * Delete all files and directories and return the number of file deleted
 	 * 
-	 * @param string $dir
-	 * @return int
+	 * @param string $dirName		Directory to delete
+	 * @return int					Number of files deleted (without directories)
 	 */
-	public static function delEmptyDirRecursively( $dir )
+	public static function delEmptyDirRecursively( $dirName )
 	{
 		$numChilds = 0;
 
-		if ( !file_exists($dir) )	{ return 0; }
-		if ( is_file($dir) )		{ return 1; }
+		if ( !file_exists($dirName) )	{ return 0; }
+		if ( is_file($dirName) )		{ return 1; }
 
-		$files = array_diff( scandir($dir), array( '.', '..', '.DS_Store', 'Thumbs.db' ) );
+		$files = array_diff( scandir($dirName), array( '.', '..', '.DS_Store', 'Thumbs.db' ) );
 		foreach ($files as $file)
 		{
-			if (is_dir($dir.'/'.$file))
+			if (is_dir($dirName.'/'.$file))
 			{
-				$numChilds += self::delEmptyDirRecursively($dir.'/'.$file);
+				$numChilds += self::delEmptyDirRecursively($dirName.'/'.$file);
 			}
 			else
 			{
@@ -171,19 +169,19 @@ class FileUtil
 
 		if ( $numChilds < 1 )
 		{
-			rmdir($dir);
+			rmdir($dirName);
 		}
 
 		return $numChilds;
 	}
 	
 	/**
-	 * Copy the recursivly the directory ($dir2copy) to the directory ($dir_paste)
+	 * Copy the recursivly the directory ($dir2copy) to the directory ($dir2paste)
 	 * 
-	 * @param string $dir2copy
-	 * @param string $dir_paste
+	 * @param string $dir2copy		Original directory
+	 * @param string $dir2paste		New directory
 	 */
-	public static function copyDir( $dir2copy, $dir_paste )
+	public static function copyDir( $dir2copy, $dir2paste )
 	{
 		if ( is_dir($dir2copy) )
 		{
@@ -192,19 +190,16 @@ class FileUtil
 			{     
 				while ( ($file = readdir($dh)) !== false )
 				{
-					if (!is_dir($dir_paste))
-					{
-						mkdir ($dir_paste, 0777);
-					}
+					if ( !is_dir($dir2paste) ) { mkdir ($dir2paste, 0777); }
 					
-					if(is_dir($dir2copy.$file) && $file != '..'  && $file != '.')
+					if( is_dir($dir2copy.$file) && $file != '..'  && $file != '.')
 					{
-						copyDir ( $dir2copy.$file.'/' , $dir_paste.$file.'/' ); 
+						$this->copyDir ( $dir2copy.$file.'/' , $dir2paste.$file.'/' ); 
 					}
 					elseif( $file != '..' &&
 							$file != '.' )
 					{
-						copy ( $dir2copy.$file , $dir_paste.$file ); 
+						copy ( $dir2copy.$file , $dir2paste.$file ); 
 					}
 				}
 
@@ -214,14 +209,15 @@ class FileUtil
 	}
 	
 	/**
-	 * Copy the directory ($dir2copy) to the directory ($dir_paste) for type.
+	 * Copy the directory ($dir2copy) to the directory ($dir2paste) for type.
 	 * Ex for copy without php:
 	 * <code>copyDirWithoutType( 'original/dir', 'new/dir', array('php', 'php4', 'php5') );</code>
 	 * 
-	 * @param string $dir2copy
-	 * @param string $dir_paste
+	 * @param string $dir2copy		Original directory
+	 * @param string $dir2paste		New directory
+	 * @param array $extentions		Exceptions list
 	 */
-	public static function copyDirWithoutType( $dir2copy, $dir_paste, array $extentions = null )
+	public static function copyDirWithoutType( $dir2copy, $dir2paste, array $extentions = null )
 	{
 		if ( $extentions === null ) { $extentions = array(); }
 		
@@ -232,14 +228,14 @@ class FileUtil
 			{     
 				while ( ($file = readdir($dh)) !== false )
 				{
-					if (!is_dir($dir_paste))
+					if (!is_dir($dir2paste))
 					{
-						mkdir ($dir_paste, 0777);
+						mkdir ($dir2paste, 0777);
 					}
 					
 					if(is_dir($dir2copy.$file) && $file != '..'  && $file != '.')
 					{
-						self::copyDirWithoutPhpFiles ( $dir2copy.$file.'/' , $dir_paste.$file.'/' ); 
+						self::copyDirWithoutPhpFiles ( $dir2copy.$file.'/' , $dir2paste.$file.'/' ); 
 					}
 					elseif( $file != '..' &&
 							$file != '.' )
@@ -251,7 +247,7 @@ class FileUtil
 							
 							if ( strtolower( substr( strrchr( $file, '.' ), 1 ) ) === $ext ) { $ok = false; }
 						}
-						if( $ok ) { copy ( $dir2copy.$file , $dir_paste.$file ); }
+						if( $ok ) { copy ( $dir2copy.$file , $dir2paste.$file ); }
 					}
 				}
 

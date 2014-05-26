@@ -1,6 +1,6 @@
 # 1and1
-# AddType x-mapp-php6 .php								# 1and1
-# AddHandler x-mapp-php6 .php							# 1and1
+AddType x-mapp-php6 .php								# 1and1
+AddHandler x-mapp-php6 .php							# 1and1
 
 
 <IfModule mod_rewrite.c>

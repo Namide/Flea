@@ -5,7 +5,8 @@
  */
 
 // Absolute URL of the website
-define( '_ROOT_URL', 'http://localhost/Flea/' );
+//define( '_ROOT_URL', 'http://localhost/Flea/' );
+define( '_ROOT_URL', 'http://flea.namide.com/' );
 
 // Directory name of the system's files
 // It is better to be outside of the www directory
@@ -36,7 +37,7 @@ define( '_URL_REWRITING', false );
 define( '_DEBUG', true );
 
 // Cache activated => TRUE, deactivated => FALSE
-define( '_CACHE', true );
+define( '_CACHE', false );
 
 // Maximum number of files in the cache directory
 // It is better to have 5 beyond the maximum number of cachable pages
