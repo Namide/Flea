@@ -1,7 +1,7 @@
 <?php
 
 $url = 'fr/recherche';		
-$template = '';
+$template = 'default';
 
 $visible = true;	
 $cachable = true;
@@ -20,5 +20,4 @@ $type = ''; // error404 // default
 
 // $tags				
 // $tag				
-// $contents			
-// $content			
+// $contents		

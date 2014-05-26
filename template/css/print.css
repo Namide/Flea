@@ -1,0 +1,20 @@
+
+@page { margin: 10% }
+
+body { font-family: Arial, sans-serif; }
+
+a
+{
+	color:#000;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+a:link:after, a:visited:after
+{
+  font-size: 90%;
+  content: " (" attr(href) ") ";
+  font-style: italic;
+  color:#444;
+  font-weight: 0;
+}

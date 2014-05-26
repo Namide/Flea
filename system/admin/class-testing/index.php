@@ -28,7 +28,7 @@ namespace Flea\admin;
 
 function resultTest( $valid )
 {
-	if ( $valid ) return '<span class="passed">true</span>';
+	if ( $valid ) { return '<span class="passed">true</span>'; }
 	return '<span class="error">false</span>';
 }
 function testString( $a, $b )
@@ -37,7 +37,33 @@ function testString( $a, $b )
 }
 function testArray( $a, $b )
 {
-	return resultTest(count( array_diff($a, $b) ) < 1);
+	return resultTest( sameArray( $a, $b ) );
+}
+function sameArray( $a, $b )
+{
+	foreach($a as $key => $value)
+    {
+        if(is_array($value))
+        {
+              if( !isset($b[$key]) )
+              {
+                  return false;
+              }
+              elseif(!is_array($b[$key]))
+              {
+                  return false;
+              }
+              else
+              {
+                  return sameArray($value, $b[$key]);
+              }
+          }
+          elseif(!isset($b[$key]) || $b[$key] != $value)
+          {
+              return false;
+          }
+    }
+    return true; 
 }
 function testObject( $a, $b )
 {
@@ -47,29 +73,27 @@ function testObject( $a, $b )
 function writeTest( $method, $resul )
 {
 	global $class;
-	echo '
-			<tr>
-				<td>'.$class.'</td><td>'.$method.'()</td><td>'.$resul.'</td>
-			</tr>';
+	echo '<tr><td>'.$class.'</td><td>'.$method.'()</td><td>'.$resul.'</td>', writeTime() , '</tr>' , "\n";
+}
+
+function writeTime()
+{
+	global $time;
+	if ( $time == null ) $time = microtime(true);
+	
+	$dt = microtime(true) - $time;
+	$color = ($dt > 0.001);
+	$totalTime = number_format( $dt, 3);
+	$time = microtime(true);
+	
+	echo '<td><em ',( ($color)?'class="error"':'') ,'>'.$totalTime.'s</em></td>', "\n";
 }
 
 function writeClass( $className, $t = true )
 {
 	global $class;
 	$class = $className;
-	global $time;
-	$totalTime = number_format( (microtime(true) - $time), 3);
-	$time = microtime(true);
-	//define('ADMIN_CLASS', $className);
-	if( $t )
-	{
-		echo '	<tr>
-				<td colspan="3" align="center">time:'.$totalTime.'ms</td>
-			</tr>';
-	}
-	echo '	<tr>
-				<th colspan="3" align="center">'.$className.'</th>
-			</tr>';
+	echo '<tr><th colspan="4" align="center">'.$className.'</th></tr>', "\n";
 }
 
 ?>
@@ -80,6 +104,7 @@ function writeClass( $className, $t = true )
 			<th>Class</th>
 			<th>method</th>
 			<th>state</th>
+			<th>time</th>
 		</tr>
 		<?php
 
@@ -88,7 +113,10 @@ function writeClass( $className, $t = true )
 
 			include_once 'config.php';
 			include_once _SYSTEM_DIRECTORY.'init/import.php';
-
+			include_once _SYSTEM_DIRECTORY.'helpers/miscellaneous/FileUtil.php';
+			include_once _SYSTEM_DIRECTORY.'helpers/system/DataUtil.php';
+			include_once _SYSTEM_DIRECTORY.'helpers/system/Cache.php';
+			
 			writeClass('LangList');
 			$lang = \Flea\LangList::getInstance();
 			$lang->addDefault('uk');
@@ -136,7 +164,26 @@ function writeClass( $className, $t = true )
 			writeTest( 'getElementsByLang', testObject( $elementList->getByLang('fr')[0], $element2 ) );
 			writeTest( 'getById', testObject( $elementList->getByName('whohoo-as\' /', 'fr'), $element2 ) );
 
-
+			
+			writeClass('DataUtil');
+			$datas = new \Flea\DataUtil(_TEMP_DIRECTORY);
+			$temp = 'yohé!';
+			$key = 'test-01';
+			if ( $datas->has($key) ) $datas->delete ($key);
+			$datas->add( 'test-01', $temp );
+			writeTest( 'add', testString( $datas->has($key), true ) );
+			writeTest( 'has', testString( $datas->has($key), true ) );
+			if ( $datas->has($key) ) $datas->delete ($key);
+			writeTest( 'delete', testString( $datas->has($key), false ) );
+			$temp = array( 'a'=>array(5,1,2), 'f'=>3 );
+			$datas->addJson($key, $temp);
+			writeTest( 'addJson', testString( $datas->has($key), true ) );
+			$temp2 = $datas->getJson($key, $temp);
+			writeTest( 'getJson', testString( $temp, $temp2 ) );
+			$temp2 = $datas->delete($key);
+			
+			writeClass('-');
+			
 		?>
 
 	</tbody>

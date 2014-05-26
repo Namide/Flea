@@ -29,6 +29,15 @@ system
 			Router.php
 			Cache.php
 			FileUtil.php
+			DataUtil.php
+				_construct( dir, name )
+				add( key, content, type = file /* json */ );
+				update( key, content );
+				get( key )
+				getType( key )
+				has( key )
+				render( key )
+
 			//SaveUtil.php
 			UrlUtil.php
 			
@@ -79,20 +88,21 @@ TO-DO
 	singletons -> utilisable sans méthode getInstance() pour InitUtil, BuildUtil et TemplateUtil
 	language -> lang
 	
-	Flea variables (old mustache) !
+	Flea.variables (old mustache) !
 		{{rootPath}}
 		{{templatePath}}
 		{{contentPath}}
 		
-		{{currentLang}}
-		
-		{{currentPageContentPath}}
+		{{lang}}
+		{{description}}
+		{{title}}
+		{{body}}
+
+		{{pageContentPath}}
 		
 		{{idPageToAbsUrl:basic/homepage}}
 		? dynamic pages ?
 
-		!title
-		!description
 		!date
 	
 	PageList

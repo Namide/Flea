@@ -3,10 +3,7 @@
 	<p>Tests.</p>
 	
 	<?php
-		//include_once _SYSTEM_DIRECTORY.'helpers/SearchEngine.php';
-		//$search = SearchEngine::getInstance();
-	
-		print_r( Flea\General::getInstance()->getCurrentGetUrl() );
+		//print_r( Flea\General::getInstance()->getCurrentGetUrl() );
 	?>
 	
 	 <form action="{{idPageToAbsUrl:en/search}}" type="POST">

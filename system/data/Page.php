@@ -36,29 +36,29 @@ class Page extends Element
 	
 	protected $_phpHeader;
 	/**
-	 * set phpHeader
+	 * Set phpHeader (for header() function)
 	 * 
-	 * @param string $phpHeader
+	 * @param string $phpHeader		PHP header
 	 */
     public function setPhpHeader( $phpHeader ) { $this->_phpHeader = $phpHeader; }
 	/**
 	 * phpHeader if the page has a special format (XML...)
 	 * 
-	 * @return string
+	 * @return string	PHP header
 	 */
     public function getPhpHeader() { return $this->_phpHeader; }
 	
     protected $_visible;
 	/**
-	 * set the visibility of the page
+	 * Set the visibility of the page
 	 * 
-	 * @param boolean $visible
+	 * @param boolean $visible	Visibility of the page
 	 */
     public function setVisible( $visible ) { $this->_visible = $visible; }
 	/**
 	 * If the page is visible (sitemap.xml...)
 	 * 
-	 * @return boolean
+	 * @return boolean	Visibility of the page
 	 */
     public function getVisible() { return $this->_visible; }
 
@@ -66,13 +66,13 @@ class Page extends Element
 	/**
 	 * Active or unactive the GET method
 	 * 
-	 * @param boolean $visible
+	 * @param boolean $enabled		Global variables GET enabled
 	 */
     public function setGetEnabled( $enabled ) { $this->_getEnabled = $enabled; }
 	/**
 	 * If the GET is activated the page can have several URL with the same base
 	 * 
-	 * @return boolean
+	 * @return boolean		Global variables GET enabled
 	 */
     public function getGetEnabled() { return $this->_getEnabled; }
 
@@ -80,7 +80,7 @@ class Page extends Element
 	/**
 	 * Active or unactive the explicit GET
 	 * 
-	 * @param boolean $visible
+	 * @param boolean $visible		Global variables GET explicit or not
 	 */
     public function setGetExplicit( $explicit ) { $this->_getExplicit = $explicit; }
 	/**
@@ -90,37 +90,37 @@ class Page extends Element
 	 * ( explicit ) www.flea.namide.com/games/page/2/tag/RTS
 	 * ( !explicit ) www.flea.namide.com/games/2/RTS
 	 * 
-	 * @return boolean
+	 * @return boolean		Global variables GET explicit or not
 	 */
     public function getGetExplicit() { return $this->_getExplicit; }
 
 	
     protected $_cachable;
 	/**
-	 * set the chability of the page
+	 * set the cachability of the page
 	 * 
-	 * @param boolean $cachable
+	 * @param boolean $cachable		Is the page cachable or not
 	 */
 	public function setCachable( $cachable ) { $this->_cachable = $cachable; }
 	/**
 	 * Cachability of the page.
 	 * It's recomended to don't cache a page with POST datas.
 	 * 
-	 * @return boolean
+	 * @return boolean		Is the page cachable or not
 	 */
     public function getCachable() { return $this->_cachable; }
 
     protected $_url;
 	/**
-	 * Set the URL of the page
+	 * Set the URL of the page (without Root and GET)
 	 * 
-	 * @param string $url
+	 * @param string $url		URL of the page
 	 */
     public function setPageUrl( $url ) { $this->_url = $url; }
 	/**
-	 * URL of the page
+	 * URL of the page (without Root and GET)
 	 * 
-	 * @return string
+	 * @return string	URL of the page
 	 */
     public function getPageUrl() { return $this->_url; }
 
@@ -129,8 +129,8 @@ class Page extends Element
 	 * = -1 if the URL is different
 	 * = +x to x = the sames caracters
 	 * 
-	 * @param string $pageUrl
-	 * @return int
+	 * @param string $pageUrl	URL of the page (without root, with GET)
+	 * @return int				If they are differents: -1 or 0 , otherwise positive
 	 */
 	public function comparePageUrl( $pageUrl )
 	{
@@ -147,16 +147,16 @@ class Page extends Element
 	
     protected $_htmlHeader;
 	/**
-	 * Set the header php
+	 * Add to the content header HTML (links CSS, links JS...)
 	 * 
-	 * @param string $header
+	 * @param string $header	HTML header
 	 */
     public function setHtmlHeader( $header ) { $this->_htmlHeader = $header; }
 	
 	/**
 	 * HTML content in the header
 	 * 
-	 * @return type
+	 * @return type		HTML header
 	 */
 	public function getHtmlHeader() { return $this->_htmlHeader; }
 	
@@ -164,14 +164,14 @@ class Page extends Element
 	/**
 	 * Set the body of the page
 	 * 
-	 * @param string $body
+	 * @param string $body		Body of the page
 	 */
     public function setHtmlBody( $body ) { $this->_htmlBody = $body; }
 	
 	/**
 	 * Body content in the HTML page
 	 * 
-	 * @return type
+	 * @return type			Body of the page
 	 */
 	public function getHtmlBody() { return $this->_htmlBody; }
 
@@ -179,13 +179,13 @@ class Page extends Element
 	/**
 	 * Set the title of the page
 	 * 
-	 * @param string $title
+	 * @param string $title		Title of the page
 	 */
     public function setHtmlTitle( $title ) { $this->_htmlTitle = $title; }
 	/**
 	 * Title in the HTML page
 	 * 
-	 * @return string
+	 * @return string			Title of the page
 	 */
     public function getHtmlTitle() { return $this->_htmlTitle; }
 
@@ -193,13 +193,13 @@ class Page extends Element
 	/**
 	 * Set the description of the page
 	 * 
-	 * @param string $description
+	 * @param string $description		Desciption of the page
 	 */
     public function setHtmlDescription( $description ) { $this->_htmlDescription = $description; }
 	/**
 	 * Description of the page (in the header)
 	 * 
-	 * @return string
+	 * @return string		Desciption of the page
 	 */
     public function getHtmlDescription() { return $this->_htmlDescription; }
 	
@@ -207,13 +207,13 @@ class Page extends Element
 	/**
 	 * Change the template of the page
 	 * 
-	 * @param string $template
+	 * @param string $template		Template of the page
 	 */
     public function setTemplate( $template ) { $this->_template = $template; }
 	/**
 	 * Template used for the page
 	 * 
-	 * @return string
+	 * @return string		Template of the page
 	 */
     public function getTemplate() { return $this->_template; }
 
@@ -221,13 +221,13 @@ class Page extends Element
 	/**
 	 * Change the build file of the page
 	 * 
-	 * @param string $buildFile
+	 * @param string $buildFile		Build file
 	 */
     public function setBuildFile( $buildFile ) { $this->_buildFile = $buildFile; }
 	/**
 	 * Used in second time to update the content(s) of the page
 	 * 
-	 * @return string
+	 * @return string		Build file
 	 */
     public function getBuildFile() { return $this->_buildFile; }
 	
@@ -265,7 +265,12 @@ class Page extends Element
 		}
 	}
 
-	
+	/**
+	 * A page object contain all the datas of an HTML page
+	 * 
+	 * @param type $name		Name of the page
+	 * @param type $lang		Language of the page
+	 */
 	public function __construct( $name = '', $lang = null )
     {
 		parent::__construct($lang);
@@ -292,7 +297,7 @@ class Page extends Element
 	/**
 	 * Get a script for create the same object
 	 * 
-	 * @return string
+	 * @return string		The save text
 	 */
 	public function getSave()
 	{
@@ -303,8 +308,8 @@ class Page extends Element
 	 * Update the object with a saved object.
 	 * A saved object can by generate by the method getSave().
 	 * 
-	 * @param array $saveDatas
-	 * @return self
+	 * @param array $saveDatas	Datas generated by a save method of this class
+	 * @return self				Page with the news values
 	 */
 	public function update( array $saveDatas )
 	{

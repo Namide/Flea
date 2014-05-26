@@ -24,15 +24,28 @@
  * THE SOFTWARE.
  */
 
-if ( _DEBUG ) include _SYSTEM_DIRECTORY.'helpers/system/Debug.php';
-include _SYSTEM_DIRECTORY.'data/Saver.php';
-include _SYSTEM_DIRECTORY.'data/list/LangList.php';
-include _SYSTEM_DIRECTORY.'data/Element.php';
-include _SYSTEM_DIRECTORY.'data/list/ElementList.php';
-include _SYSTEM_DIRECTORY.'data/Page.php';
-include _SYSTEM_DIRECTORY.'data/list/PageList.php';
+if ( _DEBUG )
+{
+	include_once _SYSTEM_DIRECTORY.'helpers/system/Debug.php';
+	if (!ini_get('display_errors')) { ini_set('display_errors', '1'); }
+	error_reporting(E_ALL);
+}
 
-include _SYSTEM_DIRECTORY.'data/General.php';
-include _SYSTEM_DIRECTORY.'helpers/system/UrlUtil.php';
-include _SYSTEM_DIRECTORY.'helpers/common/InitUtil.php';
-include _SYSTEM_DIRECTORY.'helpers/common/BuildUtil.php';
+include_once _SYSTEM_DIRECTORY.'data/Saver.php';
+include_once _SYSTEM_DIRECTORY.'data/list/LangList.php';
+include_once _SYSTEM_DIRECTORY.'data/Element.php';
+include_once _SYSTEM_DIRECTORY.'data/list/ElementList.php';
+include_once _SYSTEM_DIRECTORY.'data/Page.php';
+include_once _SYSTEM_DIRECTORY.'data/list/PageList.php';
+
+include_once _SYSTEM_DIRECTORY.'data/General.php';
+include_once _SYSTEM_DIRECTORY.'helpers/system/UrlUtil.php';
+include_once _SYSTEM_DIRECTORY.'helpers/common/InitUtil.php';
+include_once _SYSTEM_DIRECTORY.'helpers/common/BuildUtil.php';
+
+if ( _CACHE )
+{
+	include_once _SYSTEM_DIRECTORY.'helpers/miscellaneous/FileUtil.php';
+	include_once _SYSTEM_DIRECTORY.'helpers/system/DataUtil.php';
+	include_once _SYSTEM_DIRECTORY.'helpers/system/Cache.php';
+}

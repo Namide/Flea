@@ -5,7 +5,7 @@
  */
 
 // Absolute URL of the website
-define( '_ROOT_URL', 'http://flea.namide.com/' );
+define( '_ROOT_URL', 'http://localhost/Flea/' );
 
 // Directory name of the system's files
 // It is better to be outside of the www directory
@@ -30,13 +30,13 @@ define( '_TEMP_DIRECTORY', 'temp-files/' );
  */
 
 // URL rewriting activated => TRUE, deactivated => FALSE
-define( '_URL_REWRITING', true );
+define( '_URL_REWRITING', false );
 
 // Debug mode activated => TRUE, deactivated => FALSE
 define( '_DEBUG', true );
 
 // Cache activated => TRUE, deactivated => FALSE
-define( '_CACHE', false );
+define( '_CACHE', true );
 
 // Maximum number of files in the cache directory
 // It is better to have 5 beyond the maximum number of cachable pages

@@ -36,9 +36,9 @@ class Element extends Saver
 	
 	private $_date;
 	/**
-	 * Date of the Element
+	 * Date of the Element, no set format
 	 * 
-	 * @param string $date
+	 * @param string $date	Date
 	 */
     public function setDate( $date )
 	{
@@ -47,7 +47,7 @@ class Element extends Saver
 	/**
 	 * Date of the Element
 	 * 
-	 * @return string
+	 * @return string	Date
 	 */
     public function getDate() { return $this->$date; }
 	
@@ -56,7 +56,7 @@ class Element extends Saver
 	 * Language of the Element.
 	 * The list of language is in the LangList.php
 	 * 
-	 * @param string $lang
+	 * @param string $lang	Language
 	 */
     public function setLang( $lang )
 	{
@@ -70,21 +70,22 @@ class Element extends Saver
 	 * Language of the Element.
 	 * The list of language is in the LangList.php
 	 * 
-	 * @return string
+	 * @return string	Language
 	 */
     public function getLang() { return $this->_lang; }
 
     private $_name;
 	/**
-	 * ID of the Element
+	 * Name of the Element.
+	 * Like an ID, but an element has the same ID for differents languages
 	 * 
-	 * @param string $name
+	 * @param string $name	Name of the Element
 	 */
     public function setName( $name ) { $this->_name = $name; }
 	/**
-	 * ID of the Element
+	 * Name of the Element
 	 * 
-	 * @return string
+	 * @return string	Name of the Element
 	 */
     public function getName() { return $this->_name; }
 	
@@ -92,13 +93,13 @@ class Element extends Saver
 	/**
 	 * Type of the element
 	 * 
-	 * @param string $type
+	 * @param string $type	Type of the element
 	 */
     public function setType( $type ) { $this->_type = $type; }
 	/**
 	 * Type of the element
 	 * 
-	 * @return string
+	 * @return string		Type of the element
 	 */
     public function getType() { return $this->_type; }
 	
@@ -108,7 +109,7 @@ class Element extends Saver
 	 * Add a tag to the element.
 	 * In example you can use tags for search a list of elements.
 	 * 
-	 * @param string $tag
+	 * @param string $tag	Tag name
 	 */
     public function addTag( $tag )
 	{
@@ -119,7 +120,7 @@ class Element extends Saver
 	 * Add a list of tags to the element.
 	 * In example you can use tags for search a list of elements.
 	 * 
-	 * @param array $tags
+	 * @param array $tags	List of tag names
 	 */
     public function addTags( array $tags )
     {
@@ -132,8 +133,8 @@ class Element extends Saver
 	/**
 	 * Search if the element has a tag
 	 * 
-	 * @param string $tag
-	 * @return boolean
+	 * @param string $tag	Tag name
+	 * @return boolean		Tag exist
 	 */
     public function hasTag( $tag )
     {
@@ -144,8 +145,8 @@ class Element extends Saver
 	 * Search if the element has a list of tag.
 	 * To return true the element must to have all the tags of the list.
 	 * 
-	 * @param array $tag
-	 * @return boolean
+	 * @param array $tag	List of tag names
+	 * @return boolean		true if the tag exist, otherwise false
 	 */
     public function hasTags( array $tags )
     {
@@ -162,7 +163,7 @@ class Element extends Saver
 	/**
 	 * List of the tag's element
 	 * 
-	 * @return array
+	 * @return array	List of all tags
 	 */
 	public function getTags()
     {
@@ -171,8 +172,6 @@ class Element extends Saver
 	
 	/**
 	 * Remove all the tags
-	 * 
-	 * @return array
 	 */
 	public function removeTags()
     {
@@ -180,9 +179,9 @@ class Element extends Saver
     }
 	
 	/**
-	 * Remove all the tags
+	 * Remove a tag
 	 * 
-	 * @return array
+	 * @param type $tag	Name of the tag
 	 */
 	public function removeTag( $tag )
     {
@@ -198,8 +197,8 @@ class Element extends Saver
 	 * A content is a data with label and value.
 	 * You can't add 2 contents with same label.
 	 * 
-	 * @param string $label
-	 * @param string $value
+	 * @param string $label		Label of the content
+	 * @param string $value		Value of the content
 	 */
 	public function addContent( $label, &$value )
 	{
@@ -213,7 +212,7 @@ class Element extends Saver
 	/**
 	 * Add a list of contents
 	 * 
-	 * @param array $arrayOfContentByLabel
+	 * @param array $arrayOfContentByLabel	List of content in associative array
 	 */
     public function addContents( array &$arrayOfContentByLabel )
     {
@@ -226,8 +225,8 @@ class Element extends Saver
 	/**
 	 * Test if the content already exist
 	 * 
-	 * @param string $label
-	 * @return boolean
+	 * @param string $label		Label of the content
+	 * @return boolean			true if the content exist, otherwise false
 	 */
     public function hasContent( $label )
     {
@@ -237,18 +236,22 @@ class Element extends Saver
 	/**
 	 * Return the value of the content
 	 * 
-	 * @param string $label
-	 * @return string
+	 * @param string $label		Label of the content
+	 * @return string			Content
 	 */
 	public function getContent( $label )
     {
+		if ( !$this->hasContent($label) )
+		{
+			return '';
+		}
         return $this->_contents[ $label ];
     }
 	
 	/**
 	 * Return the list of the element's contents
 	 * 
-	 * @return string
+	 * @return string	List of contents
 	 */
 	public function getContents()
     {
@@ -258,7 +261,8 @@ class Element extends Saver
 	/**
 	 * Create an element
 	 * 
-	 * @param type $lang
+	 * @param type $name	Name of the element
+	 * @param type $lang	Language of the element
 	 */
 	public function __construct( $name = '', $lang = null )
     {
@@ -277,7 +281,7 @@ class Element extends Saver
 	/**
 	 * Get a script for create the same object
 	 * 
-	 * @return string
+	 * @return string	String to generated the same element
 	 */
 	public function getSave()
 	{
@@ -289,8 +293,8 @@ class Element extends Saver
 	 * Update the object with a saved object.
 	 * A saved object can by generate by the method getSave().
 	 * 
-	 * @param array $saveDatas
-	 * @return static
+	 * @param array $saveDatas		Datas generated by a save method of this class
+	 * @return static				Element with the news values
 	 */
 	public function update( array $saveDatas )
 	{

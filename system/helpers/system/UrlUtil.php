@@ -133,7 +133,7 @@ class UrlUtil
 	
 	private function explodeDynamicUrlToGet( $restUrl, array &$pageGet, $isExplicit )
 	{
-		$getTemp = explode( '/', $restUrl );print_r($getTemp);
+		$getTemp = explode( '/', $restUrl );
 		if ( $isExplicit )
 		{
 			$l = count( $getTemp ) - 1;
@@ -237,7 +237,11 @@ class UrlUtil
 	{
 		if ( $getUrl === null )	{ $getUrl = array(); }
 		
-		$urlStr = $pageUrl.'&'.implode('&', $getUrl);
+		$urlStr = $pageUrl;
+		if( count($getUrl) > 0 )
+		{
+			$urlStr .= '&'.implode('&', $getUrl);
+		}
 		
 		$invalid = array( /*'/'=>'-',*/ '\\'=>'-', ':'=>'-', /*'?'=>'-',*/ '"'=>'-', '*'=>'-', '<'=>'-', '>'=>'-', '|'=>'-' );
 		$urlStr = str_replace(array_keys($invalid), array_values($invalid), htmlentities( $urlStr ) );
@@ -245,6 +249,16 @@ class UrlUtil
 		$invalid = array( '&'=>'/', '?'=>'/' );
 		$urlStr = str_replace(array_keys($invalid), array_values($invalid), htmlentities( $urlStr ) );
 
+		$ext = strtolower( substr( strrchr( $urlStr, '.' ), 1 ) );
+		if ( strpos( $ext, '/' ) == false )
+		{
+			if( substr($urlStr,strlen($urlStr)) !== '/' )
+			{
+				$urlStr .= '/';
+			}
+			$urlStr .= 'index.html';
+		}
+		
 		return $urlStr;
 	}
 	

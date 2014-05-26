@@ -41,7 +41,7 @@ class LangList
 	/**
 	 * List of languages used in the Website
 	 * 
-	 * @return array
+	 * @return array	List of languages
 	 */
     public function getList() { return $this->_langs; }
 	
@@ -54,7 +54,7 @@ class LangList
 	/**
 	 * This language is used if the user don't choose a language
 	 * 
-	 * @param string $lang
+	 * @param string $lang	Default language
 	 */
     public function addDefault( $lang )
     {
@@ -65,7 +65,7 @@ class LangList
 	/**
 	 * Language defined in default language
 	 * 
-	 * @return string
+	 * @return string	Default language
 	 */
 	public function getDefault()
     {
@@ -75,7 +75,7 @@ class LangList
 	/**
 	 * Add a language in the Website
 	 * 
-	 * @param string $lang
+	 * @param string $lang	New language
 	 */
     public function add( $lang )
     {
@@ -89,8 +89,8 @@ class LangList
 	/**
 	 * Test if Lang already pushed
 	 * 
-	 * @param string $lang
-	 * @return boolean
+	 * @param string $lang	Language
+	 * @return boolean		Has this language in the LangList Object
 	 */
 	public function has( $lang )
 	{
@@ -101,7 +101,7 @@ class LangList
 	 * Recovered the language with the navigator global variable
 	 * of, if isn't in list, the default language
 	 * 
-	 * @return string
+	 * @return string	The language of the current navigator (in 2 chars)
 	 */
     public function getLangByNavigator()
     {
@@ -131,7 +131,7 @@ class LangList
 	/**
 	 * Instance of the langListObject
 	 * 
-	 * @return self
+	 * @return self		LangList instancied
 	 */
     final public static function getInstance()
     {
