@@ -109,31 +109,6 @@ class BuildUtil extends InitUtil
     }
 	
 	/**
-	 * Simple method to create a link.
-	 * Ex:
-	 * <code>
-	 * - $pageName = 'home';
-	 * - $tagBefore = '<em>';
-	 * - $tagAfter = '</em>';
-	 * - $attInA = ' class="link-home blue"';
-	 * =>  <a href="http://flea.namide.com/en/home" class="link-home blue">Home page<em></em></a>
-	 * </code>
-	 * 
-	 * @param string $pageName		Name of the page to linked
-	 * @param string $tagBefore		Tag before the title of the page (in the tag <a></a>)
-	 * @param string $tagAfter		Tag after the title of the page (in the tag <a></a>)
-	 * @param string $attInA		Additionnal attribute to the tag <a></a>
-	 * @return string				HTML link generated	
-	 */
-	public function getLink( $pageName, $tagBefore = '', $tagAfter = '', $attInA = '' )
-	{
-		$lang = General::getInstance()->getCurrentLang();
-		$pageList = PageList::getInstance();
-		$page = $pageList->getPage( $idPage, $lang );
-		return '<a href="'.$this->urlPageToAbsUrl( $page->getUrl() ).'" '.$attInA.'>'.$tagBefore.$page->getTitle().$tagAfter.'</a>';
-	}
-	
-	/**
 	 * Format the text by converting the Flea variables to real datas.
 	 * List of Flea variables :
 	 * - {{rootPath}}			=> URL of the root
