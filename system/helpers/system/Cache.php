@@ -41,7 +41,7 @@ class Cache
 	/**
 	 * Directory for write the file(s)
 	 * 
-	 * @param string $rootDir
+	 * @param string $rootDir	Root directory
 	 */
 	function __construct( $rootDir = null )
 	{
@@ -59,8 +59,8 @@ class Cache
 	/**
 	 * Test if the file is already writed
 	 * 
-	 * @param string $fileName
-	 * @return bool
+	 * @param string $fileName	Name of the file
+	 * @return bool				true if the file is writted, false if error has occured
 	 */
 	public function isWrited( $fileName )
 	{
@@ -70,7 +70,8 @@ class Cache
 	/**
 	 * Write the file in the directory
 	 * 
-	 * @param string $fileName
+	 * @param type $fileName	Name of the file
+	 * @param type $content		Content of the file (optional)
 	 */
 	public function writeCache( $fileName, &$content = null )
 	{
@@ -86,17 +87,6 @@ class Cache
 	 */
 	public function echoSaved( $fileName )
 	{
-		/*$file_extension = strtolower( substr( strrchr( $fileName ,"." ), 1 ) );
-
-		switch ($file_extension)
-		{
-			case "xml":
-				header('Content-Type: application/xml;');
-				break;
-			//default: $ctype="application/force-download";
-		}
-		
-		readfile( $this->_rootDir.$fileName );*/
 		$this->_dataUtil->render($fileName);
 	}
 	
@@ -106,8 +96,8 @@ class Cache
 	 * - the maximum of cached page not reached
 	 * - the propertie "cachable" of the page is true
 	 * 
-	 * @param Page $page
-	 * @return boolean
+	 * @param Page $page	Page to test
+	 * @return boolean		true if the page is cachable, false if the page is uncachable
 	 */
 	public function isPageCachable( Page &$page )
 	{
@@ -144,7 +134,7 @@ allow from all
 	/**
 	 * Get the content saved
 	 * 
-	 * @return string
+	 * @return string		Content saved
 	 */
 	public function getSaved()
 	{
@@ -154,7 +144,7 @@ allow from all
 	/**
 	 * Set the content
 	 * 
-	 * @param string $content
+	 * @param string $content		Change the content
 	 */
 	public function setSaved( $content )
 	{
@@ -164,7 +154,7 @@ allow from all
 	/**
 	 * Stop to save the communication (echo...)
 	 * 
-	 * @return string
+	 * @return string		Content saved
 	 */
 	public function stopSave()
 	{
@@ -178,8 +168,8 @@ allow from all
 	/**
 	 * Num of files saved
 	 * 
-	 * @param string $cacheDirectory
-	 * @return int
+	 * @param string $cacheDirectory		Directory of the files
+	 * @return int							Number of files cached
 	 */
 	public static function getNumFilesSaved( $cacheDirectory )
 	{

@@ -37,15 +37,14 @@ class DataUtil
 	/**
 	 * Directory to save the files
 	 * 
-	 * @return string
+	 * @return string		Directory to save the files
 	 */
 	public function getDir() { return $this->_dir; }
 	
 	/**
 	 * Initialise the "connection" with the directory of data files
 	 * 
-	 * @param type $dir
-	 * @param type $name
+	 * @param type $dir		Directory to save the files
 	 */
 	public function __construct( $dir )
 	{
@@ -55,8 +54,8 @@ class DataUtil
 	/**
 	 * Add a file in the datas
 	 * 
-	 * @param string $key
-	 * @param string $content
+	 * @param string $key		Key of the data to save (same that the name of a file)
+	 * @param string $content	Content of the data to save
 	 */
 	public function add( $key, &$content )
 	{
@@ -70,8 +69,8 @@ class DataUtil
 	/**
 	 * Add a JSON file in the datas
 	 * 
-	 * @param string $key
-	 * @param array $content
+	 * @param string $key		Key of the data saved (same that the name)
+	 * @param array $content	Content of the data saved
 	 */
 	public function addJson( $key, array &$content )
 	{
@@ -82,8 +81,8 @@ class DataUtil
 	/**
 	 * Update a file in the datas
 	 * 
-	 * @param string $key
-	 * @param string $content
+	 * @param string $key			Key of the data saved (same that the name)
+	 * @param string $content		New content of the data
 	 */
 	public function update( $key, &$content )
 	{
@@ -99,8 +98,8 @@ class DataUtil
 	/**
 	 * Update a JSON file in the datas
 	 * 
-	 * @param string $key
-	 * @param array $content
+	 * @param string $key		Key of the data saved (same that the name)
+	 * @param array $content	New content of the data
 	 */
 	public function updateJson( $key, array &$content )
 	{
@@ -111,8 +110,8 @@ class DataUtil
 	/**
 	 * Get the content of a file in the datas
 	 * 
-	 * @param string $key
-	 * @return string
+	 * @param string $key		Key of the data saved (same that the name)
+	 * @return string			Content of the data
 	 */
 	public function get( $key )
 	{
@@ -126,8 +125,8 @@ class DataUtil
 	/**
 	 * Get the content of a JSON file in the datas
 	 * 
-	 * @param string $key
-	 * @return array
+	 * @param string $key		Key of the data saved (same that the name)
+	 * @return array			Content of the data
 	 */
 	public function getJson( $key )
 	{
@@ -138,8 +137,8 @@ class DataUtil
 	/**
 	 * Test if the file exist in the datas
 	 * 
-	 * @param string $key
-	 * @return bool
+	 * @param string $key		Key of the data saved (same that the name)
+	 * @return bool				true if the data exist, otherwise false
 	 */
 	public function has( $key )
 	{
@@ -149,7 +148,7 @@ class DataUtil
 	/**
 	 * Delete a file in the datas
 	 * 
-	 * @param string $key
+	 * @param string $key		Key of the files
 	 */
 	public function delete( $key )
 	{
@@ -159,7 +158,7 @@ class DataUtil
 	/**
 	 * Echo the content of a file in the datas
 	 * 
-	 * @param string $key
+	 * @param string $key		Key of the data saved (same that the name)
 	 */
 	public function render( $key )
 	{

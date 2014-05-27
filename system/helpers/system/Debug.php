@@ -40,7 +40,7 @@ class Debug
 	/**
 	 * Save an error message
 	 * 
-	 * @param string $msg
+	 * @param string $msg		Error message (information about the error)
 	 */
 	public function addError( $msg )
 	{
@@ -49,9 +49,8 @@ class Debug
 	}
 	
 	/**
-	 * Dispatch all errors messages
-	 * 
-	 * @param string $msg
+	 * Dispatch all errors messages.
+	 * Echo in the HTML and in alert(); JavaScript
 	 */
 	public function dispatchErrors()
 	{
@@ -97,7 +96,7 @@ class Debug
 	/**
 	 * Instance of the Debug object
 	 * 
-	 * @return self
+	 * @return self		Instance of the object Debug
 	 */
     final public static function getInstance()
     {
@@ -109,6 +108,13 @@ class Debug
         return self::$_INSTANCE;
     }
 	
+	/**
+	 * Get the path of errors
+	 * 
+	 * @param int $traces_to_ignore		First trace (1 if you would escape the first function)
+	 * @param int $max_trace			Maximum of recover functions
+	 * @return string					Resume of path error
+	 */
 	protected function getDebugBacktrace( $traces_to_ignore = 1, $max_trace = 1 )
 	{
 		$traces = debug_backtrace();
@@ -119,19 +125,6 @@ class Debug
 			{
 				continue;
 			}
-			/*$object = '';
-			if (isset($call['class']))
-			{
-				$object = $call['class'].$call['type'];
-				if (is_array($call['args']))
-				{
-					foreach ($call['args'] as &$arg)
-					{
-						//get_arg
-						func_get_arg($arg);
-					}
-				}
-			}    */   
 
 			$str = '';
 			if( $max_trace > 1 )

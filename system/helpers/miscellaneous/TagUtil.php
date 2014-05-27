@@ -65,10 +65,10 @@ class TagUtil
 	/**
 	 * Simple method to create an img
 	 * 
-	 * @param type $fileName
-	 * @param type $alt
-	 * @param type $attInImg
-	 * @return type
+	 * @param type $fileName	Name of the image to include
+	 * @param type $alt			Alternative content of the tag <img/>
+	 * @param type $attInImg	Additionnal attribute to the tag <img/>
+	 * @return type				Tag img with : alt, width, height and $attInImg
 	 */
 	public static function getImg( $fileName, $alt = '', $attInImg = '' )
 	{
@@ -77,6 +77,11 @@ class TagUtil
 			return '<img src="'.$fileName.'" alt="'.$alt.'" '.$attInImg.'/>';
 		}
 		list( $width, $height, $type, $attr ) = getimagesize($filename);
-		return '<img src="'.$fileName.'" width="'.$width.'" height="'.$height.'" alt="'.$alt.'" '.$attInImg.'/>';
+		
+		$img = '<img src="'.$fileName.'" width="'.$width.'" height="'.$height.'"';
+		if ( $alt != '' ) $img.= ' alt="'.$alt.'"';
+		if ( $attInImg != '' ) $img.= ' '.$attInImg;
+		$img .= '/>';
+		return  $img;
 	}
 }
