@@ -64,6 +64,30 @@ class PageList extends ElementList
 	}
     
 	/**
+	 * Add all pages of a directory
+	 * 
+	 * @param type $dir				Root directory
+	 * @param type $fileDirRel		Relative directory (for the recursivity)	
+	 */
+	function addPagesByDir( $dir, $fileDirRel = '' )
+	{
+		if ( !file_exists($dir) ) { return; }
+
+		$dirOpen = opendir($dir);
+		while($file = @readdir($dirOpen))
+		{
+			if ($file == "." || $file == "..") { continue; }
+
+			if( is_dir($dir.'/'.$file) )
+			{
+				addPagesRecurs( $dir.'/'.$file.'/', $fileDirRel.'/'.$file );
+				$this->createPage( (($fileDirRel != '')?$fileDirRel.'/':'').$file );
+			}
+		}
+		closedir($dirOpen);
+	}
+	
+	/**
 	 * Add all the pages (by languages) in the folder
 	 * 
 	 * @param string $folderName	Name of the folder thats contain the page

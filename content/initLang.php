@@ -25,5 +25,7 @@
  */
 
 // Initialize the languages
+$lang = \Flea\LangList::getInstance();
+
 $lang->addDefault('en');
 $lang->add('fr');

@@ -27,32 +27,10 @@
 namespace Flea;
 
 include _CONTENT_DIRECTORY.'initBegin.php';
-
-$lang = LangList::getInstance();
 include _CONTENT_DIRECTORY.'initLang.php';
 
-$pageList = PageList::getInstance();
-$langs = $lang->getList();
-addPagesRecurs( _CONTENT_DIRECTORY, $lang, $pageList, '' );
+PageList::getInstance()->addPagesByDir(_CONTENT_DIRECTORY);
 General::getInstance()->setPagesInitialised(true);
 
 UrlUtil::getInstance();
 BuildUtil::getInstance();
-
-function addPagesRecurs( $dir, &$langs, PageList &$pageList, $fileDirRel )
-{
-	if ( !file_exists($dir) ) { return; }
-	
-	$dirOpen = opendir($dir);
-    while($file = @readdir($dirOpen))
-    {
-		if ($file == "." || $file == "..") { continue; }
-
-        if( is_dir($dir.'/'.$file) )
-        {
-            addPagesRecurs( $dir.'/'.$file.'/', $langs, $pageList, $fileDirRel.'/'.$file );
-			$pageList->createPage( (($fileDirRel != '')?$fileDirRel.'/':'').$file );
-        }
-    }
-    closedir($dirOpen);
-}

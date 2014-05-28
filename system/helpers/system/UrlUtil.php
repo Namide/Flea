@@ -168,10 +168,10 @@ class UrlUtil
 	/**
 	 * Relative URL of the page
 	 * 
-	 * @param Page $page
-	 * @param string $lang
-	 * @param array $getUrl
-	 * @return string
+	 * @param Page $page		Object Page
+	 * @param string $lang		Language of the page
+	 * @param array $getUrl		List of GETs (optional)
+	 * @return string			Relative URL of the page
 	 */
 	public function getRelUrlByIdLang( Page &$page, $lang, array $getUrl = null )
     {
@@ -184,10 +184,10 @@ class UrlUtil
 	/**
 	 * PageUrl to relative URL
 	 * 
-	 * @param string $pageUrl
-	 * @param array $getUrl
-	 * @param bool $explicitGet
-	 * @return string
+	 * @param string $pageUrl		Page URL
+	 * @param array $getUrl			List of GETs (optional)
+	 * @param bool $explicitGet		GETs list is explicit or not
+	 * @return string				Relative URL of the page
 	 */
 	public function getRelUrlByPageUrl( $pageUrl, array $getUrl = null, $explicitGet = true )
 	{
@@ -224,11 +224,13 @@ class UrlUtil
 
 
 	/**
-	 * Converts an URL of page to a string
+	 * Converts an URL of page to an hash string
 	 * 
-	 * @return string
+	 * @param type $pageUrl		Page URL
+	 * @param array $getUrl		List of GETs (optional)
+	 * @return string			Hash string of the URL
 	 */
-	public static function urlPageToStr( $pageUrl, $getUrl = null )
+	public static function urlPageToStr( $pageUrl, array $getUrl = null )
 	{
 		if ( $getUrl === null )	{ $getUrl = array(); }
 		
@@ -266,8 +268,10 @@ class UrlUtil
     }
  
 	/**
-	* @return UrlUtil
-	*/
+	 * Instance of the object UrlUtil
+	 * 
+	 * @return UrlUtil
+	 */
     final public static function getInstance()
     {
         if(!isset(self::$_INSTANCE))
