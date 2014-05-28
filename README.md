@@ -30,6 +30,10 @@ Initialize the page
 ```php
 // URL
 $url = 'en/home';
+// Additional URL
+$addUrl = 'en/homepage';
+// List of additional URL
+//$addUrls = array('en/homepage/1', 'en/homepage/2'); 
 // Name of the template	
 $template = 'default';
 

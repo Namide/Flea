@@ -35,14 +35,14 @@ class UrlUtil
 {
 	private static $_INSTANCE = null;
 
+	private static $_arg = '_u';
 	/**
 	 * Label of the variable GET that content the URL.
 	 * If you change it, change to the root .htaccess
 	 * 
 	 * @return string
 	 */
-    private static $_arg = '_u';
-	//public function getPageGetArg() { return self::$_arg; }
+    //public function getPageGetArg() { return self::$_arg; }
 	
 	private $_basePageUrl;
 	
@@ -54,7 +54,6 @@ class UrlUtil
 	/**
 	 * Reload the URL.
 	 * This state compose the global GET and computes the currentPage
-	 * 
 	 */
 	public function reset()
 	{
@@ -83,14 +82,10 @@ class UrlUtil
 	private static function getNavigatorGets()
 	{
 		$navigatorGets = array();
-		
 		foreach ($_GET as $key => $value)
 		{
 			$navigatorGets[$key] = filter_input( INPUT_GET, $key, FILTER_SANITIZE_STRING );
 		}
-		
-		//$navigatorGets = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
-		//$navigatorGets = self::getCleanGets( $navigatorGets );
 		
 		return $navigatorGets;
 	}
@@ -98,7 +93,7 @@ class UrlUtil
 	/**
 	 * Get first relative URL, this URL does not represent a Page
 	 * 
-	 * @return string
+	 * @return string		Language
 	 */
 	public static function getNavigatorRelUrl()
 	{
@@ -173,12 +168,12 @@ class UrlUtil
 	/**
 	 * Relative URL of the page
 	 * 
-	 * @param \Flea\Page $page
+	 * @param Page $page
 	 * @param string $lang
 	 * @param array $getUrl
 	 * @return string
 	 */
-	public function getRelUrlByIdLang( \Flea\Page &$page, $lang, array $getUrl = null )
+	public function getRelUrlByIdLang( Page &$page, $lang, array $getUrl = null )
     {
 		$page = PageList::getInstance()->getByName( $page->getName(), $lang );
 		$url = $this->getRelUrlByPageUrl( $page->getPageUrl(), $getUrl, $page->getGetExplicit() );

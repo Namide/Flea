@@ -97,6 +97,12 @@ class PageList extends ElementList
 				
 				$url = $page->getPageUrl();
 				parent::add( $page, $url );
+				
+				foreach ($page->getAdditionalPageUrls() as $url)
+				{
+					parent::add( $page, $url );
+				}
+				
 				array_push( $pages, $page );
             }
 			
@@ -116,6 +122,8 @@ class PageList extends ElementList
 		}
 		
 		if ( isset($url) )				{ $page->setPageUrl($url) ; }
+		if ( isset($addUrl) )			{ $page->addAdditionalPageUrl($addUrl) ; }
+		if ( isset($addUrls) )			{ $page->addAdditionalPageUrls($addUrls) ; }
 		if ( isset($template) )			{ $page->setTemplate($template) ; }
 		
 		if ( isset($visible) )			{ $page->setVisible($visible) ; }

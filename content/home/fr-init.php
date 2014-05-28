@@ -1,7 +1,10 @@
 <?php
 
 		
-$url = 'fr';		
+$url = 'fr';
+$addUrl = 'fr/accueil';
+//$addUrls = array('en/homepage/1', 'en/homepage/2'); 
+
 $template = 'default';
 
 $visible = true;	

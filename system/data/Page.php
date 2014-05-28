@@ -123,7 +123,33 @@ class Page extends Element
 	 * @return string	URL of the page
 	 */
     public function getPageUrl() { return $this->_url; }
-
+	
+	protected $_additionalUrl;
+	/**
+	 * Add an additionnal URL for this page (without Root and GET)
+	 * 
+	 * @param string $url		Additional URL of the page
+	 */
+    public function addAdditionalPageUrl( $url ) { $this->_additionalUrl[] = $url; }
+	/**
+	 * Add a list of additionnals URLs for this page (without Root and GET)
+	 * 
+	 * @param string $url		Additionals URLs of this page
+	 */
+    public function addAdditionalPageUrls( array $urls )
+	{
+		foreach ( $urls as $url )
+        {
+            $this->addAdditionalPageUrl( $url );
+        }
+	}
+	/**
+	 * Get additionals URLs of this page
+	 * 
+	 * @return string			Additional URL of this page
+	 */
+    public function getAdditionalPageUrls() { return $this->_additionalUrl; }
+	
 	/**
 	 * Compare the URL, if this page accept GET it can accept others URL.
 	 * = -1 if the URL is different
@@ -279,6 +305,7 @@ class Page extends Element
         $this->_getEnabled = false;
 		$this->_getExplicit = true;
 		$this->_cachable = true;
+		$this->_additionalUrl = array();
 		
 		$this->_url = '';
 		
