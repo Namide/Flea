@@ -26,5 +26,15 @@
 
 namespace Flea;
 
+if (file_exists(_CONTENT_DIRECTORY.'initBuild.php') )
+{
+	include _CONTENT_DIRECTORY.'initBuild.php';
+}
+
 $page = General::getInstance()->getCurrentPage();
 PageList::getInstance()->updatePage( $page );
+
+if ( _DEBUG )
+{
+	Debug::getInstance()->addTimeMark('build page');
+}

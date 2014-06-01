@@ -27,7 +27,7 @@
 namespace Flea;
 
 $timestart = microtime(true);
-$initTime = 0;
+//$initTime = 0;
 
 if ( _CACHE )
 {
@@ -44,7 +44,8 @@ if ( _CACHE )
 		if ( _DEBUG )
 		{
 			include_once _SYSTEM_DIRECTORY.'helpers/system/Debug.php';
-			echo '<!-- load cache time: ', number_format( microtime(true) - $timestart , 3) , 's -->';
+			//echo '<!-- load cache time: ', number_format( microtime(true) - $timestart , 3) , 's -->';
+			echo '<!--'.Debug::getInstance()->getTimes('load cache time').'-->';
 			Debug::getInstance()->dispatchErrors();
 		}
 		exit();
@@ -70,7 +71,8 @@ if ( _CACHE )
 
 			if ( _DEBUG )
 			{
-				echo '<!-- execute PHP and write cache time: ', number_format( microtime(true) - $timestart , 3), 's -->';
+				//echo '<!-- execute PHP and write cache time: ', number_format( microtime(true) - $timestart , 3), 's -->';
+				echo '<!--'.Debug::getInstance()->getTimes('load cache time').'-->';
 				Debug::getInstance()->dispatchErrors();
 			}
 		}
@@ -90,6 +92,7 @@ $page->render();
 
 if ( _DEBUG )
 {
-	echo '<!-- execute PHP time: ', number_format( microtime(true) - $timestart , 3),'s -->';
+	//echo '<!-- execute PHP time: ', number_format( microtime(true) - $timestart , 3),'s -->';
+	echo '<!--'.Debug::getInstance()->getTimes('execute PHP time').'-->';
 	Debug::getInstance()->dispatchErrors();
 }

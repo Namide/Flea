@@ -37,6 +37,10 @@ class Debug
 	
 	private $_errorList;
 	
+	private $_timer;
+	private $_totalTime;
+	private $_timerList;
+	
 	/**
 	 * Save an error message
 	 * 
@@ -66,6 +70,34 @@ class Debug
 		}
 	}
 	
+	/**
+	 * Add a time marker
+	 * 
+	 * @param type $msg		Description of the marker
+	 */
+	public function addTimeMark( $msg )
+	{
+		$dt = microtime(true) - $this->_timer;
+		$this->_timer += $dt;
+		$this->_totalTime += $dt;
+		$this->_timerList[] = array( 'dt'=>$dt, 'msg'=>$msg );
+	}
+	
+	/**
+	 * Get all the markers and the total time
+	 */
+	public function getTimes( $msg )
+	{
+		$this->_timerList[] = array( 'dt'=>$this->_totalTime, 'msg'=>'total time: '.$msg );
+		
+		$output = '';
+		foreach ($this->_timerList as $value)
+		{
+			$output .= $value['msg'].': '.number_format( $value['dt'] , 3).'s'."\n";
+		}
+		return $output;
+	}
+
 	private function addHtmlReturns($str)
 	{
 		return str_replace('\n', '<br>', $str);
@@ -80,6 +112,9 @@ class Debug
 	final private function __construct()
     {
 		$this->_errorList = array();
+		$this->_timerList = array();
+		$this->_timer = microtime(true);
+		$this->_totalTime = 0;
     }
 	
 	/**

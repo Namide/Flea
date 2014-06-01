@@ -55,9 +55,9 @@ class TagUtil
 	{
 		$lang = General::getInstance()->getCurrentLang();
 		$pageList = PageList::getInstance();
-		$page = $pageList->getPage( $pageName, $lang );
+		$page = $pageList->getByName( $pageName, $lang );
 		$buildUtil = BuildUtil::getInstance();
-		return '<a href="'.$buildUtil->urlPageToAbsUrl( $page->getUrl() ).'" '.$attInA.'>'.$tagBefore.$page->getTitle().$tagAfter.'</a>';
+		return '<a href="'.$buildUtil->getAbsUrlByPageUrl( $page->getPageUrl() ).'" '.$attInA.'>'.$tagBefore.$page->getHtmlTitle().$tagAfter.'</a>';
 	}
 	
 	/**

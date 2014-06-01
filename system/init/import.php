@@ -27,6 +27,7 @@
 if ( _DEBUG )
 {
 	include_once _SYSTEM_DIRECTORY.'helpers/system/Debug.php';
+	Flea\Debug::getInstance();
 	if (!ini_get('display_errors')) { ini_set('display_errors', '1'); }
 	error_reporting(E_ALL);
 }
@@ -48,4 +49,9 @@ if ( _CACHE )
 	include_once _SYSTEM_DIRECTORY.'helpers/miscellaneous/FileUtil.php';
 	include_once _SYSTEM_DIRECTORY.'helpers/system/DataUtil.php';
 	include_once _SYSTEM_DIRECTORY.'helpers/system/Cache.php';
+}
+
+if ( _DEBUG )
+{
+	Flea\Debug::getInstance()->addTimeMark('imports');
 }

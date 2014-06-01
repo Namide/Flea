@@ -3,7 +3,7 @@
 /* 
  * The MIT License
  *
- * Copyright 2014 Damien Doussaud (namide.com).
+ * Copyright 2014 Damien.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,29 +24,4 @@
  * THE SOFTWARE.
  */
 
-namespace Flea;
-
-if (file_exists(_CONTENT_DIRECTORY.'initBegin.php') )
-{
-	include _CONTENT_DIRECTORY.'initBegin.php';
-}
-
-if (file_exists(_CONTENT_DIRECTORY.'initLang.php') )
-{
-	include _CONTENT_DIRECTORY.'initLang.php';
-}
-elseif ( _DEBUG )
-{
-	Debug::getInstance()->addError( 'The file: '._CONTENT_DIRECTORY.'initLang.php don\'t exist' );
-}
-
-PageList::getInstance()->addPagesByDir(_CONTENT_DIRECTORY);
-General::getInstance()->setPagesInitialised(true);
-
-UrlUtil::getInstance();
-BuildUtil::getInstance();
-
-if ( _DEBUG )
-{
-	Debug::getInstance()->addTimeMark('init page');
-}
+// Your code before the pages build here
