@@ -27,7 +27,8 @@
 namespace Flea;
 
 /**
- * Description of BuildUtil
+ * Utils to write pages and template.
+ * This class cannot be used before the building page time.
  *
  * @author Namide
  */

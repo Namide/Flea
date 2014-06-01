@@ -39,13 +39,11 @@ class TagUtil
 	/**
 	 * Simple method to create a link.
 	 * Ex:
-	 * <code>
 	 * - $pageName = 'home';
 	 * - $tagBefore = '<em>';
 	 * - $tagAfter = '</em>';
 	 * - $attInA = ' class="link-home blue"';
 	 * =>  <a href="http://flea.namide.com/en/home" class="link-home blue">Home page<em></em></a>
-	 * </code>
 	 * 
 	 * @param string $pageName		Name of the page to linked
 	 * @param string $tagBefore		Tag before the title of the page (in the tag <a></a>)

@@ -67,6 +67,8 @@ template
 
 TO-DO
 
+	get the abs URL with pageName and global GET
+
 	sort the Pages by date
 
 	"mustache" après le template !

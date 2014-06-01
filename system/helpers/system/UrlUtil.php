@@ -270,7 +270,7 @@ class UrlUtil
 	/**
 	 * Instance of the object UrlUtil
 	 * 
-	 * @return UrlUtil
+	 * @return UrlUtil		UrlUtil object instancied
 	 */
     final public static function getInstance()
     {

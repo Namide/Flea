@@ -2,7 +2,7 @@
 
 function getMenu()
 {
-	$templateUtils = Flea\BuildUtil::getInstance();
+	$templateUtils = \Flea\BuildUtil::getInstance();
 	$lang = \Flea\General::getInstance()->getCurrentLang();
 	
 	if ( $lang == 'all' ) return '';
@@ -13,9 +13,15 @@ function getMenu()
 	$output = '<ul>';
 	foreach( $pageList->getAllByLang( $lang ) as $pageTemp )
 	{
-		$output .= '<li><a href="'.\Flea\BuildUtil::getInstance()->getAbsUrlByPageUrl($pageTemp->getPageUrl()).'">';
+		$output .= '<li><a href="{{pageNameToAbsUrl:'.$pageTemp->getName().'}}">';
 		$output .= $pageTemp->getHtmlTitle().'</a></li>';
 	}
+	foreach( $pageList->getAllByLang( 'all' ) as $pageTemp )
+	{
+		$output .= '<li><a href="{{rootPath}}'.$pageTemp->getName().'">';
+		$output .= $pageTemp->getHtmlTitle().'</a></li>';
+	}
+	//$output .= '<li><a href="'._ROOT_URL.'doc">Documentation'.(($lang==='fr')?' (en)':'').'</a></li>';
 	$output .= '</ul>';
 
     return $output;

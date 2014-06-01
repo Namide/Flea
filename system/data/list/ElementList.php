@@ -94,7 +94,7 @@ class ElementList extends Saver
 		}
 		elseif ( _DEBUG && isset($this->_elements[$key]) )
 		{
-			Debug::getInstance()->addError( 'The list has the same key ['.$key.'] for the element ['.$element.']' );
+			Debug::getInstance()->addError( 'The list has the same key ['.$key.'] for the element ['.$element->getName().']' );
 		}
 		else
 		{

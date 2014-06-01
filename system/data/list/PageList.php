@@ -80,7 +80,7 @@ class PageList extends ElementList
 
 			if( is_dir($dir.'/'.$file) )
 			{
-				addPagesRecurs( $dir.'/'.$file.'/', $fileDirRel.'/'.$file );
+				$this->addPagesByDir( $dir.'/'.$file.'/', $fileDirRel.'/'.$file );
 				$this->createPage( (($fileDirRel != '')?$fileDirRel.'/':'').$file );
 			}
 		}

@@ -211,7 +211,7 @@ class FileUtil
 	/**
 	 * Copy the directory ($dir2copy) to the directory ($dir2paste) for type.
 	 * Ex for copy without php:
-	 * <code>copyDirWithoutType( 'original/dir', 'new/dir', array('php', 'php4', 'php5') );</code>
+	 * copyDirWithoutType( 'original/dir', 'new/dir', array('php', 'php4', 'php5') );
 	 * 
 	 * @param string $dir2copy		Original directory
 	 * @param string $dir2paste		New directory

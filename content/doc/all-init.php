@@ -1,10 +1,10 @@
 <?php
 
-$url = 'fr';
-$addUrl = 'fr/accueil';
+$url = 'doc';
+//$addUrl = 'fr/accueil';
 //$addUrls = array('en/homepage/1', 'en/homepage/2'); 
 
-$template = 'default';
+$template = '';
 
 $visible = true;	
 $cachable = true;
@@ -13,13 +13,13 @@ $getEnabled = false;
 $getExplicit = true;
 $date = '2014-05-01';
 
-$htmlBody = '<h1>Page d\'accueil</h1>';
+//$htmlBody = '<h1>Page d\'accueil</h1>';
 $htmlDescription = 'description';
 $htmlHeader = '';
-$htmlTitle = 'accueil';
+$htmlTitle = 'Documentation';
 
-$type = 'default'; // error404
-// $phpHeader		
+$type = ''; // error404
+$phpHeader = 'Location: '._ROOT_URL.'doc/index.html';
 
 // $tags				
 // $tag				
