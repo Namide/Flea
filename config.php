@@ -6,7 +6,9 @@
 
 // Absolute URL of the website
 //define( '_ROOT_URL', 'http://localhost/Flea/' );
-define( '_ROOT_URL', 'http://flea.namide.com/' );
+//define( '_ROOT_URL', 'http://flea.namide.com/' );
+define( '_ROOT_URL', 'http://127.0.0.1/Flea/' );
+
 
 // Directory name of the system's files
 // It is better to be outside of the www directory
@@ -42,3 +44,14 @@ define( '_CACHE', false );
 // Maximum number of files in the cache directory
 // It is better to have 5 beyond the maximum number of cachable pages
 define( '_MAX_PAGE_CACHE', 50 );
+
+
+/*
+ *		DATA BASE
+ */
+
+define( '_DB_DSN_CACHE', 'sqlite:'._CONTENT_DIRECTORY.'cache.sdb' );
+define( '_DB_DSN_PAGES', 'sqlite:'._CONTENT_DIRECTORY.'pages.sdb' );
+define( '_DB_USER', null );
+define( '_DB_PASS', null );
+define( '_DB_OPTIONS', null );

@@ -299,7 +299,7 @@ class Page extends Element
 	 */
 	public function __construct( $name = '', $lang = null )
     {
-		parent::__construct($lang);
+		parent::__construct($name, $lang);
 		
         $this->_visible = true;
         $this->_getEnabled = false;
@@ -320,6 +320,11 @@ class Page extends Element
 		$this->_phpHeader = '';
 		$this->_buildFile = '';
     }
+	
+	public function getObjectVars()
+	{
+		return get_object_vars($this);
+	}
 	
 	/**
 	 * Get a script for create the same object

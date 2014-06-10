@@ -25,3 +25,27 @@
  */
 
 // Your code before the pages initialisation here
+
+/*$dbname = _CONTENT_DIRECTORY.'bdd.db';
+$base = new SQLite3($dbname, 0666);
+var_dump($base);*/
+
+foreach(PDO::getAvailableDrivers() as $driver)
+{
+    echo $driver.'<br>';
+}
+
+if ( _DB_DSN_PAGES !== null )
+{
+    try
+    {
+	$pdo = new PDO( _DB_DSN_PAGES, _DB_USER, _DB_PASS, _DB_OPTIONS );
+    }
+    catch( PDOException $e )
+    {
+	if ( _DEBUG )
+	{
+	    \Flea\Debug::getInstance()->addError ( $e->getMessage() );
+	}
+    }
+}

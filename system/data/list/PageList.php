@@ -87,6 +87,28 @@ class PageList extends ElementList
 		closedir($dirOpen);
 	}
 	
+	public function db_savePages()
+	{
+		if ( !PageList::db_exist(_DB_DSN_PAGES) )
+		{
+			$emptyPage = new Page();
+			$datas = $emptyPage->getObjectVars();
+			
+			PageList::db_create(_DB_DSN_PAGES, $datas, true);
+		}
+		
+		$sql = '';
+		foreach ($this->_elements as $key => $value) 
+		{
+			$sql = Page::db_insert(_DB_DSN_PAGES, $value->getObjectVars(), false);
+			
+			$db = new PDO(_DB_DSN_PAGES, _DB_USER, _DB_PASS, _DB_OPTIONS );
+			$db->query($sql);
+			$db = null;
+		}
+		
+	}
+	
 	/**
 	 * Add all the pages (by languages) in the folder
 	 * 

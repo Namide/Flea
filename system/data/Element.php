@@ -266,6 +266,7 @@ class Element extends Saver
 	 */
 	public function __construct( $name = '', $lang = null )
     {
+		parent::__construct();
         if ( $lang === null )
 		{
 			$lang = LangList::getInstance()->getDefault();
