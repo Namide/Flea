@@ -7,7 +7,7 @@
 // Absolute URL of the website
 //define( '_ROOT_URL', 'http://localhost/Flea/' );
 //define( '_ROOT_URL', 'http://flea.namide.com/' );
-define( '_ROOT_URL', 'http://127.0.0.1/Flea/' );
+define( '_ROOT_URL', 'http://localhost/damien/github/Flea/' );
 
 
 // Directory name of the system's files
@@ -50,8 +50,8 @@ define( '_MAX_PAGE_CACHE', 50 );
  *		DATA BASE
  */
 
-define( '_DB_DSN_CACHE', 'sqlite:'._CONTENT_DIRECTORY.'cache.sdb' );
-define( '_DB_DSN_PAGES', 'sqlite:'._CONTENT_DIRECTORY.'pages.sdb' );
+define( '_DB_DSN_CACHE', 'sqlite:'._CONTENT_DIRECTORY.'cache.sqlite' );
+define( '_DB_DSN_PAGES', 'sqlite:'._CONTENT_DIRECTORY.'pages.sqlite' );
 define( '_DB_USER', null );
 define( '_DB_PASS', null );
 define( '_DB_OPTIONS', null );
