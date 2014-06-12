@@ -325,6 +325,67 @@ class ElementList extends Saver
         return self::$_instances[$c];
     }
 	
+	/*public function db_exist( $dsn, Element $elementExample )
+	{
+		if ( $childClass === null )
+		{
+			$childClass = 'Element';
+		}
+		return gettype($elementExample)::db_exist( $dsn );
+	}*/
+	
+	/*public function db_create( $dsn, Element $elementExample )
+	{
+		if ( $childClass === null )
+		{
+			$childClass = 'Element';
+		}
+		
+		$element = new Element();
+		$objectVars = $element->getObjectVars();
+		call_user_func( $elementExample . '::db_create', $dsn, $objectVars, true );
+		//$childClass::db_create( $dsn, $objectVars, true );
+	}*/
+	
+	public function db_save( $dsn )
+	{
+		if ( _DEBUG && !$this->db_exist( $dsn, stripslashes( get_called_class() ) ) )
+		{
+			Debug::getInstance()->addError('You must create after save data base');
+		}
+		
+		$sql = '';
+		foreach ($this->_elements as $key => $value) 
+		{
+			
+			
+			$sql .= Saver::db_insert($dsn, $value->getObjectVars(), false, stripslashes(get_called_class()) );
+			
+			//$sql .= call_user_func( get_called_class().'::db_insert', $dsn, $value->getObjectVars(), false );
+			//$sql .= call_user_func( get_called_class().'::db_insert', $dsn, $value->getObjectVars(), false );
+			//$sql .= $childClass::db_insert($dsn, $value->getObjectVars(), false);
+		}
+		
+		echo "-- ElementList->db_save()\n"
+			. $sql
+			. "\n --";
+		
+		try
+		{
+			$db = new \PDO( $dsn, _DB_USER, _DB_PASS, _DB_OPTIONS );
+			$db->exec($sql);
+			$db = null;
+		}
+		catch (PDOException $e)
+		{
+			if ( _DEBUG ) 
+			{
+				Debug::getInstance()->addError( 'Save database error: '.$e->getMessage() );
+			}
+		}
+		
+	}
+	
 	/**
 	 * Get a script for create the same object
 	 * 

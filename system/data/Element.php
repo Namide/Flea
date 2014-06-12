@@ -258,6 +258,11 @@ class Element extends Saver
         return $this->_contents;
     }
 	
+	public function getObjectVars()
+	{
+		return get_object_vars($this);
+	}
+	
 	/**
 	 * Create an element
 	 * 
@@ -277,6 +282,7 @@ class Element extends Saver
 		$this->_name = $name;
 		
 		$this->_type = '';
+		$this->_date = '';
     }
 
 	/**

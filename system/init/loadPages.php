@@ -40,10 +40,11 @@ elseif ( _DEBUG )
 	Debug::getInstance()->addError( 'The file: '._CONTENT_DIRECTORY.'initLang.php don\'t exist' );
 }
 
-if ( !PageList::getInstance()->db_pagesExist() )
+if ( !PageList::db_exist(_DB_DSN_PAGES) )//!PageList::getInstance()->db_exist( _DB_DSN_PAGES ) )
 {
+	PageList::db_create( _DB_DSN_PAGES, Page::getEmptyPage()->getObjectVars() );
 	PageList::getInstance()->addPagesByDir(_CONTENT_DIRECTORY);
-	PageList::getInstance()->db_savePages();
+	PageList::getInstance()->db_save(_DB_DSN_PAGES);
 }
 General::getInstance()->setPagesInitialised(true);
 

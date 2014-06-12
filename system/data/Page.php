@@ -314,12 +314,16 @@ class Page extends Element
 		$this->_htmlHeader = '';
 		$this->_htmlBody = '';
 		
-        $this->_file2 = '';
-		$this->_template = '';
+        $this->_template = '';
 		
 		$this->_phpHeader = '';
 		$this->_buildFile = '';
     }
+	
+	public static function getEmptyPage()
+	{
+		return new Page();
+	}
 	
 	public function getObjectVars()
 	{

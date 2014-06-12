@@ -77,13 +77,13 @@ abstract class Saver
 	    return $output;
     }*/
 
-	
-	protected static function db_exist( $dbDsnCache, $tableName = null )
+	public static function db_exist( $dbDsnCache, $tableName = null )
     {
 		if ( $tableName === null )
 		{
 			$tableName = stripslashes(get_called_class());
 		}
+		
 		try
 		{
 			$sql = 'SELECT 1 FROM `'.$tableName.'` LIMIT 1';
@@ -99,123 +99,145 @@ abstract class Saver
 		return ($result !== false);
 	}
 	
-    protected static function db_create( $dbDsnCache, array $getObjectVars, $exec = true, $tableName = null )
+    public static function db_create( $dbDsnCache, array $getObjectVars, $exec = true, $tableName = null )
     {
 		if ( $tableName === null )
 		{
 			$tableName = stripslashes(get_called_class());
 		}
 		
-		try
+		$sqls = array();
+		$sqls[0] = 'CREATE TABLE `'.$tableName.'` ( ';
+		$first = true;
+		foreach ( $getObjectVars as $key => $value )
 		{
-			$sqls = array();
-			$sqls[0] = 'CREATE TABLE `'.$tableName.'` ( ';
-			$first = true;
-			foreach ( $getObjectVars as $key => $value )
+
+			if ( gettype($value) == "boolean" )
 			{
-				
-				if ( gettype($value) == "boolean" )
-				{
-					$sqls[0] .= ( ($first)?'':', ' ).$key.' BOOLEAN';
-					if ( $first ) $first = false;
-				}
-				elseif ( gettype($value) == "integer" )
-				{
-					$sqls[0] .= ( ($first)?'':', ' ).$key.' INT';
-					if ( $first ) $first = false;
-				}
-				elseif ( gettype($value) == "double" )
-				{
-					$sqls[0] .= ( ($first)?'':', ' ).$key.' DOUBLE';
-					if ( $first ) $first = false;
-				}
-				elseif ( gettype($value) == "string" )
-				{
-					$sqls[0] .= ( ($first)?'':', ' ).$key.' TEXT';
-					if ( $first ) $first = false;
-				}
-				elseif ( gettype($value) == "array" )
-				{
-					$sqls[1] = 'CREATE TABLE `'.$tableName.'_array` ( _id INT, _key TEXT, _value TEXT );';
-				}
+				$sqls[0] .= ( ($first)?'':', ' ).$key.' BOOLEAN';
+				if ( $first ) $first = false;
 			}
-			$sqls[0] .= ' );';
-			$sql = implode('', $sqls);
-			
-			if ( $exec )
+			elseif ( gettype($value) == "integer" )
 			{
+				$sqls[0] .= ( ($first)?'':', ' ).$key.' INT';
+				if ( $first ) $first = false;
+			}
+			elseif ( gettype($value) == "double" )
+			{
+				$sqls[0] .= ( ($first)?'':', ' ).$key.' DOUBLE';
+				if ( $first ) $first = false;
+			}
+			elseif ( gettype($value) == "string" )
+			{
+				$sqls[0] .= ( ($first)?'':', ' ).$key.' TEXT';
+				if ( $first ) $first = false;
+			}
+			elseif ( gettype($value) == "array" )
+			{
+				$sqls[1] = 'CREATE TABLE `'.$tableName.'_array` ( _id INT, _key TEXT, _value TEXT );';
+			}
+		}
+		$sqls[0] .= ' );';
+		$sql = implode('', $sqls);
+		
+		echo "-- Saver::db_create()\n"
+			. $sql
+			. "\n --";
+		
+		if ( $exec )
+		{
+			try
+			{	
 				$db = new \PDO($dbDsnCache, _DB_USER, _DB_PASS, _DB_OPTIONS );
 				//$db->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );//Error Handling
 				$db->exec($sql);
 				$db = null;
+				
+				return $sql;
 			}
-			
-			return $sql;
-		}
-		catch(PDOException $e)
-		{
-			if ( _DEBUG )
+			catch(PDOException $e)
 			{
-				Debug::getInstance()->addError($e);
+				if ( _DEBUG )
+				{
+					Debug::getInstance()->addError('Create database error: '.$e);
+				}
 			}
 		}
 		return '';
     }
 
-    protected static function db_insert( $dbDsnCache, array $getObjectVars, $exec = true, $tableName = null )
+	public static function db_insert( $dbDsnCache, array $getObjectVars, $exec = true, $tableName = null )
     {
 		if ( $tableName === null )
 		{
 			$tableName = stripslashes(get_called_class());
 		}
 		
-		try
+		
+		$sqls[0] = 'INSERT INTO `'.$tableName.'` VALUES ( ';
+		$first = true;
+		foreach ( $getObjectVars as $key => $value )
 		{
-			$sqls[0] = 'INSERT INTO `'.$tableName.'` VALUES ( ';
-			$first = true;
-			foreach ( $getObjectVars as $key => $value )
+			
+			if ( gettype($value) == 'boolean' )
 			{
-				
-				if ( gettype($value) == "boolean" )		$sqls[0] .= ( ($first)?'':', ' ).(($value)?'1':'0');
-				elseif ( gettype($value) == "integer" )	$sqls[0] .= ( ($first)?'':', ' ).$value;
-				elseif ( gettype($value) == "double" )	$sqls[0] .= ( ($first)?'':', ' ).$value;
-				elseif ( gettype($value) == "string" )	$sqls[0] .= ( ($first)?'':', ' ).'\''.addslashes($value).'\'';
-				elseif ( gettype($value) == "array" )
-				{
-					foreach ($value as $key2 => $val2)
-					{
-						$sqlTemp = 'INSERT INTO '.$tableName.'_array VALUES ( '.(int)$getObjectVars['_id'];
-						$sqlTemp .= '\''.addslashes($key2).'\' \''.addslashes($val2).'\'';
-						$sqlTemp .= ' );';
-					}
-				}
-				else
-				{
-					continue;
-				}
+				$sqls[0] .= ( ($first)?'':', ' ).(($value)?'1':'0');
 				$first = false;
 			}
-			$sqls[0] .= ' );';
-			$sql = implode('', $sqls);
-			
-			if ( $exec )
+			elseif ( gettype($value) == 'integer' )
+			{
+				$sqls[0] .= ( ($first)?'':', ' ).$value;
+				$first = false;
+			}
+			elseif ( gettype($value) == 'double' )
+			{
+				$sqls[0] .= ( ($first)?'':', ' ).$value;
+				$first = false;
+			}
+			elseif ( gettype($value) == 'string' )
+			{
+				$sqls[0] .= ( ($first)?'':', ' ).'\''.addslashes($value).'\'';
+				$first = false;
+			}
+			elseif ( gettype($value) == 'array' )
+			{
+				$sqlTemp = '';
+				foreach ($value as $key2 => $val2)
+				{
+					$sqlTemp .= 'INSERT INTO `'.$tableName.'_array` VALUES ( '.(int)$getObjectVars['_id'];
+					$sqlTemp .= ', \''.addslashes($key2).'\', \''.addslashes($val2).'\'';
+					$sqlTemp .= ' );';
+				}
+				if ( $sqlTemp != '' ) $sqls[] = $sqlTemp;
+			}
+		}
+		$sqls[0] .= ' );';
+		$sql = implode('', $sqls);
+		
+		/*echo "\n-->"
+			. $sql
+			. "<--\n";*/
+		
+		if ( $exec )
+		{
+			try
 			{
 				$db = new \PDO($dbDsnCache, _DB_USER, _DB_PASS, _DB_OPTIONS );
 				//$db->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );//Error Handling
 				$db->exec($sql);
 				$db = null;
+				return $sql;
 			}
-			
-			return $sql;
-		}
-		catch(PDOException $e)
-		{
-			if ( _DEBUG )
+			catch(PDOException $e)
 			{
-				Debug::getInstance()->addError($e);
+				if ( _DEBUG )
+				{
+					Debug::getInstance()->addError('Insert database error: '.$e);
+				}
 			}
 		}
-		return '';
+		
+		return $sql;
     }
 
     /**

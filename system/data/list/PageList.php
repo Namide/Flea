@@ -87,12 +87,57 @@ class PageList extends ElementList
 		closedir($dirOpen);
 	}
 	
-	public function db_pagesExist()
+	/*public function db_exist( $dsn, $childClass = null )
+	{
+		if ( $childClass === null )
+		{
+			$childClass = 'Element';
+		}
+		return $childClass::db_exist( $dsn );
+	}*/
+	
+	/*public function db_create( $dsn, $childClass = null )
+	{
+		if ( $childClass === null )
+		{
+			$childClass = 'Element';
+		}
+		
+		$element = new Element();
+		$objectVars = $element->getObjectVars();
+		$childClass::db_create( $dsn, $objectVars, true );
+	}*/
+	
+	/*public function db_save( $dsn, $childClass = null )
+	{
+		if ( _DEBUG && !$this->db_exist() )
+		{
+			Debug::getInstance()->addError('You must create after save data base');
+		}
+		if ( $childClass === null )
+		{
+			$childClass = 'Element';
+		}
+		
+		$sql = '';
+		foreach ($this->_elements as $key => $value) 
+		{
+			$sql .= $childClass::db_insert($dsn, $value->getObjectVars(), false);
+		}
+		
+		//print_r($sql);
+		
+		$db = new \PDO( $dsn, _DB_USER, _DB_PASS, _DB_OPTIONS );
+		$db->exec($sql);
+		$db = null;
+	}*/
+	
+	/*public function db_pagesExist()
 	{
 		return Page::db_exist(_DB_DSN_PAGES);
-	}
+	}*/
 	
-	public function db_savePages()
+	/*public function db_savePages()
 	{
 		if ( !$this->db_pagesExist() )
 		{
@@ -114,7 +159,7 @@ class PageList extends ElementList
 		$db->exec($sql);
 		$db = null;
 		
-	}
+	}*/
 	
 	/**
 	 * Add all the pages (by languages) in the folder
@@ -247,31 +292,133 @@ class PageList extends ElementList
 			Debug::getInstance()->addError( 'All pages must be initialised after use getByUrl()' );
 		}
 		
-		// EXIST
-		if ( $this->hasKey($relURL) )
+		$tableName = stripslashes(get_called_class());
+		
+		
+		try
+		{
+			$page = null;
+			$db = new \PDO(_DB_DSN_PAGES, _DB_USER, _DB_PASS, _DB_OPTIONS );
+			
+			
+			// EXIST
+			$sql = 'SELECT COUNT(*) FROM `'.$tableName.'` WHERE _url LIKE \''.$relURL.'\' LIMIT 1;';
+			$res = $db->query($sql);
+			if ( $res && $res->fetchColumn() > 0 )
+			{
+				$sql = 'SELECT * FROM `'.$tableName.'` WHERE _url LIKE \''.$relURL.'\' LIMIT 1;';
+				foreach  ($db->query($sql) as $row)
+				{
+					$page = new Page();
+					$page->update($row);
+				}
+				if( $page != null ) { return $page; }
+			}
+			
+			
+			// EXIST WITHOUT "/" AT THE END
+			if ( strlen($relURL) > 0 && $relURL[strlen($relURL)-1] === '/' )
+			{
+				$urlTemp = substr( $relURL, 0, strlen($relURL)-1 );
+				$sql = 'SELECT COUNT(*) FROM `'.$tableName.'` WHERE _url LIKE \''.$urlTemp.'\' LIMIT 1;';
+				$res = $db->query($sql);
+				if ( $res && $res->fetchColumn() > 0 )
+				{
+					$sql = 'SELECT * FROM `'.$tableName.'` WHERE _url LIKE \''.$urlTemp.'\' LIMIT 1;';
+					foreach  ($db->query($sql) as $row)
+					{
+						$page = new Page();
+						$page->update($row);
+					}
+					if( $page != null ) { return $page; }
+				}
+			}
+			
+			$lang = LangList::getInstance()->getLangByNavigator();
+			
+			// IS DEFAULT PAGE
+			$sql =  'SELECT COUNT(*) FROM `'.$tableName.'` WHERE _type = \'default\' AND _lang = \''.$lang.'\' LIMIT 1;';
+			$res = $db->query($sql);
+			if ( $res && $res->fetchColumn() > 0 )
+			{
+				$sql =  'SELECT * FROM `'.$tableName.'` WHERE _type = \'default\' AND _lang = \''.$lang.'\' LIMIT 1;';
+				foreach  ($db->query($sql) as $row)
+				{
+					$page = new Page();
+					$page->update($row);
+				}
+				if( $page != null ) { return $page; }
+			}
+			
+			// IS DYNAMIC PAGE
+			$sql = 'SELECT COUNT(*) FROM `'.$tableName.'` WHERE _url% LIKE \''.$relURL.'\' AND _lang = \''.$lang.'\' LIMIT 1;';
+			$res = $db->query($sql);
+			if ( $res && $res->fetchColumn() > 0 )
+			{
+				$sql = 'SELECT * FROM `'.$tableName.'` WHERE _url% LIKE \''.$relURL.'\' AND _lang = \''.$lang.'\' LIMIT 1;';
+				$bestScore = 0;
+				$page = null;
+				foreach ($db->query($sql) as $row)
+				{
+					$pageTemp = new Page();
+					$pageTemp->update($row);
+					
+					$scoreTemp = $pageTemp->comparePageUrl($relURL);
+					if ( $scoreTemp > $bestScore )
+					{
+						$bestScore = $scoreTemp;
+						$page = $pageTemp;
+					}
+				}
+				if( $page != null ) { return $page; }
+			}
+			
+			// IS ERROR 404
+			$sql =  'SELECT COUNT(*) FROM `'.$tableName.'` WHERE _type = \'error404\' AND _lang = \''.$lang.'\' LIMIT 1;';
+			$res = $db->query($sql);
+			if ( $res && $res->fetchColumn() > 0 )
+			{
+				$sql =  'SELECT * FROM `'.$tableName.'` WHERE _type = \'error404\' AND _lang = \''.$lang.'\' LIMIT 1;';
+				foreach  ($db->query($sql) as $row)
+				{
+					$page = new Page();
+					$page->update($row);
+				}
+				if( $page != null ) { return $page; }
+			}
+			
+			
+		}
+		catch (PDOException $e)
+		{
+			if ( _DEBUG ) Debug::getInstance ()->addError ('Database error: '.$e);
+		}
+		/*if ( $this->hasKey($relURL) )
 		{
 			return parent::getByKey($relURL);
-		}
+		}*/
 		
-		// EXIST WITHOUT "/" AT THE END
-		if ( strlen($relURL) > 0 && $relURL[strlen($relURL)-1] === '/' )
+		/*if ( strlen($relURL) > 0 && $relURL[strlen($relURL)-1] === '/' )
 		{
 			$urlTemp = substr( $relURL, 0, strlen($relURL)-1 );
 			if ( $this->hasKey($urlTemp) )
 			{
 				return parent::getByKey($urlTemp);
 			}
-		}
+		}*/
+		
+		
+		//$lang = LangList::getInstance()->getLangByNavigator();
 		
 		// IS DEFAULT PAGE
-		$lang = LangList::getInstance()->getLangByNavigator();
+		/*$lang = LangList::getInstance()->getLangByNavigator();
 		if( ($relURL === '' || $relURL === '/') && !empty($this->_default) )
         {
 			return $this->getDefaultPage($lang);
-        }
+        }*/
 		
 		// IS DYNAMIC PAGE
-		$bestScore = 0;
+		/*$bestScore = 0;
 		$page = null;
 		foreach ( $this->_elements as $pageTemp )
 		{
@@ -282,10 +429,10 @@ class PageList extends ElementList
 				$page = $pageTemp;
 			}
 		}
-		if ( $page != null ) { return $page; }
+		if ( $page != null ) { return $page; }*/
 		
         // IS ERROR 404
-		if ( !empty( $this->_error404 ) )
+		/*if ( !empty( $this->_error404 ) )
 		{
 			foreach ( $this->_elements as $page )
 			{
@@ -296,7 +443,7 @@ class PageList extends ElementList
 					return $page;
 				}
 			}
-		}
+		}*/
         
         // CREATE PAGE ERROR 404
 			$page = new Page();
