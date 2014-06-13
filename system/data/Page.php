@@ -31,8 +31,123 @@ namespace Flea;
  *
  * @author namide.com
  */
-class Page extends Element
+class Page
 {
+	public static $TYPE_DEFAULT = 'default';
+	public static $TYPE_ERROR404 = 'error404';
+	
+	public static $_EMPTY = null;
+	
+	private $_id;
+	public function getId() { return $this->_id; }
+	private function updateId()
+	{
+		$this->_id = $this->_name.','.$this->_lang;
+	}
+	
+	private $_name;
+	/**
+	 * Name of the Element.
+	 * Like an ID, but an element has the same ID for differents languages
+	 * 
+	 * @param string $name	Name of the Element
+	 */
+    public function setName( $name ) { $this->_name = $name; $this->updateId(); }
+	/**
+	 * Name of the Element
+	 * 
+	 * @return string	Name of the Element
+	 */
+    public function getName() { return $this->_name; }
+	
+	private $_lang;
+	/**
+	 * Language of the Element.
+	 * The list of language is in the LangList.php
+	 * 
+	 * @param string $lang	Language
+	 */
+    public function setLang( $lang )
+	{
+		if ( _DEBUG && !LangList::getInstance()->has($lang) )
+		{
+			Debug::getInstance()->addError( 'The Language '.$lang.' don\'t exist');
+		}
+		$this->_lang = $lang;
+		$this->updateId();
+	}
+	/**
+	 * Language of the Element.
+	 * The list of language is in the LangList.php
+	 * 
+	 * @return string	Language
+	 */
+    public function getLang() { return $this->_lang; }
+	
+	private $_date;
+	/**
+	 * Date of the Element, no set format
+	 * 
+	 * @param string $date	Date
+	 */
+    public function setDate( $date )
+	{
+		$this->_date = $date;
+	}
+	/**
+	 * Date of the Element
+	 * 
+	 * @return string	Date
+	 */
+    public function getDate() { return $this->_date; }
+	
+	private $_type;
+	/**
+	 * Type of the element
+	 * 
+	 * @param string $type	Type of the element
+	 */
+    public function setType( $type )
+	{
+		if (	_DEBUG &&
+				$type !== '' &&
+				$type !== Page::$TYPE_DEFAULT &&
+				$type !== Page::$TYPE_ERROR404 )
+		{
+			Debug::getInstance()->addError('The type: '.$type.' don\'t exist');
+		}
+		$this->_type = $type;
+	}
+	/**
+	 * Type of the element
+	 * 
+	 * @return string		Type of the element
+	 */
+    public function getType() { return $this->_type; }
+	
+	private $_tags;
+	/**
+	 * Tags of the page.
+	 * In example you can use tags for search a list of elements.
+	 * 
+	 * @return DataList 
+	 */
+	public function getTags()
+	{
+		return $this->_tags;
+	}
+	
+	private $_contents;
+	/**
+	 * A content is a pair with key and value.
+	 * You can't add 2 contents with same label.
+	 * 
+	 * @return DataList 
+	 */
+	public function getContents()
+	{
+		return $this->_tags;
+	}
 	
 	protected $_phpHeader;
 	/**
@@ -80,7 +195,7 @@ class Page extends Element
 	/**
 	 * Active or unactive the explicit GET
 	 * 
-	 * @param boolean $visible		Global variables GET explicit or not
+	 * @param boolean $explicit		Global variables GET explicit or not
 	 */
     public function setGetExplicit( $explicit ) { $this->_getExplicit = $explicit; }
 	/**
@@ -124,31 +239,13 @@ class Page extends Element
 	 */
     public function getPageUrl() { return $this->_url; }
 	
-	protected $_additionalUrl;
+	protected $_additionalUrls;
 	/**
-	 * Add an additionnal URL for this page (without Root and GET)
+	 * Additionnal(s) URL for this page (without Root and GET)
 	 * 
 	 * @param string $url		Additional URL of the page
 	 */
-    public function addAdditionalPageUrl( $url ) { $this->_additionalUrl[] = $url; }
-	/**
-	 * Add a list of additionnals URLs for this page (without Root and GET)
-	 * 
-	 * @param string $url		Additionals URLs of this page
-	 */
-    public function addAdditionalPageUrls( array $urls )
-	{
-		foreach ( $urls as $url )
-        {
-            $this->addAdditionalPageUrl( $url );
-        }
-	}
-	/**
-	 * Get additionals URLs of this page
-	 * 
-	 * @return string			Additional URL of this page
-	 */
-    public function getAdditionalPageUrls() { return $this->_additionalUrl; }
+    public function getAdditionalUrls() { return $this->_additionalUrls; }
 	
 	/**
 	 * Compare the URL, if this page accept GET it can accept others URL.
@@ -262,13 +359,13 @@ class Page extends Element
 	 */
 	public function render()
 	{
-		if ( $this->_phpHeader != '' )
-		{
-			header( $this->_phpHeader );
-		}
-
 		if ( $this->_template != '' )
 		{
+			if ( $this->_phpHeader != '' )
+			{
+				header( $this->_phpHeader );
+			}
+		
 			ob_start();
 			include _TEMPLATE_DIRECTORY.$this->_template.'.php';
 			$content = ob_get_clean();
@@ -276,19 +373,27 @@ class Page extends Element
 		}
 		else
 		{
-			echo '<!doctype html>';
-			echo '<html><head>' , BuildUtil::getInstance()->replaceFleaVars( $this->_htmlHeader, $this );
-			if ( $this->_htmlTitle != '' )
-			{
-				echo '<title>', BuildUtil::getInstance()->replaceFleaVars( $this->_htmlTitle, $this ), '</title>';
-			}
-			if ( $this->_htmlDescription != '' )
-			{
-				echo '<meta name="description" content="', BuildUtil::getInstance()->replaceFleaVars( $this->_htmlDescription, $this ), '"/>';
-			}
-			echo '</head><body>' , BuildUtil::getInstance()->replaceFleaVars( $this->_htmlBody, $this );
-			echo '</body></html>';
+			$this->renderWithoutTemplate();
 		}
+	}
+	
+	public function renderWithoutTemplate()
+	{
+		if ( $this->_phpHeader != '' )
+		{
+			header( $this->_phpHeader );
+		}
+		echo '<!doctype html><html><head>';
+		echo BuildUtil::getInstance()->replaceFleaVars( $this->_htmlHeader, $this );
+		if ( $this->_htmlTitle != '' )
+		{
+			echo '<title>', BuildUtil::getInstance()->replaceFleaVars( $this->_htmlTitle, $this ), '</title>';
+		}
+		if ( $this->_htmlDescription != '' )
+		{
+			echo '<meta name="description" content="', BuildUtil::getInstance()->replaceFleaVars( $this->_htmlDescription, $this ), '"/>';
+		}
+		echo '</head><body>' , BuildUtil::getInstance()->replaceFleaVars( $this->_htmlBody, $this ), '</body></html>';
 	}
 
 	/**
@@ -299,13 +404,23 @@ class Page extends Element
 	 */
 	public function __construct( $name = '', $lang = null )
     {
-		parent::__construct($name, $lang);
+		if ( $lang === null )
+		{
+			$lang = LangList::getInstance()->getDefault();
+		}
+		$this->setLang( $lang );
+		$this->setName( $name );
+		$this->_contents = new DataList(true);
+		$this->_tags = new DataList(false);
+		
+		$this->_type = '';
+		$this->_date = '';
 		
         $this->_visible = true;
         $this->_getEnabled = false;
 		$this->_getExplicit = true;
 		$this->_cachable = true;
-		$this->_additionalUrl = array();
+		$this->_additionalUrl = new DataList(false);
 		
 		$this->_url = '';
 		
@@ -320,14 +435,49 @@ class Page extends Element
 		$this->_buildFile = '';
     }
 	
+	/**
+	 * 
+	 * @return Page
+	 */
 	public static function getEmptyPage()
 	{
-		return new Page();
+		if ( Page::$_EMPTY === null ) Page::$_EMPTY = new Page ();
+		return Page::$_EMPTY;
 	}
 	
 	public function getObjectVars()
 	{
-		return get_object_vars($this);
+		$obj = get_object_vars($this);
+		foreach ($obj as $key => $value)
+		{
+			if( get_class($value) == get_class( DataList::getEmptyDataList() ) )
+			{
+				$obj[$key] = $value->getArray();
+			}
+		}
+		
+		return $obj;
+	}
+	
+	public function setByObjectVars( $obj )
+	{
+		foreach ($obj as $key => $value)
+		{
+			if ( get_type($value) == 'array' )
+			{
+				$this[$key] = new DataList();
+				$this[$key]->setByArray( $value );
+			}
+			else
+			{
+				$this[$key] = $value;
+			}
+		}
+	}
+	
+	public function addToList( $privateListName, $value, $key )
+	{
+		$this[$privateListName]->add($value, $key);
 	}
 	
 	/**

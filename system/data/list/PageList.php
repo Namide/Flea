@@ -31,8 +31,228 @@ namespace Flea;
  *
  * @author Namide
  */
-class PageList extends ElementList
+class PageList
 {
+	private static $_INSTANCE = null;
+	
+	public static $LOAD_INIT = 0;
+	public static $LOAD_LIST = 1;
+	
+    /**
+	 * List of elements
+	 * 
+	 * @return array All the elements
+	 */
+	public function getAll( $where = null, $flagLoad = 0 )
+	{
+		$query = 'SELECT';
+		if ( $flagLoad == PageList::$LOAD_INIT )
+		{
+			$query = '';//'SELECT name, color, calories FROM fruit ORDER BY name'
+			$first = true;
+			foreach (Page::getEmptyPage()->getObjectVars() as $key => $value)
+			{
+				if ( !$first )
+				{
+					$query .= ' ,';
+				}
+				
+				if ( gettype($value) != 'array' && gettype($value) != 'object' )
+				{
+					$first = true;
+					$query .= ' '.$key;
+				}
+			}
+		}
+		elseif ( $flagLoad == PageList::$LOAD_INIT | PageList::$LOAD_LIST )
+		{
+			$query .= ' *';
+		}
+		else
+		{
+			$query .= ' *';
+		}
+
+		/*
+		SELECT *
+		FROM table
+		WHERE condition
+		GROUP BY expression
+		HAVING condition
+		{ UNION | INTERSECT | EXCEPT }
+		ORDER BY expression
+		LIMIT count
+		OFFSET start
+		 */
+		$query .= ' FROM `'.DataBase::objectToTableName( Page::getEmptyPage() ).'`';
+		if ( $where !== null ) $query .= ' WHERE '.$where;
+		$query .= ' ORDER BY _date;';
+		//$query .= ' LIMIT';
+		
+		$pages = array();
+		foreach ( DataBase::query($query) as $row )
+		{
+			$page = new Page();
+			$page->setByObjectVars($row);
+			
+			if ( ($flagLoad & PageList::$LOAD_LIST) > 0 )
+			{
+				$query = 'SELECT * FROM `'.DataBase::objectToTableName( Page::getEmptyPage() ).'` WHERE parent_id = \''.$page->getId().'\'';
+				foreach ( DataBase::query($query) as $row2 )
+				{
+					$page->addToList( $row2['parent_prop'], $row2['key'], $row2['value'] );
+				}
+			}
+			
+			$pages[$page->getId()] = $page;
+		}
+		
+		return $pages;
+	}
+	
+	public function getByList( $where, $flagLoad = 0 )
+	{
+		
+		$table_page = DataBase::objectToTableName( Page::getEmptyPage() );
+		$table_list = DataBase::objectToTableName( Page::getEmptyPage() );
+		
+		$query = 'SELECT * FROM `'.$table_page.'` INNER JOIN `'.$table_list.'` WHERE `'.$table_page.'._id` = `'.$table_list.'.parent_id`';
+		if ( $where !== null ) $query .= ' AND '.$where;
+		$query .= ' ORDER BY _date;';
+		//$query .= ' LIMIT';
+		
+		$pages = array();
+		foreach ( DataBase::query($query) as $row )
+		{
+			$page = new Page();
+			$page->setByObjectVars($row);
+			
+			if ( ($flagLoad & PageList::$LOAD_LIST) > 0 )
+			{
+				$query = 'SELECT * FROM `'.DataBase::objectToTableName( Page::getEmptyPage() ).'` WHERE parent_id = \''.$page->getId().'\'';
+				foreach ( DataBase::query($query) as $row2 )
+				{
+					$page->addToList( $row2['parent_prop'], $row2['key'], $row2['value'] );
+				}
+			}
+			
+			$pages[$page->getId()] = $page;
+		}
+		
+		return $pages;
+	}
+	
+	/**
+	 * List of elements in the language
+	 * 
+	 * @param string $lang	Language
+	 * @return array		All the page for this language
+	 */
+	public function getAllByLang( $lang, $flagLoad = 0 )
+	{
+		return $this->getAll( '_lang = \''.$lang.'\'', $flagLoad );
+	}
+	
+	final protected function __construct() { }
+	
+	/**
+	 * Return the elements with this ID (all langues)
+	 * 
+	 * @param string $name	Name of the elements
+	 * @return array		List of the elements with the name
+	 */
+	public function getAllByName( $name, $flagLoad = 0 )
+	{
+		return $this->getAll( '_name = \''.$name.'\'', $flagLoad );
+	}
+	
+	/**
+	 * Return a list of element with the tag
+	 * 
+	 * @param string $tag	Tag for the element
+	 * @param string $lang	Language of the element
+	 * @return array		List of the elements
+	 */
+	public function getByTag( $tag, $lang, $flagLoad = 0 )
+    {
+		$where = ' _lang = \''.$lang.'\' AND _tag = \''.$tag.'\'';
+		return $this->getByList ( $where, $flagLoad );
+    }
+	
+	/**
+	 * Return a list of element with each element has at least one of your tags
+	 * 
+	 * @param array $tags	List of tags (withouts keys)
+	 * @param string $lang	Language of the elements
+	 * @return array		List of elements
+	 */
+	public function getWithOneOfTags( array $tags, $lang, $flagLoad )
+    {
+		$where = ' _lang = \''.$lang.'\' AND (';
+		
+		$first = true;
+		foreach ($tags as $tag)
+		{
+			if ( !$first ) $where .= ' OR';
+			$where .= ' _tags = \''.$tag.'\'';
+			$first = false;
+		}
+		$where .= ')';
+		
+		return $this->getByList ( $where, $flagLoad );
+    }
+    
+	/**
+	 * Return a list of element with each element has each of tags
+	 * 
+	 * @param array $tags	List of tags
+	 * @param string $lang	Language of the elements
+	 * @return array		List of elements
+	 */
+	public function getWithAllTags( array $tags, $lang, $flagLoad = 0 )
+    {
+		$where = ' _lang = \''.$lang.'\' AND ';
+		
+		$first = true;
+		foreach ($tags as $tag)
+		{
+			if ( !$first ) $where .= ' AND';
+			$where .= ' _tags = \''.$tag.'\'';
+			$first = false;
+		}
+		
+		return $this->getByList ( $where, $flagLoad );
+    }
+	
+	/**
+	 * Return a list of element for a language
+	 * 
+	 * @param string $lang	Language of the elements
+	 * @return array		List of elements
+	 */
+    public function getByLang( $lang, $flagLoad = 0 )
+    {
+        return $this->getAll( '_lang = \''.$lang.'\'', $flagLoad );
+    }
+	
+	/**
+	 * Test if the element with this ID and this language exist
+	 * 
+	 * @param string $name	Name of the element
+	 * @param string $lang	Language of the element
+	 * @return boolean		Exist
+	 */
+	public function has( $name, $lang = null )
+    {
+		$tableName = DataBase::objectToTableName( Page::getEmptyPage() );
+		
+		$where = '_name = \''.$name.'\'';
+		if ( $lang !== null ) { $where .= ' AND _lang = \''.$lang.'\''; }
+		
+		return (DataBase::count( _DB_DSN_PAGES, $tableName, $where ) > 0);
+    }
+	
+	
 	
 	protected $_default;
 	/**
@@ -69,9 +289,49 @@ class PageList extends ElementList
 	 * @param type $dir				Root directory
 	 * @param type $fileDirRel		Relative directory (for the recursivity)	
 	 */
-	function addPagesByDir( $dir, $fileDirRel = '' )
+	public function addPagesByDir( $dir, $fileDirRel = '' )
 	{
-		if ( !file_exists($dir) ) { return; }
+		$listOfPages = $this->addPageByDirRecurs();
+		$this->db_insertPages($listOfPages);
+	}
+	
+	protected function db_insertPages( array $list )
+	{
+		$tableName = DataBase::objectToTableName( Page::getEmptyPage() );
+		
+		$pageVars = Page::getEmptyPage()->getObjectVars();
+		DataBase::create(_DB_DSN_PAGES, $pageVars, $tableName, true);
+		$sql = 'CREATE TABLE `'.$tableName.'_array` ( page_id TEXT, page_prop TEXT, key TEXT, value TEXT );';
+		DataBase::execute(_DB_DSN_PAGES, $sql);
+		
+		$sql = '';
+		foreach ($listOfPages as $page) 
+		{
+			$pageVars = $page->getObjectVars();
+			$sql .= DataBase::insert( _DB_DSN_PAGES, $pageVars, $tableName, false );
+			
+			foreach ($pageVars as $key => $value)
+			{
+				if( get_class($value) == get_class( DataList::getEmptyDataList() ) )
+				{
+					foreach ($value->getArray() as $key2 => $val2)
+					{
+						$sql .= 'INSERT INTO `'.$tableName.'_array` VALUES ( \''.$pageVars['_id'].'\'';
+						$sql .= ', \''.addslashes($key).'\' );';
+						$sql .= ', \''.addslashes($key2).'\', \''.addslashes($val2).'\' );';
+					}
+				}
+			}
+		}
+		DataBase::execute(_DB_DSN_PAGES, $sql);
+	}
+	
+	
+	protected function addPageByDirRecurs()
+	{
+		$list = array();
+		
+		if ( !file_exists($dir) ) { return $list; }
 
 		$dirOpen = opendir($dir);
 		while($file = @readdir($dirOpen))
@@ -80,86 +340,16 @@ class PageList extends ElementList
 
 			if( is_dir($dir.'/'.$file) )
 			{
-				$this->addPagesByDir( $dir.'/'.$file.'/', $fileDirRel.'/'.$file );
-				$this->createPage( (($fileDirRel != '')?$fileDirRel.'/':'').$file );
+				$list1 = $this->addPagesByDir( $dir.'/'.$file.'/', $fileDirRel.'/'.$file );
+				$list2 = $this->createPage( (($fileDirRel != '')?$fileDirRel.'/':'').$file );
+				$list = array_merge($list1, $list2);
 			}
 		}
 		closedir($dirOpen);
+		
+		return $list;
 	}
 	
-	/*public function db_exist( $dsn, $childClass = null )
-	{
-		if ( $childClass === null )
-		{
-			$childClass = 'Element';
-		}
-		return $childClass::db_exist( $dsn );
-	}*/
-	
-	/*public function db_create( $dsn, $childClass = null )
-	{
-		if ( $childClass === null )
-		{
-			$childClass = 'Element';
-		}
-		
-		$element = new Element();
-		$objectVars = $element->getObjectVars();
-		$childClass::db_create( $dsn, $objectVars, true );
-	}*/
-	
-	/*public function db_save( $dsn, $childClass = null )
-	{
-		if ( _DEBUG && !$this->db_exist() )
-		{
-			Debug::getInstance()->addError('You must create after save data base');
-		}
-		if ( $childClass === null )
-		{
-			$childClass = 'Element';
-		}
-		
-		$sql = '';
-		foreach ($this->_elements as $key => $value) 
-		{
-			$sql .= $childClass::db_insert($dsn, $value->getObjectVars(), false);
-		}
-		
-		//print_r($sql);
-		
-		$db = new \PDO( $dsn, _DB_USER, _DB_PASS, _DB_OPTIONS );
-		$db->exec($sql);
-		$db = null;
-	}*/
-	
-	/*public function db_pagesExist()
-	{
-		return Page::db_exist(_DB_DSN_PAGES);
-	}*/
-	
-	/*public function db_savePages()
-	{
-		if ( !$this->db_pagesExist() )
-		{
-			$emptyPage = new Page();
-			$datas = $emptyPage->getObjectVars();
-			
-			print_r( Page::db_create(_DB_DSN_PAGES, $datas, true) );
-		}
-		
-		$sql = '';
-		foreach ($this->_elements as $key => $value) 
-		{
-			$sql .= Page::db_insert(_DB_DSN_PAGES, $value->getObjectVars(), false);
-		}
-		
-		print_r($sql);
-		
-		$db = new \PDO(_DB_DSN_PAGES, _DB_USER, _DB_PASS, _DB_OPTIONS );
-		$db->exec($sql);
-		$db = null;
-		
-	}*/
 	
 	/**
 	 * Add all the pages (by languages) in the folder
@@ -167,7 +357,7 @@ class PageList extends ElementList
 	 * @param string $folderName	Name of the folder thats contain the page
 	 * @return array				List of the pages generated (differents languages)
 	 */
-	public function createPage( $folderName )
+	protected function createPage( $folderName )
     {
         $pages = array();
         
@@ -193,14 +383,6 @@ class PageList extends ElementList
 					$page->setBuildFile($buildFile);
 				}
 				
-				$url = $page->getPageUrl();
-				parent::add( $page, $url );
-				
-				foreach ($page->getAdditionalPageUrls() as $url)
-				{
-					parent::add( $page, $url );
-				}
-				
 				array_push( $pages, $page );
             }
 			
@@ -217,6 +399,18 @@ class PageList extends ElementList
 		if ( _DEBUG && empty($pageUrlTemp) && !isset($url) )
 		{
 			Debug::getInstance()->addError( 'The initialisation of a page must to have an URL' );
+		}
+		
+		if ( isset($type) )	
+		{
+			$page->setType($type);
+			if ( $type == Page::$TYPE_ERROR404 )
+			{
+				$this->_error404 = $page->getName();
+				$page->setVisible( false );
+				$page->setCachable( false );
+				$page->setPhpHeader( 'HTTP/1.0 404 Not Found' );
+			}
 		}
 		
 		if ( isset($url) )				{ $page->setPageUrl($url) ; }
@@ -242,19 +436,6 @@ class PageList extends ElementList
 		if ( isset($tag) )				{ $page->addTag($tag) ; }
 		if ( isset($contents) )			{ $page->addContents($contents) ; }
 		
-		if ( isset($type) )	
-		{
-			$page->setType($type);
-			if ( $type == 'default' )	{ $this->_default = $page->getName(); }
-			if ( $type == 'error404' )
-			{
-				$this->_error404 = $page->getName();
-				$page->setVisible( false );
-				$page->setCachable( false );
-				$page->setPhpHeader( 'HTTP/1.0 404 Not Found' );
-			}
-		}
-		
         return $page;
     }
 	
@@ -265,7 +446,7 @@ class PageList extends ElementList
 	 * @param Page $page	Page to update
 	 * @return Page			Same page updated
 	 */
-	public function updatePage( &$page )
+	public function buildPage( &$page )
 	{
 		if( $page->getBuildFile() == '' )
 		{
@@ -285,7 +466,7 @@ class PageList extends ElementList
 	 * @param string $relURL	Relative URL
 	 * @return Page				Corresponding page
 	 */
-    public function getByUrl( $relURL )
+    public function getByUrl( $relURL, $flagLoad = 0 )
     {
 		if( _DEBUG && !General::getInstance()->getPagesInitialised() )
 		{
@@ -295,157 +476,69 @@ class PageList extends ElementList
 		$tableName = stripslashes(get_called_class());
 		
 		
-		try
-		{
-			$page = null;
-			$db = new \PDO(_DB_DSN_PAGES, _DB_USER, _DB_PASS, _DB_OPTIONS );
-			
-			
-			// EXIST
-			$sql = 'SELECT COUNT(*) FROM `'.$tableName.'` WHERE _url LIKE \''.$relURL.'\' LIMIT 1;';
-			$res = $db->query($sql);
-			if ( $res && $res->fetchColumn() > 0 )
-			{
-				$sql = 'SELECT * FROM `'.$tableName.'` WHERE _url LIKE \''.$relURL.'\' LIMIT 1;';
-				foreach  ($db->query($sql) as $row)
-				{
-					$page = new Page();
-					$page->update($row);
-				}
-				if( $page != null ) { return $page; }
-			}
-			
-			
-			// EXIST WITHOUT "/" AT THE END
-			if ( strlen($relURL) > 0 && $relURL[strlen($relURL)-1] === '/' )
-			{
-				$urlTemp = substr( $relURL, 0, strlen($relURL)-1 );
-				$sql = 'SELECT COUNT(*) FROM `'.$tableName.'` WHERE _url LIKE \''.$urlTemp.'\' LIMIT 1;';
-				$res = $db->query($sql);
-				if ( $res && $res->fetchColumn() > 0 )
-				{
-					$sql = 'SELECT * FROM `'.$tableName.'` WHERE _url LIKE \''.$urlTemp.'\' LIMIT 1;';
-					foreach  ($db->query($sql) as $row)
-					{
-						$page = new Page();
-						$page->update($row);
-					}
-					if( $page != null ) { return $page; }
-				}
-			}
-			
-			$lang = LangList::getInstance()->getLangByNavigator();
-			
-			// IS DEFAULT PAGE
-			$sql =  'SELECT COUNT(*) FROM `'.$tableName.'` WHERE _type = \'default\' AND _lang = \''.$lang.'\' LIMIT 1;';
-			$res = $db->query($sql);
-			if ( $res && $res->fetchColumn() > 0 )
-			{
-				$sql =  'SELECT * FROM `'.$tableName.'` WHERE _type = \'default\' AND _lang = \''.$lang.'\' LIMIT 1;';
-				foreach  ($db->query($sql) as $row)
-				{
-					$page = new Page();
-					$page->update($row);
-				}
-				if( $page != null ) { return $page; }
-			}
-			
-			// IS DYNAMIC PAGE
-			$sql = 'SELECT COUNT(*) FROM `'.$tableName.'` WHERE _url% LIKE \''.$relURL.'\' AND _lang = \''.$lang.'\' LIMIT 1;';
-			$res = $db->query($sql);
-			if ( $res && $res->fetchColumn() > 0 )
-			{
-				$sql = 'SELECT * FROM `'.$tableName.'` WHERE _url% LIKE \''.$relURL.'\' AND _lang = \''.$lang.'\' LIMIT 1;';
-				$bestScore = 0;
-				$page = null;
-				foreach ($db->query($sql) as $row)
-				{
-					$pageTemp = new Page();
-					$pageTemp->update($row);
-					
-					$scoreTemp = $pageTemp->comparePageUrl($relURL);
-					if ( $scoreTemp > $bestScore )
-					{
-						$bestScore = $scoreTemp;
-						$page = $pageTemp;
-					}
-				}
-				if( $page != null ) { return $page; }
-			}
-			
-			// IS ERROR 404
-			$sql =  'SELECT COUNT(*) FROM `'.$tableName.'` WHERE _type = \'error404\' AND _lang = \''.$lang.'\' LIMIT 1;';
-			$res = $db->query($sql);
-			if ( $res && $res->fetchColumn() > 0 )
-			{
-				$sql =  'SELECT * FROM `'.$tableName.'` WHERE _type = \'error404\' AND _lang = \''.$lang.'\' LIMIT 1;';
-				foreach  ($db->query($sql) as $row)
-				{
-					$page = new Page();
-					$page->update($row);
-				}
-				if( $page != null ) { return $page; }
-			}
-			
-			
-		}
-		catch (PDOException $e)
-		{
-			if ( _DEBUG ) Debug::getInstance ()->addError ('Database error: '.$e);
-		}
-		/*if ( $this->hasKey($relURL) )
-		{
-			return parent::getByKey($relURL);
-		}*/
-		
-		/*if ( strlen($relURL) > 0 && $relURL[strlen($relURL)-1] === '/' )
+		// EXIST
+		$pages = $this->getAll( '_url LIKE \''.$relURL.'\'', $flagLoad);
+		if ( count($pages) > 0 ) return $pages[0];
+
+
+		// EXIST WITHOUT "/" AT THE END
+		if ( strlen($relURL) > 0 && $relURL[strlen($relURL)-1] === '/' )
 		{
 			$urlTemp = substr( $relURL, 0, strlen($relURL)-1 );
-			if ( $this->hasKey($urlTemp) )
-			{
-				return parent::getByKey($urlTemp);
-			}
-		}*/
-		
-		
-		//$lang = LangList::getInstance()->getLangByNavigator();
-		
-		// IS DEFAULT PAGE
-		/*$lang = LangList::getInstance()->getLangByNavigator();
-		if( ($relURL === '' || $relURL === '/') && !empty($this->_default) )
-        {
-			return $this->getDefaultPage($lang);
-        }*/
-		
-		// IS DYNAMIC PAGE
-		/*$bestScore = 0;
-		$page = null;
-		foreach ( $this->_elements as $pageTemp )
-		{
-			$scoreTemp = $pageTemp->comparePageUrl($relURL);
-			if ( $scoreTemp > $bestScore )
-			{
-				$bestScore = $scoreTemp;
-				$page = $pageTemp;
-			}
+			$pages = $this->getAll( '_url LIKE \''.$urlTemp.'\'', $flagLoad);
+			if ( count($pages) > 0 ) return $pages[0];
 		}
-		if ( $page != null ) { return $page; }*/
-		
-        // IS ERROR 404
-		/*if ( !empty( $this->_error404 ) )
+
+
+		$lang = LangList::getInstance()->getLangByNavigator();
+
+		// IS DYNAMIC PAGE
+		$pages = $this->getAll( '_url% LIKE \''.$relURL.'\' AND _lang = \''.$lang.'\'', $flagLoad);
+		if ( count($pages) > 0 )
 		{
-			foreach ( $this->_elements as $page )
+			$bestScore = 0;
+			$page = null;
+			foreach ($pages as $pageTemp)
 			{
-				$nameTemp = $page->getName();
-				$langTemp = $page->getLang();
-				if ( $nameTemp === $this->_error404 && $langTemp === $lang )
+				$scoreTemp = $pageTemp->comparePageUrl($relURL);
+				if ( $scoreTemp > $bestScore )
 				{
-					return $page;
+					$bestScore = $scoreTemp;
+					$page = $pageTemp;
 				}
 			}
-		}*/
-        
-        // CREATE PAGE ERROR 404
+			if( $page != null ) { return $page; }
+		}
+
+		return $this->getDefaultPage($lang, $flagLoad);
+    }
+	
+	/**
+	 * Default page for the lang
+	 * 
+	 * @param string $lang	Language
+	 * @return Page			default page
+	 */
+    public function getDefaultPage( $lang, $flagLoad = 0 )
+    {
+        $pages = $this->getAll( '_type = \''.Page::$TYPE_DEFAULT.'\' AND _lang = \''.$lang.'\' LIMIT 1', $flagLoad);
+		if ( count($pages) > 0 ) return $pages[0];
+		
+		/* IF THE LANGUAGE OF THE DEFAULT PAGE DON'T EXIST */
+		$pages = $this->getAll( '_type = \''.Page::$TYPE_DEFAULT.'\' LIMIT 1', $flagLoad);
+		if ( count($pages) > 0 ) return $pages[0];
+		
+		/* IF THE DEFAULT PAGE DON'T EXIST */
+		$pages = $this->getAll( '_lang = \''.$lang.'\' LIMIT 1', $flagLoad);
+		if ( count($pages) > 0 ) return $pages[0];
+		
+		$pages = $this->getAll( '_type = \''.Page::$TYPE_ERROR404.'\' AND _lang = \''.$lang.'\' LIMIT 1', $flagLoad);
+		if ( count($pages) > 0 ) return $pages[0];
+
+		$pages = $this->getAll( '_type = \''.Page::$TYPE_ERROR404.'\' LIMIT 1', $flagLoad);
+		if ( count($pages) > 0 ) return $pages[0];
+
+		// CREATE PAGE ERROR 404
 			$page = new Page();
 			$page->setHtmlHeader( '<title>Error 404 - Not found</title>
 					<meta name="robots" content="noindex,nofollow" />
@@ -455,50 +548,6 @@ class PageList extends ElementList
 			return $page;
         //
     }
-	
-	/**
-	 * Default page for the lang
-	 * 
-	 * @param string $lang	Language
-	 * @return Page			default page
-	 */
-    public function getDefaultPage( $lang )
-    {
-        $name = $this->_default;
-        
-        foreach ( $this->_elements as $page )
-        {
-			if (	$page->getName() === $name &&
-					$page->getLang() === $lang )
-            {
-                return $page;
-            }
-        }
-		
-		/* IF THE LANGUAGE OF THE DEFAULT PAGE DON'T EXIST */
-		foreach ( $this->_elements as $page )
-        {
-            if ( $page->getName() === $name )
-            {
-                return $page;
-            }
-        }
-		
-		/* IF THE DEFAULT PAGE DON'T EXIST */
-		foreach ( $this->_elements as $page )
-        {
-            if ( $page->getLang() === $lang )
-            {
-                return $page;
-            }
-        }
-		
-		/* ELSE: RANDOM PAGE (FIRST IN THE LIST) */
-		foreach ( $this->_elements as $page )
-        {
-            return $page;
-        }
-    }
     
 	/**
 	 * Get all pages visible (ex: for the sitemap.xml)
@@ -506,18 +555,10 @@ class PageList extends ElementList
 	 * @param string $lang	Language
 	 * @return array		List of the visible pages
 	 */
-    public function getAllVisible( $lang )
+    public function getAllVisible( $lang, $flagLoad = 0 )
     {
-        $pages = array();
-        foreach ( $this->_elements as $page )
-        {
-			if (	$page->getVisible() &&
-					$page->getLanguage() === $lang )
-            {
-                array_push( $pages, $page );
-            }
-        }
-        return $pages;
+		$pages = $this->getAll( '_visible = 1 AND _lang = \''.$lang.'\'', $flagLoad);
+		return $pages;
     }
 	
 	/**
@@ -527,13 +568,12 @@ class PageList extends ElementList
 	 * @param string $lang	Language
 	 * @return Page			Page corresponding
 	 */
-    public function getByName( $name, $lang )
+    public function getByName( $name, $lang, $flagLoad = 0 )
     {
-		if ( $this->has($name, $lang) )
-		{
-			return parent::getByName($name, $lang);
-		}
-        return $this->getDefaultPage( $lang );
+		$pages = $this->getAll( '_name = \''.$name.'\' AND _lang = \''.$lang.'\' LIMIT 1', $flagLoad);
+		if ( count($pages) > 0 ) return $pages[0];
+		
+        return $this->getDefaultPage( $lang, $flagLoad );
     }
 	
 	/**
@@ -543,9 +583,10 @@ class PageList extends ElementList
 	 * @param string $url	Relative URL
 	 * @return boolean		URL exist
 	 */
-	public function hasUrl( $url )
+	public function hasUrl( $url, $flagLoad = 0 )
     {
-		return $this->hasKey($url);
+		$pages = $this->getAll( '_url = \''.$url.'\' LIMIT 1', $flagLoad );
+		return ( count($pages) > 0 );
     }
 	
 	/**
@@ -556,42 +597,33 @@ class PageList extends ElementList
 	 */
     private function getLangByUrl( $url )
     {
-        if ( $this->hasUrl($url) )
-        {
-            $page = $this->_elements[$url];
-            return $page->getLang();
-        }
+        $pages = $this->getAll( '_url = \''.$url.'\' LIMIT 1', PageList::$LOAD_INIT );
+		if ( count($pages) > 0 ) return $pages[0]->getLang();
+		
         
 		return LangList::getInstance()->getLangByNavigator();
     }
 	
-	/**
-	 * Get a script for create the same object
-	 * 
-	 * @return string	The save text
-	 */
-	/*public function getSave()
-	{
-		return $this->constructSave( get_object_vars($this) );
-	}*/
-	
-	/**
-	 * Update the object with a saved object.
-	 * A saved object can by generate by the method getSave().
-	 * 
-	 * @param array $saveDatas	Datas generated by a save method of this class
-	 * @return Page				PageList with the news values
-	 */
-	/*public function update( array $saveDatas )
-	{
-		if ( count( $saveDatas ) > 0 )
+	final public function __clone()
+    {
+		if ( _DEBUG )
 		{
-			foreach ( $saveDatas as $varLabel => $varValue )
-			{
-				$this->$varLabel = $varValue;
-			}
+			Debug::getInstance()->addError( 'You can\'t clone a singleton' );
 		}
-		return $this;
-	}*/
+    }
+ 
+	/**
+	 * Instance of the list
+	 * 
+	 * @return static	Instance of the object ElementList
+	 */
+    final public static function getInstance()
+    {
+        if(PageList::$_INSTANCE === null)
+        {
+            PageList::$_INSTANCE = new PageList();
+        }
+        return PageList::$_INSTANCE;
+    }
 	
 }
