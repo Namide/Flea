@@ -43,34 +43,30 @@ class PageList
 	 * 
 	 * @return array All the elements
 	 */
-	public function getAll( $where = null, $flagLoad = 0 )
+	public function getAll( $query = null, $flagLoad = 0 )
 	{
-		$query = 'SELECT';
+		$sql = 'SELECT';
 		if ( $flagLoad == PageList::$LOAD_INIT )
 		{
-			$query = '';//'SELECT name, color, calories FROM fruit ORDER BY name'
+			//'SELECT name, color, calories FROM fruit ORDER BY name'
 			$first = true;
 			foreach (Page::getEmptyPage()->getObjectVars() as $key => $value)
 			{
-				if ( !$first )
-				{
-					$query .= ' ,';
-				}
-				
 				if ( gettype($value) != 'array' && gettype($value) != 'object' )
 				{
-					$first = true;
-					$query .= ' '.$key;
+					if ( !$first ) { $sql .= ' ,'; }
+					$sql .= ' '.$key;
+					$first = false;
 				}
 			}
 		}
 		elseif ( $flagLoad == PageList::$LOAD_INIT | PageList::$LOAD_LIST )
 		{
-			$query .= ' *';
+			$sql .= ' *';
 		}
 		else
 		{
-			$query .= ' *';
+			$sql .= ' *';
 		}
 
 		/*
@@ -84,21 +80,28 @@ class PageList
 		LIMIT count
 		OFFSET start
 		 */
-		$query .= ' FROM `'.DataBase::objectToTableName( Page::getEmptyPage() ).'`';
-		if ( $where !== null ) $query .= ' WHERE '.$where;
-		$query .= ' ORDER BY _date;';
+		$sql .= ' FROM `'.DataBase::objectToTableName( Page::getEmptyPage() ).'`';
+		if ( $query !== null )
+		{
+			$sql .= ' '.$query.';';
+		}
+		else
+		{
+			$sql .= ' ORDER BY _date;';
+		}
+		
 		//$query .= ' LIMIT';
 		
 		$pages = array();
-		foreach ( DataBase::query($query) as $row )
+		foreach ( DataBase::fetchAll( _DB_DSN_PAGES , $sql ) as $row )
 		{
 			$page = new Page();
 			$page->setByObjectVars($row);
 			
 			if ( ($flagLoad & PageList::$LOAD_LIST) > 0 )
 			{
-				$query = 'SELECT * FROM `'.DataBase::objectToTableName( Page::getEmptyPage() ).'` WHERE parent_id = \''.$page->getId().'\'';
-				foreach ( DataBase::query($query) as $row2 )
+				$sql = 'SELECT * FROM `'.DataBase::objectToTableName( Page::getEmptyPage() ).'` WHERE parent_id = \''.$page->getId().'\'';
+				foreach ( DataBase::fetchAll($query) as $row2 )
 				{
 					$page->addToList( $row2['parent_prop'], $row2['key'], $row2['value'] );
 				}
@@ -122,7 +125,7 @@ class PageList
 		//$query .= ' LIMIT';
 		
 		$pages = array();
-		foreach ( DataBase::query($query) as $row )
+		foreach ( DataBase::fetchAll($query) as $row )
 		{
 			$page = new Page();
 			$page->setByObjectVars($row);
@@ -130,7 +133,7 @@ class PageList
 			if ( ($flagLoad & PageList::$LOAD_LIST) > 0 )
 			{
 				$query = 'SELECT * FROM `'.DataBase::objectToTableName( Page::getEmptyPage() ).'` WHERE parent_id = \''.$page->getId().'\'';
-				foreach ( DataBase::query($query) as $row2 )
+				foreach ( DataBase::fetchAll($query) as $row2 )
 				{
 					$page->addToList( $row2['parent_prop'], $row2['key'], $row2['value'] );
 				}
@@ -150,7 +153,7 @@ class PageList
 	 */
 	public function getAllByLang( $lang, $flagLoad = 0 )
 	{
-		return $this->getAll( '_lang = \''.$lang.'\'', $flagLoad );
+		return $this->getAll( 'WHERE _lang = \''.$lang.'\' ORDER BY _date', $flagLoad );
 	}
 	
 	final protected function __construct() { }
@@ -163,7 +166,7 @@ class PageList
 	 */
 	public function getAllByName( $name, $flagLoad = 0 )
 	{
-		return $this->getAll( '_name = \''.$name.'\'', $flagLoad );
+		return $this->getAll( 'WHERE _name = \''.$name.'\' ORDER BY _date', $flagLoad );
 	}
 	
 	/**
@@ -232,7 +235,7 @@ class PageList
 	 */
     public function getByLang( $lang, $flagLoad = 0 )
     {
-        return $this->getAll( '_lang = \''.$lang.'\'', $flagLoad );
+        return $this->getAll( 'WHERE _lang = \''.$lang.'\' ORDER BY _date', $flagLoad );
     }
 	
 	/**
@@ -289,9 +292,9 @@ class PageList
 	 * @param type $dir				Root directory
 	 * @param type $fileDirRel		Relative directory (for the recursivity)	
 	 */
-	public function addPagesByDir( $dir, $fileDirRel = '' )
+	public function addPagesByDir( $dir )
 	{
-		$listOfPages = $this->addPageByDirRecurs();
+		$listOfPages = $this->addPageByDirRecurs( $dir, '' );
 		$this->db_insertPages($listOfPages);
 	}
 	
@@ -304,30 +307,33 @@ class PageList
 		$sql = 'CREATE TABLE `'.$tableName.'_array` ( page_id TEXT, page_prop TEXT, key TEXT, value TEXT );';
 		DataBase::execute(_DB_DSN_PAGES, $sql);
 		
-		$sql = '';
-		foreach ($listOfPages as $page) 
+		//$sql = '';
+		foreach ($list as $page) 
 		{
 			$pageVars = $page->getObjectVars();
-			$sql .= DataBase::insert( _DB_DSN_PAGES, $pageVars, $tableName, false );
+			DataBase::insert( _DB_DSN_PAGES, $pageVars, $tableName, true );
+			//DataBase::execute(_DB_DSN_PAGES, $sql);
 			
 			foreach ($pageVars as $key => $value)
 			{
-				if( get_class($value) == get_class( DataList::getEmptyDataList() ) )
+				if(	gettype($value) == 'object' &&
+					get_class($value) == get_class( DataList::getEmptyDataList() ) )
 				{
 					foreach ($value->getArray() as $key2 => $val2)
 					{
-						$sql .= 'INSERT INTO `'.$tableName.'_array` VALUES ( \''.$pageVars['_id'].'\'';
+						$sql = 'INSERT INTO `'.$tableName.'_array` VALUES ( \''.$pageVars['_id'].'\'';
 						$sql .= ', \''.addslashes($key).'\' );';
 						$sql .= ', \''.addslashes($key2).'\', \''.addslashes($val2).'\' );';
+						DataBase::execute(_DB_DSN_PAGES, $sql);
 					}
 				}
 			}
 		}
-		DataBase::execute(_DB_DSN_PAGES, $sql);
+		//if ( $sql != '' ) { DataBase::execute(_DB_DSN_PAGES, $sql); }
 	}
 	
 	
-	protected function addPageByDirRecurs()
+	protected function addPageByDirRecurs( $dir, $fileDirRel = '' )
 	{
 		$list = array();
 		
@@ -336,13 +342,15 @@ class PageList
 		$dirOpen = opendir($dir);
 		while($file = @readdir($dirOpen))
 		{
-			if ($file == "." || $file == "..") { continue; }
-
-			if( is_dir($dir.'/'.$file) )
+			if( $file != "." &&
+				$file != ".." &&
+				is_dir($dir.'/'.$file) )
 			{
-				$list1 = $this->addPagesByDir( $dir.'/'.$file.'/', $fileDirRel.'/'.$file );
+				$list1 = $this->addPageByDirRecurs( $dir.'/'.$file.'/', $fileDirRel.'/'.$file );
 				$list2 = $this->createPage( (($fileDirRel != '')?$fileDirRel.'/':'').$file );
-				$list = array_merge($list1, $list2);
+				
+				
+				$list = array_merge($list, $list1, $list2);
 			}
 		}
 		closedir($dirOpen);
@@ -414,8 +422,8 @@ class PageList
 		}
 		
 		if ( isset($url) )				{ $page->setPageUrl($url) ; }
-		if ( isset($addUrl) )			{ $page->addAdditionalPageUrl($addUrl) ; }
-		if ( isset($addUrls) )			{ $page->addAdditionalPageUrls($addUrls) ; }
+		if ( isset($addUrl) )			{ $page->getAdditionalUrls()->add($addUrl); }
+		if ( isset($addUrls) )			{ $page->getAdditionalUrls()->addMultiple($addUrls); }
 		if ( isset($template) )			{ $page->setTemplate($template) ; }
 		
 		if ( isset($visible) )			{ $page->setVisible($visible) ; }
@@ -432,9 +440,9 @@ class PageList
 				
 		if ( isset($phpHeader) )		{ $page->setPhpHeader($phpHeader) ; }
 		
-		if ( isset($tags) )				{ $page->addTags($tags) ; }
-		if ( isset($tag) )				{ $page->addTag($tag) ; }
-		if ( isset($contents) )			{ $page->addContents($contents) ; }
+		if ( isset($tags) )				{ $page->getTags()->addMultiple($tags) ; }
+		if ( isset($tag) )				{ $page->getTags()->add($tag) ; }
+		if ( isset($contents) )			{ $page->getContents()->addMultiple($contents) ; }
 		
         return $page;
     }
@@ -477,7 +485,7 @@ class PageList
 		
 		
 		// EXIST
-		$pages = $this->getAll( '_url LIKE \''.$relURL.'\'', $flagLoad);
+		$pages = $this->getAll( 'WHERE _url LIKE \''.$relURL.'\' ORDER BY _date', $flagLoad);
 		if ( count($pages) > 0 ) return $pages[0];
 
 
@@ -485,7 +493,7 @@ class PageList
 		if ( strlen($relURL) > 0 && $relURL[strlen($relURL)-1] === '/' )
 		{
 			$urlTemp = substr( $relURL, 0, strlen($relURL)-1 );
-			$pages = $this->getAll( '_url LIKE \''.$urlTemp.'\'', $flagLoad);
+			$pages = $this->getAll( 'WHERE _url LIKE \''.$urlTemp.'\' ORDER BY _date', $flagLoad);
 			if ( count($pages) > 0 ) return $pages[0];
 		}
 
@@ -493,7 +501,7 @@ class PageList
 		$lang = LangList::getInstance()->getLangByNavigator();
 
 		// IS DYNAMIC PAGE
-		$pages = $this->getAll( '_url% LIKE \''.$relURL.'\' AND _lang = \''.$lang.'\'', $flagLoad);
+		$pages = $this->getAll( 'WHERE _url LIKE \''.$relURL.'\' AND _lang = \''.$lang.'\' ORDER BY _date', $flagLoad);
 		if ( count($pages) > 0 )
 		{
 			$bestScore = 0;
@@ -521,21 +529,21 @@ class PageList
 	 */
     public function getDefaultPage( $lang, $flagLoad = 0 )
     {
-        $pages = $this->getAll( '_type = \''.Page::$TYPE_DEFAULT.'\' AND _lang = \''.$lang.'\' LIMIT 1', $flagLoad);
+        $pages = $this->getAll( 'WHERE _type = \''.Page::$TYPE_DEFAULT.'\' AND _lang = \''.$lang.'\' ORDER BY _date LIMIT 1', $flagLoad);
 		if ( count($pages) > 0 ) return $pages[0];
 		
 		/* IF THE LANGUAGE OF THE DEFAULT PAGE DON'T EXIST */
-		$pages = $this->getAll( '_type = \''.Page::$TYPE_DEFAULT.'\' LIMIT 1', $flagLoad);
+		$pages = $this->getAll( 'WHERE _type = \''.Page::$TYPE_DEFAULT.'\' ORDER BY _date LIMIT 1', $flagLoad);
 		if ( count($pages) > 0 ) return $pages[0];
 		
 		/* IF THE DEFAULT PAGE DON'T EXIST */
-		$pages = $this->getAll( '_lang = \''.$lang.'\' LIMIT 1', $flagLoad);
+		$pages = $this->getAll( 'WHERE _lang = \''.$lang.'\' ORDER BY _date LIMIT 1', $flagLoad);
 		if ( count($pages) > 0 ) return $pages[0];
 		
-		$pages = $this->getAll( '_type = \''.Page::$TYPE_ERROR404.'\' AND _lang = \''.$lang.'\' LIMIT 1', $flagLoad);
+		$pages = $this->getAll( 'WHERE _type = \''.Page::$TYPE_ERROR404.'\' AND _lang = \''.$lang.'\' ORDER BY _date LIMIT 1', $flagLoad);
 		if ( count($pages) > 0 ) return $pages[0];
 
-		$pages = $this->getAll( '_type = \''.Page::$TYPE_ERROR404.'\' LIMIT 1', $flagLoad);
+		$pages = $this->getAll( 'WHERE _type = \''.Page::$TYPE_ERROR404.'\' ORDER BY _date LIMIT 1', $flagLoad);
 		if ( count($pages) > 0 ) return $pages[0];
 
 		// CREATE PAGE ERROR 404
@@ -557,7 +565,7 @@ class PageList
 	 */
     public function getAllVisible( $lang, $flagLoad = 0 )
     {
-		$pages = $this->getAll( '_visible = 1 AND _lang = \''.$lang.'\'', $flagLoad);
+		$pages = $this->getAll( 'WHERE _visible = 1 AND _lang = \''.$lang.'\' ORDER BY _date', $flagLoad);
 		return $pages;
     }
 	
@@ -570,7 +578,7 @@ class PageList
 	 */
     public function getByName( $name, $lang, $flagLoad = 0 )
     {
-		$pages = $this->getAll( '_name = \''.$name.'\' AND _lang = \''.$lang.'\' LIMIT 1', $flagLoad);
+		$pages = $this->getAll( 'WHERE _name = \''.$name.'\' AND _lang = \''.$lang.'\' ORDER BY _date LIMIT 1', $flagLoad);
 		if ( count($pages) > 0 ) return $pages[0];
 		
         return $this->getDefaultPage( $lang, $flagLoad );
@@ -585,7 +593,7 @@ class PageList
 	 */
 	public function hasUrl( $url, $flagLoad = 0 )
     {
-		$pages = $this->getAll( '_url = \''.$url.'\' LIMIT 1', $flagLoad );
+		$pages = $this->getAll( 'WHERE _url = \''.$url.'\' LIMIT 1', $flagLoad );
 		return ( count($pages) > 0 );
     }
 	
@@ -597,7 +605,7 @@ class PageList
 	 */
     private function getLangByUrl( $url )
     {
-        $pages = $this->getAll( '_url = \''.$url.'\' LIMIT 1', PageList::$LOAD_INIT );
+        $pages = $this->getAll( 'WHERE _url = \''.$url.'\' LIMIT 1', PageList::$LOAD_INIT );
 		if ( count($pages) > 0 ) return $pages[0]->getLang();
 		
         

@@ -48,6 +48,9 @@ abstract class DataBase
 		try
 		{
 			$db = new \PDO( $dbDsnCache, _DB_USER, _DB_PASS, _DB_OPTIONS );
+			if ( _DEBUG ) { $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING); }
+			else { $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT); }
+			
 			$res = $db->query($sql);
 			if ( $res )
 			{
@@ -74,6 +77,10 @@ abstract class DataBase
 		{
 			$sql = 'SELECT 1 FROM `'.$tableName.'` LIMIT 1';
 			$db = new \PDO($dbDsnCache, _DB_USER, _DB_PASS, _DB_OPTIONS );
+			/*if ( _DEBUG ) { $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING); }
+			else { $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT); }*/
+			$db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
+			
 			$result = $db->query($sql);
 			$db = null;
 		}
@@ -119,7 +126,7 @@ abstract class DataBase
 		
 		if ( $exec )
 		{
-			return $this->execute( $dbDsnCache, $sql );
+			return DataBase::execute( $dbDsnCache, $sql );
 		}
 		
 		return false;
@@ -128,76 +135,70 @@ abstract class DataBase
 	public static function insert( $dbDsnCache, array $getObjectVars, $tableName, $exec = true )
     {
 		$sqls[0] = 'INSERT INTO `'.$tableName.'` VALUES ( ';
+		$binds = array();
 		$first = true;
 		foreach ( $getObjectVars as $key => $value )
 		{
-			
 			if ( gettype($value) == 'boolean' )
 			{
-				$sqls[0] .= ( ($first)?'':', ' ).(($value)?'1':'0');
+				$sqls[0] .= ( ($first)?':':', :' ).$key;
+				$binds[] = array( ':'.$key, (($value)?'1':'0'), \PDO::PARAM_BOOL );
 				$first = false;
 			}
 			elseif ( gettype($value) == 'integer' )
 			{
-				$sqls[0] .= ( ($first)?'':', ' ).$value;
+				$sqls[0] .= ( ($first)?':':', :' ).$key;
+				$binds[] = array( ':'.$key, $value, \PDO::PARAM_INT );
 				$first = false;
 			}
 			elseif ( gettype($value) == 'double' )
 			{
-				$sqls[0] .= ( ($first)?'':', ' ).$value;
+				$sqls[0] .= ( ($first)?':':', :' ).$key;
+				$binds[] = array( ':'.$key, $value, \PDO::PARAM_STR );
 				$first = false;
 			}
 			elseif ( gettype($value) == 'string' )
 			{
-				$sqls[0] .= ( ($first)?'':', ' ).'\''.addslashes($value).'\'';
+				$sqls[0] .= ( ($first)?':':', :' ).$key;
+				$binds[] = array( ':'.$key, $value, \PDO::PARAM_STR );
 				$first = false;
 			}
-			/*elseif ( gettype($value) == 'array' )
-			{
-				$sqlTemp = '';
-				foreach ($value as $key2 => $val2)
-				{
-					$sqlTemp .= 'INSERT INTO `'.$tableName.'_array` VALUES ( \''.$getObjectVars['_id'].'\'';
-					$sqlTemp .= ', \''.addslashes($key).'\' );';
-					$sqlTemp .= ', \''.addslashes($key2).'\', \''.addslashes($val2).'\' );';
-				}
-				if ( $sqlTemp != '' ) $sqls[] = $sqlTemp;
-			}
-			elseif( get_class($value) == get_class( DataList::getEmptyDataList() ) )
-			{
-				$sqlTemp = '';
-				foreach ($value->getArray() as $key2 => $val2)
-				{
-					$sqlTemp .= 'INSERT INTO `'.$tableName.'_array` VALUES ( \''.$getObjectVars['_id'].'\'';
-					$sqlTemp .= ', \''.addslashes($key).'\' );';
-					$sqlTemp .= ', \''.addslashes($key2).'\', \''.addslashes($val2).'\' );';
-				}
-				if ( $sqlTemp != '' ) $sqls[] = $sqlTemp;
-				//$sqls[1] = 'CREATE TABLE `'.$tableName.'_array` ( parent_name TEXT, parent_lang TEXT, _key TEXT, _value TEXT );';
-			}*/
 		}
 		$sqls[0] .= ' );';
 		$sql = implode('', $sqls);
 		
-		/*echo "\n-->"
-			. $sql
-			. "<--\n";*/
-		
 		if ( $exec )
 		{
-			$this->execute( $dbDsnCache, $sql );
+			DataBase::execute( $dbDsnCache, $sql, $binds );
 		}
 		
 		return $sql;
     }
 	
-	public static function execute( $dbDsnCache, $request )
+	public static function execute( $dbDsnCache, $request, array $binds = null )
 	{
 		try
 		{
 			$db = new \PDO($dbDsnCache, _DB_USER, _DB_PASS, _DB_OPTIONS );
-			//$db->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );//Error Handling
-			$db->exec($request);
+			if ( _DEBUG ) { $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING); }
+			else { $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT); }
+			
+			var_dump($request);
+			
+			$stmt = $db->prepare($request); // Préparation de ton statement
+			
+			if ( $binds !== null )
+			{
+				foreach ($binds as $bind)
+				{
+					$stmt->bindValue($bind[0], $bind[1], $bind[2]);
+				}
+			}
+			//$stmt->bindParam(':idMessage', $idMessage, PDO::PARAM_INT);
+			$stmt->execute();
+			$stmt = null;
+			
+			//$db->exec($request);
 			$db = null;
 			return true;
 		}
@@ -211,13 +212,35 @@ abstract class DataBase
 		return false;
 	}
 	
-	public static function query( $dbDsnCache, $request )
+	public static function fetchAll( $dbDsnCache, $request )
 	{
 		try
 		{
 			$db = new \PDO($dbDsnCache, _DB_USER, _DB_PASS, _DB_OPTIONS );
+			if ( _DEBUG ) { $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING); }
+			else { $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT); }
+			
+			var_dump($request);
+			$stmt = $db->prepare($request);
+			
+			if ( $stmt === false )
+			{
+				return array();
+			}
+			
+			$stmt->execute();
+			$arrValues = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+			return $arrValues;
+			
+			//$db = new \PDO($dbDsnCache, _DB_USER, _DB_PASS, _DB_OPTIONS );
+			//$sth = $db->prepare($request);
+			//$sth->execute();
+			//return $sth->fetchAll();
+			
+			
+			//$db = new \PDO($dbDsnCache, _DB_USER, _DB_PASS, _DB_OPTIONS );
 			//$db->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );//Error Handling
-			return $db->query($request);
+			//return $db->query($request);
 		}
 		catch(PDOException $e)
 		{

@@ -243,7 +243,7 @@ class Page
 	/**
 	 * Additionnal(s) URL for this page (without Root and GET)
 	 * 
-	 * @param string $url		Additional URL of the page
+	 * @return DataList
 	 */
     public function getAdditionalUrls() { return $this->_additionalUrls; }
 	
@@ -420,7 +420,7 @@ class Page
         $this->_getEnabled = false;
 		$this->_getExplicit = true;
 		$this->_cachable = true;
-		$this->_additionalUrl = new DataList(false);
+		$this->_additionalUrls = new DataList(false);
 		
 		$this->_url = '';
 		
@@ -450,7 +450,7 @@ class Page
 		$obj = get_object_vars($this);
 		foreach ($obj as $key => $value)
 		{
-			if( get_class($value) == get_class( DataList::getEmptyDataList() ) )
+			if( gettype($value) == 'object' && get_class($value) == get_class( DataList::getEmptyDataList() ) )
 			{
 				$obj[$key] = $value->getArray();
 			}
@@ -463,14 +463,14 @@ class Page
 	{
 		foreach ($obj as $key => $value)
 		{
-			if ( get_type($value) == 'array' )
+			if ( gettype($value) == 'array' )
 			{
-				$this[$key] = new DataList();
-				$this[$key]->setByArray( $value );
+				$this->$key = new DataList();
+				$this->$key->setByArray( $value );
 			}
 			else
 			{
-				$this[$key] = $value;
+				$this->$key = $value;
 			}
 		}
 	}

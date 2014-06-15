@@ -32,7 +32,7 @@ if (file_exists(_CONTENT_DIRECTORY.'initBuild.php') )
 }
 
 $page = General::getInstance()->getCurrentPage();
-PageList::getInstance()->updatePage( $page );
+PageList::getInstance()->buildPage( $page );
 
 if ( _DEBUG )
 {
