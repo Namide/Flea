@@ -107,6 +107,10 @@ class DataList
 	
 	public function getValue( $key )
 	{
+		if ( !$this->hasKey($key) && _DEBUG )
+		{
+			Debug::getInstance()->addError('The key:'.$key.'don\'nt exist');
+		}
 		return $this->_datas[$key];
 	}
 	
@@ -123,12 +127,12 @@ class DataList
 	
 	public function hasValue( $val )
 	{
-		return in_array( $val, $this->_tags );
+		return in_array( $val, $this->_datas );
 	}
 	
 	public function hasKey( $key )
 	{
-		return array_key_exists( $key, $this->_tags );
+		return array_key_exists( $key, $this->_datas );
 	}
 	
 	public function length()

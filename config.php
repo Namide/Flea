@@ -6,8 +6,8 @@
 
 // Absolute URL of the website
 //define( '_ROOT_URL', 'http://localhost/Flea/' );
-define( '_ROOT_URL', 'http://flea.namide.com/' );
-//define( '_ROOT_URL', 'http://localhost/damien/github/Flea/' );
+//define( '_ROOT_URL', 'http://flea.namide.com/' );
+define( '_ROOT_URL', 'http://localhost/damien/github/Flea/' );
 
 
 // Directory name of the system's files

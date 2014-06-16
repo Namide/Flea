@@ -151,7 +151,7 @@ class BuildUtil extends InitUtil
 			$replacePage = preg_replace_callback( '/\{\{content:(.*?)\}\}/', function ($matches) use($page)
 			{
 				$currentPage = General::getInstance()->getCurrentPage();
-				return $currentPage->getContent($matches[1]);
+				return $currentPage->getContents()->getValue($matches[1]);
 			}, $replacePage );
 		
 			$replacePage = preg_replace_callback( '/\{\{pageNameToAbsUrl:(.*?)\}\}/', function ($matches) use($page)

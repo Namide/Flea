@@ -146,7 +146,7 @@ class Page
 	 */
 	public function getContents()
 	{
-		return $this->_tags;
+		return $this->_contents;
 	}
 	
 	protected $_phpHeader;

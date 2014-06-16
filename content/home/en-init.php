@@ -19,6 +19,6 @@ $htmlTitle = 'Home';
 $type = 'default'; // error404
 // $phpHeader		
 
-// $tags				
+$tags = array( 'basic', 'home' );			
 // $tag				
 // $contents	

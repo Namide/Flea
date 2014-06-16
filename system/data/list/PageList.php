@@ -287,79 +287,6 @@ class PageList
 	}
     
 	/**
-	 * Add all pages of a directory
-	 * 
-	 * @param type $dir				Root directory
-	 * @param type $fileDirRel		Relative directory (for the recursivity)	
-	 */
-	public function addPagesByDir( $dir )
-	{
-		$listOfPages = $this->addPageByDirRecurs( $dir, '' );
-		$this->db_insertPages($listOfPages);
-	}
-	
-	protected function db_insertPages( array $list )
-	{
-		$tableName = DataBase::objectToTableName( Page::getEmptyPage() );
-		
-		$pageVars = Page::getEmptyPage()->getObjectVars();
-		DataBase::create(_DB_DSN_PAGES, $pageVars, $tableName, true);
-		$sql = 'CREATE TABLE `'.$tableName.'_array` ( page_id TEXT, page_prop TEXT, key TEXT, value TEXT );';
-		DataBase::execute(_DB_DSN_PAGES, $sql);
-		
-		//$sql = '';
-		foreach ($list as $page) 
-		{
-			$pageVars = $page->getObjectVars();
-			DataBase::insert( _DB_DSN_PAGES, $pageVars, $tableName, true );
-			//DataBase::execute(_DB_DSN_PAGES, $sql);
-			
-			foreach ($pageVars as $key => $value)
-			{
-				if(	gettype($value) == 'object' &&
-					get_class($value) == get_class( DataList::getEmptyDataList() ) )
-				{
-					foreach ($value->getArray() as $key2 => $val2)
-					{
-						$sql = 'INSERT INTO `'.$tableName.'_array` VALUES ( \''.$pageVars['_id'].'\'';
-						$sql .= ', \''.addslashes($key).'\' );';
-						$sql .= ', \''.addslashes($key2).'\', \''.addslashes($val2).'\' );';
-						DataBase::execute(_DB_DSN_PAGES, $sql);
-					}
-				}
-			}
-		}
-		//if ( $sql != '' ) { DataBase::execute(_DB_DSN_PAGES, $sql); }
-	}
-	
-	
-	protected function addPageByDirRecurs( $dir, $fileDirRel = '' )
-	{
-		$list = array();
-		
-		if ( !file_exists($dir) ) { return $list; }
-
-		$dirOpen = opendir($dir);
-		while($file = @readdir($dirOpen))
-		{
-			if( $file != "." &&
-				$file != ".." &&
-				is_dir($dir.'/'.$file) )
-			{
-				$list1 = $this->addPageByDirRecurs( $dir.'/'.$file.'/', $fileDirRel.'/'.$file );
-				$list2 = $this->createPage( (($fileDirRel != '')?$fileDirRel.'/':'').$file );
-				
-				
-				$list = array_merge($list, $list1, $list2);
-			}
-		}
-		closedir($dirOpen);
-		
-		return $list;
-	}
-	
-	
-	/**
 	 * Add all the pages (by languages) in the folder
 	 * 
 	 * @param string $folderName	Name of the folder thats contain the page
@@ -403,12 +330,6 @@ class PageList
     {
 		include $filename;
 		
-		$pageUrlTemp = $page->getPageUrl();
-		if ( _DEBUG && empty($pageUrlTemp) && !isset($url) )
-		{
-			Debug::getInstance()->addError( 'The initialisation of a page must to have an URL' );
-		}
-		
 		if ( isset($type) )	
 		{
 			$page->setType($type);
@@ -442,7 +363,7 @@ class PageList
 		
 		if ( isset($tags) )				{ $page->getTags()->addMultiple($tags) ; }
 		if ( isset($tag) )				{ $page->getTags()->add($tag) ; }
-		if ( isset($contents) )			{ $page->getContents()->addMultiple($contents) ; }
+		if ( isset($contents) )			{ $page->getContents()->addMultiple($contents); }
 		
         return $page;
     }
@@ -486,7 +407,7 @@ class PageList
 		
 		// EXIST
 		$pages = $this->getAll( 'WHERE _url LIKE \''.$relURL.'\' ORDER BY _date', $flagLoad);
-		if ( count($pages) > 0 ) return $pages[0];
+		if ( count($pages) > 0 ) return current ($pages);
 
 
 		// EXIST WITHOUT "/" AT THE END
@@ -494,7 +415,7 @@ class PageList
 		{
 			$urlTemp = substr( $relURL, 0, strlen($relURL)-1 );
 			$pages = $this->getAll( 'WHERE _url LIKE \''.$urlTemp.'\' ORDER BY _date', $flagLoad);
-			if ( count($pages) > 0 ) return $pages[0];
+			if ( count($pages) > 0 ) return current ($pages);
 		}
 
 
@@ -530,21 +451,21 @@ class PageList
     public function getDefaultPage( $lang, $flagLoad = 0 )
     {
         $pages = $this->getAll( 'WHERE _type = \''.Page::$TYPE_DEFAULT.'\' AND _lang = \''.$lang.'\' ORDER BY _date LIMIT 1', $flagLoad);
-		if ( count($pages) > 0 ) return $pages[0];
+		if ( count($pages) > 0 ) return current($pages);
 		
 		/* IF THE LANGUAGE OF THE DEFAULT PAGE DON'T EXIST */
 		$pages = $this->getAll( 'WHERE _type = \''.Page::$TYPE_DEFAULT.'\' ORDER BY _date LIMIT 1', $flagLoad);
-		if ( count($pages) > 0 ) return $pages[0];
+		if ( count($pages) > 0 ) return current($pages);
 		
 		/* IF THE DEFAULT PAGE DON'T EXIST */
 		$pages = $this->getAll( 'WHERE _lang = \''.$lang.'\' ORDER BY _date LIMIT 1', $flagLoad);
-		if ( count($pages) > 0 ) return $pages[0];
+		if ( count($pages) > 0 ) return current($pages);
 		
 		$pages = $this->getAll( 'WHERE _type = \''.Page::$TYPE_ERROR404.'\' AND _lang = \''.$lang.'\' ORDER BY _date LIMIT 1', $flagLoad);
-		if ( count($pages) > 0 ) return $pages[0];
+		if ( count($pages) > 0 ) return current($pages);
 
 		$pages = $this->getAll( 'WHERE _type = \''.Page::$TYPE_ERROR404.'\' ORDER BY _date LIMIT 1', $flagLoad);
-		if ( count($pages) > 0 ) return $pages[0];
+		if ( count($pages) > 0 ) return current($pages);
 
 		// CREATE PAGE ERROR 404
 			$page = new Page();
@@ -579,7 +500,7 @@ class PageList
     public function getByName( $name, $lang, $flagLoad = 0 )
     {
 		$pages = $this->getAll( 'WHERE _name = \''.$name.'\' AND _lang = \''.$lang.'\' ORDER BY _date LIMIT 1', $flagLoad);
-		if ( count($pages) > 0 ) return $pages[0];
+		if ( count($pages) > 0 ) return current ($pages);
 		
         return $this->getDefaultPage( $lang, $flagLoad );
     }
@@ -606,9 +527,8 @@ class PageList
     private function getLangByUrl( $url )
     {
         $pages = $this->getAll( 'WHERE _url = \''.$url.'\' LIMIT 1', PageList::$LOAD_INIT );
-		if ( count($pages) > 0 ) return $pages[0]->getLang();
+		if ( count($pages) > 0 ) return current ($pages)->getLang();
 		
-        
 		return LangList::getInstance()->getLangByNavigator();
     }
 	

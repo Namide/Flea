@@ -183,7 +183,7 @@ abstract class DataBase
 			if ( _DEBUG ) { $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING); }
 			else { $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT); }
 			
-			var_dump($request);
+			//var_dump($request);
 			
 			$stmt = $db->prepare($request); // Préparation de ton statement
 			
@@ -220,7 +220,7 @@ abstract class DataBase
 			if ( _DEBUG ) { $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING); }
 			else { $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT); }
 			
-			var_dump($request);
+			//var_dump($request);
 			$stmt = $db->prepare($request);
 			
 			if ( $stmt === false )

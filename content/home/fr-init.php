@@ -21,6 +21,6 @@ $htmlTitle = 'accueil';
 $type = 'default'; // error404
 // $phpHeader		
 
-// $tags				
+$tags = array( 'basic', 'home' );			
 // $tag				
-$contents = array( 'test01'=>'youhou ! ! !', 'test02'=>'hoé???' );
+$contents = array( 'test01'=>'youhou ! ! !', 'test02'=>'hoé???', 'test02'=>'haha' );
