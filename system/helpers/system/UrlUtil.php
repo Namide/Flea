@@ -240,7 +240,7 @@ class UrlUtil
 			$urlStr .= '&'.implode('&', $getUrl);
 		}
 		
-		$invalid = array( /*'/'=>'-',*/ '\\'=>'-', ':'=>'-', /*'?'=>'-',*/ '"'=>'-', '*'=>'-', '<'=>'-', '>'=>'-', '|'=>'-' );
+		/*$invalid = array( '\\'=>'-', ':'=>'-', '"'=>'-', '*'=>'-', '<'=>'-', '>'=>'-', '|'=>'-' );
 		$urlStr = str_replace(array_keys($invalid), array_values($invalid), htmlentities( $urlStr ) );
 
 		$invalid = array( '&'=>'/', '?'=>'/' );
@@ -254,7 +254,7 @@ class UrlUtil
 				$urlStr .= '/';
 			}
 			$urlStr .= 'index.html';
-		}
+		}*/
 		
 		return $urlStr;
 	}

@@ -161,14 +161,18 @@ class Debug
 				continue;
 			}
 
-			$str = '';
-			if( $max_trace > 1 )
-			{
-				$str .= '	#'.str_pad($i - $traces_to_ignore, 3, ' ');
-			}
 			//$str .= $object.$call['function'].'('.implode(', ', $call['args']).') ';
-			$str .= '	'.$call['file'].':'.$call['line'];
-			$ret[] = $str;
+			if ( isset($call['file']) && isset($call['line']) )
+			{
+				$str = '';
+				if( $max_trace > 1 )
+				{
+					$str .= '	#'.str_pad($i - $traces_to_ignore, 3, ' ');
+				}
+				
+				$str .= '	'.$call['file'].':'.$call['line'];
+				$ret[] = $str;
+			}
 		}
 		return implode('\n',$ret);
 	}

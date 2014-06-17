@@ -26,29 +26,32 @@
 
 namespace Flea;
 
-$timestart = microtime(true);
-//$initTime = 0;
+if ( _DEBUG )
+{
+	include_once _SYSTEM_DIRECTORY.'helpers/system/Debug.php';
+	Debug::getInstance();
+	if (!ini_get('display_errors')) { ini_set('display_errors', '1'); }
+	error_reporting(E_ALL);
+}
 
 if ( _CACHE )
 {
-	include_once _SYSTEM_DIRECTORY.'helpers/system/DataUtil.php';
+	
+	include_once _SYSTEM_DIRECTORY.'data/DataBase.php';
 	include_once _SYSTEM_DIRECTORY.'helpers/system/Cache.php';
 	include_once _SYSTEM_DIRECTORY.'helpers/system/UrlUtil.php';
-	$cache = new Cache( _CACHE_DIRECTORY.'pages/' );
+	$cache = new Cache(_DB_DSN_CACHE);
 	
-	$fileName = UrlUtil::urlPageToStr( UrlUtil::getNavigatorRelUrl() );
+	$urlStr = UrlUtil::urlPageToStr( UrlUtil::getNavigatorRelUrl() );
 	
-	if( $cache->isWrited( $fileName ) )
+	if( $cache->isWrited( $urlStr ) )
 	{
-		$cache->echoSaved($fileName);
+		$cache->echoSaved( $urlStr );
 		if ( _DEBUG )
 		{
-			include_once _SYSTEM_DIRECTORY.'helpers/system/Debug.php';
-			//echo '<!-- load cache time: ', number_format( microtime(true) - $timestart , 3) , 's -->';
 			echo '<!--'.Debug::getInstance()->getTimes('load cache time').'-->';
 			Debug::getInstance()->dispatchErrors();
 		}
-		exit();
 	}
 	else
 	{
@@ -63,25 +66,26 @@ if ( _CACHE )
 			$cache->startSave();
 				$page->render();
 			$cache->stopSave();
-			$content = BuildUtil::getInstance()->replaceFleaVars( $cache->getSaved(), $page );
-			$cache->setSaved( $content );
-			$cache->writeCache( $fileName );
-			echo $cache->getSaved();
-
-
+			$content = BuildUtil::getInstance()->replaceFleaVars( $cache->getContent(), $page );
+			$cache->setContent( $content );
+			$cache->writeCache( $urlStr, $page->getPhpHeader() );
+			
 			if ( _DEBUG )
 			{
-				//echo '<!-- execute PHP and write cache time: ', number_format( microtime(true) - $timestart , 3), 's -->';
-				echo '<!--'.Debug::getInstance()->getTimes('load cache time').'-->';
-				Debug::getInstance()->dispatchErrors();
+				Debug::getInstance()->addTimeMark('write cache');
 			}
 		}
-		else
+		
+		$page->render();
+		
+		if ( _DEBUG )
 		{
-			$page->render();
+			echo '<!--'.Debug::getInstance()->getTimes('render page time').'-->';
+			Debug::getInstance()->dispatchErrors();
 		}
-		exit();
 	}
+	
+	exit();
 }
 
 include_once _SYSTEM_DIRECTORY.'init/import.php';
@@ -92,7 +96,6 @@ $page->render();
 
 if ( _DEBUG )
 {
-	//echo '<!-- execute PHP time: ', number_format( microtime(true) - $timestart , 3),'s -->';
 	echo '<!--'.Debug::getInstance()->getTimes('execute PHP time').'-->';
 	Debug::getInstance()->dispatchErrors();
 }

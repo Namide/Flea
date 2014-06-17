@@ -35,7 +35,9 @@ class Cache
 {
 	//private $_rootDir;
 	private $_content;
-	private $_dataUtil;
+	private $_db;
+	private $_tableName;
+	//private $_dataUtil;
 	
 	
 	/**
@@ -43,17 +45,17 @@ class Cache
 	 * 
 	 * @param string $rootDir	Root directory
 	 */
-	function __construct( $rootDir = null )
+	function __construct( $dbDsnCache/*$rootDir = null*/, $tableName = 'pages-final' )
 	{
-		if ( $rootDir === null )
-		{
-			$rootDir = _CACHE_DIRECTORY;
-		}
-		
-		if ( substr( $rootDir, -1, 1 ) != '/' ) { $rootDir .= '/'; }
-		//$this->_rootDir = $rootDir;
-		$this->_dataUtil = new DataUtil($rootDir);
+		$this->_db = DataBase::getInstance($dbDsnCache);
+		$this->_tableName = $tableName;
 		$this->_content = '';
+		
+		if ( !$this->_db->exist($tableName) )
+		{
+			$sql = 'CREATE TABLE `'.$tableName.'` ( url TEXT, header TEXT, content TEXT );';
+			$this->_db->execute( $sql);
+		}
     }
 	
 	/**
@@ -62,9 +64,9 @@ class Cache
 	 * @param string $fileName	Name of the file
 	 * @return bool				true if the file is writted, false if error has occured
 	 */
-	public function isWrited( $fileName )
+	public function isWrited( $strUrl )
 	{
-		return $this->_dataUtil->has($fileName);
+		return $this->_db->count( $this->_tableName, 'url LIKE \''.$strUrl.'\'' ) > 0;
 	}
 	
 	/**
@@ -73,21 +75,42 @@ class Cache
 	 * @param type $fileName	Name of the file
 	 * @param type $content		Content of the file (optional)
 	 */
-	public function writeCache( $fileName, &$content = null )
+	public function writeCache( $url, $header = '', &$content = null )
 	{
 		if ( $content === null )
 		{
 			$content = $this->_content;
 		}
-		$this->_dataUtil->add( $fileName, $this->_content );
+		
+		$obj = array();
+		$obj['url'] = $url;
+		$obj['header'] = $header;
+		$obj['content'] = &$content;
+		$this->_db->insert( $obj, $this->_tableName, true);
+			
+		//$this->_dataUtil->add( $fileName, $this->_content );
 	}
 	
 	/**
 	 * Echo the file (with the function readfile)
 	 */
-	public function echoSaved( $fileName )
+	public function echoSaved( $url )
 	{
-		$this->_dataUtil->render($fileName);
+		$query = 'SELECT * FROM `'.$this->_tableName.'` WHERE url LIKE \''.$url.'\'';
+		
+		$row = $this->_db->fetchAll($query);
+		if ( $row > 0 ) 
+		{
+			if ( $row[0]['header'] != '' ) 
+			{
+				header( $row[0]['header'] );
+			}
+			echo $row[0]['content'];
+		}
+		elseif(_DEBUG)
+		{
+			Debug::getInstance()->addError( 'The URL '.$url.' don\'t exist in the cache data base' );
+		}
 	}
 	
 	/**
@@ -101,7 +124,7 @@ class Cache
 	 */
 	public function isPageCachable( Page &$page )
 	{
-		if ( self::getNumFilesSaved( $this->_dataUtil->getDir() ) < _MAX_PAGE_CACHE )
+		if ( $this->getNumFilesSaved() < _MAX_PAGE_CACHE )
 		{
 			return $page->getCachable();
 		}
@@ -113,7 +136,7 @@ class Cache
 	 */
 	public function startSave()
 	{
-		if( !file_exists(_CACHE_DIRECTORY) )
+		/*if( !file_exists(_CACHE_DIRECTORY) )
 		{
 			mkdir( _CACHE_DIRECTORY, 0777 );
 		}
@@ -127,7 +150,7 @@ allow from all
 </Files>';
 			fwrite($htaccess, $htaccessContent);
 			fclose($htaccess); 
-		}
+		}*/
 		ob_start();
 	}
 	
@@ -136,7 +159,7 @@ allow from all
 	 * 
 	 * @return string		Content saved
 	 */
-	public function getSaved()
+	public function getContent()
 	{
 		return $this->_content;
 	}
@@ -146,7 +169,7 @@ allow from all
 	 * 
 	 * @param string $content		Change the content
 	 */
-	public function setSaved( $content )
+	public function setContent( $content )
 	{
 		$this->_content = $content;
 	}
@@ -171,14 +194,15 @@ allow from all
 	 * @param string $cacheDirectory		Directory of the files
 	 * @return int							Number of files cached
 	 */
-	public static function getNumFilesSaved( $cacheDirectory )
+	public function getNumFilesSaved()
 	{
-		$dir = $cacheDirectory;
+		return $this->_db->count($this->_tableName);
+		/*$dir = $cacheDirectory;
 		if ( substr($dir, -1, 1) === '/' ) { $dir = substr($dir, 0, -1); }
-		return self::getNumFilesRecurs($dir);
+		return self::getNumFilesRecurs($dir);*/
 	}
 	
-	private static function getNumFilesRecurs( $dir )
+	/*private static function getNumFilesRecurs( $dir )
 	{
 		$num = 0;
 		if ( !file_exists($dir) ) return $num;
@@ -198,5 +222,5 @@ allow from all
 		closedir($MyDirectory);
 		
 		return $num;
-	}
+	}*/
 }

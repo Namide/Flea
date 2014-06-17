@@ -45,7 +45,7 @@ class DataBase
 	
 	public function count( $tableName, $where = null )
 	{
-		$sql = "SELECT COUNT(*) FROM `'.$tableName.'`'";
+		$sql = 'SELECT COUNT(*) FROM `'.$tableName.'`';
 		if ( $where !== null ) { $sql .= ' WHERE '.$where; }
 		$sql .= ';';
 		

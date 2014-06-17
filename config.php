@@ -39,7 +39,7 @@ define( '_URL_REWRITING', false );
 define( '_DEBUG', true );
 
 // Cache activated => TRUE, deactivated => FALSE
-define( '_CACHE', false );
+define( '_CACHE', true );
 
 // Maximum number of files in the cache directory
 // It is better to have 5 beyond the maximum number of cachable pages
