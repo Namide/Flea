@@ -32,36 +32,40 @@ namespace Flea;
  *
  * @author Namide
  */
-abstract class DataBase
+class DataBase
 {
-    
+    private static $_INSTANCE = array();
+	
+	private $_pdo;
+	 
 	public static function objectToTableName( $obj )
 	{
 		return stripslashes(get_class($obj));
 	}
 	
-	public static function count( $dbDsnCache, $tableName, $where = null )
+	public function count( $tableName, $where = null )
 	{
-		$sql = "SELECT COUNT(*) FROM `'.$tableName.'`';";
+		$sql = "SELECT COUNT(*) FROM `'.$tableName.'`'";
 		if ( $where !== null ) { $sql .= ' WHERE '.$where; }
+		$sql .= ';';
 		
 		try
 		{
-			$db = new \PDO( $dbDsnCache, _DB_USER, _DB_PASS, _DB_OPTIONS );
-			if ( _DEBUG ) { $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING); }
-			else { $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT); }
+			//$db = new \PDO( $dbDsnCache, _DB_USER, _DB_PASS, _DB_OPTIONS );
+			if ( _DEBUG ) { $this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING); }
+			else { $this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT); }
 			
-			$res = $db->query($sql);
+			$res = $this->_pdo->query($sql);
 			if ( $res )
 			{
 				$count = $res->fetchColumn();
 				$res = null;
-				$db = null;
+				//$db = null;
 				return $count;
 			}
 			
 			$res = null;
-			$db = null;
+			//$db = null;
 			return 0;
 		}
 		catch (PDOException $e)
@@ -71,18 +75,18 @@ abstract class DataBase
 		
 	}
 	
-	public static function exist( $dbDsnCache, $tableName )
+	public function exist( $tableName )
     {
 		try
 		{
 			$sql = 'SELECT 1 FROM `'.$tableName.'` LIMIT 1';
-			$db = new \PDO($dbDsnCache, _DB_USER, _DB_PASS, _DB_OPTIONS );
+			//$db = new \PDO($dbDsnCache, _DB_USER, _DB_PASS, _DB_OPTIONS );
 			/*if ( _DEBUG ) { $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING); }
 			else { $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT); }*/
-			$db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
+			$this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
 			
-			$result = $db->query($sql);
-			$db = null;
+			$result = $this->_pdo->query($sql);
+			//$db = null;
 		}
 		catch (PDOException $e)
 		{
@@ -92,7 +96,7 @@ abstract class DataBase
 		return ($result !== false);
 	}
 	
-    public static function create( $dbDsnCache, array $getObjectVars, $tableName, $exec = true )
+    public function create( array $getObjectVars, $tableName, $exec = true )
     {
 		$sqls = array();
 		$sqls[0] = 'CREATE TABLE `'.$tableName.'` ( ';
@@ -126,13 +130,13 @@ abstract class DataBase
 		
 		if ( $exec )
 		{
-			return DataBase::execute( $dbDsnCache, $sql );
+			return DataBase::execute( $sql );
 		}
 		
 		return false;
     }
 
-	public static function insert( $dbDsnCache, array $getObjectVars, $tableName, $exec = true )
+	public function insert( array $getObjectVars, $tableName, $exec = true )
     {
 		$sqls[0] = 'INSERT INTO `'.$tableName.'` VALUES ( ';
 		$binds = array();
@@ -169,23 +173,23 @@ abstract class DataBase
 		
 		if ( $exec )
 		{
-			DataBase::execute( $dbDsnCache, $sql, $binds );
+			DataBase::execute( $sql, $binds );
 		}
 		
 		return $sql;
     }
 	
-	public static function execute( $dbDsnCache, $request, array $binds = null )
+	public function execute( $request, array $binds = null )
 	{
 		try
 		{
-			$db = new \PDO($dbDsnCache, _DB_USER, _DB_PASS, _DB_OPTIONS );
-			if ( _DEBUG ) { $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING); }
-			else { $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT); }
+			//$db = new \PDO($dbDsnCache, _DB_USER, _DB_PASS, _DB_OPTIONS );
+			if ( _DEBUG ) { $this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING); }
+			else { $this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT); }
 			
 			//var_dump($request);
 			
-			$stmt = $db->prepare($request); // Préparation de ton statement
+			$stmt = $this->_pdo->prepare($request); // Préparation de ton statement
 			
 			if ( $binds !== null )
 			{
@@ -194,12 +198,9 @@ abstract class DataBase
 					$stmt->bindValue($bind[0], $bind[1], $bind[2]);
 				}
 			}
-			//$stmt->bindParam(':idMessage', $idMessage, PDO::PARAM_INT);
 			$stmt->execute();
 			$stmt = null;
 			
-			//$db->exec($request);
-			$db = null;
 			return true;
 		}
 		catch(PDOException $e)
@@ -212,16 +213,15 @@ abstract class DataBase
 		return false;
 	}
 	
-	public static function fetchAll( $dbDsnCache, $request )
+	public function fetchAll( $request )
 	{
 		try
 		{
-			$db = new \PDO($dbDsnCache, _DB_USER, _DB_PASS, _DB_OPTIONS );
-			if ( _DEBUG ) { $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING); }
-			else { $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT); }
+			if ( _DEBUG ) { $this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING); }
+			else { $this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT); }
 			
 			//var_dump($request);
-			$stmt = $db->prepare($request);
+			$stmt = $this->_pdo->prepare($request);
 			
 			if ( $stmt === false )
 			{
@@ -251,5 +251,43 @@ abstract class DataBase
 		}
 		return false;
 	}
+	
+	
+	private function __construct( $dbDsnCache ) 
+    {
+		try
+		{
+			$this->_pdo = new \PDO($dbDsnCache, _DB_USER, _DB_PASS, _DB_OPTIONS );
+		}
+		catch(PDOException $e)
+		{
+			if ( _DEBUG )
+			{
+				Debug::getInstance()->addError( 'Initialize database error: '.$e->getMessage() );
+			}
+		}
+    }
+	
+	/**
+	 * 
+	 * @param string $dbDsnCache
+	 * @return DataBase
+	 */
+	public static function getInstance( $dbDsnCache ) 
+    {
+		if(!isset(self::$_INSTANCE[$dbDsnCache]))
+        {
+            self::$_INSTANCE[$dbDsnCache] = new DataBase($dbDsnCache);
+        }
+        return self::$_INSTANCE[$dbDsnCache];
+    }
+	
+	final public function __clone()
+    {
+        if ( _DEBUG ) 
+		{
+			Debug::getInstance()->addError('You can\'t clone a multiton');
+		}
+    }
 	
 }

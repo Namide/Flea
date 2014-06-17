@@ -80,6 +80,7 @@ class PageList
 		LIMIT count
 		OFFSET start
 		 */
+		
 		$sql .= ' FROM `'.DataBase::objectToTableName( Page::getEmptyPage() ).'`';
 		if ( $query !== null )
 		{
@@ -93,7 +94,7 @@ class PageList
 		//$query .= ' LIMIT';
 		
 		$pages = array();
-		foreach ( DataBase::fetchAll( _DB_DSN_PAGES , $sql ) as $row )
+		foreach ( DataBase::getInstance( _DB_DSN_PAGES )->fetchAll($sql) as $row )
 		{
 			$page = new Page();
 			$page->setByObjectVars($row);
@@ -101,7 +102,7 @@ class PageList
 			if ( ($flagLoad & PageList::$LOAD_LIST) > 0 )
 			{
 				$sql = 'SELECT * FROM `'.DataBase::objectToTableName( Page::getEmptyPage() ).'` WHERE parent_id = \''.$page->getId().'\'';
-				foreach ( DataBase::fetchAll($query) as $row2 )
+				foreach ( DataBase::getInstance( _DB_DSN_PAGES )->fetchAll($query) as $row2 )
 				{
 					$page->addToList( $row2['parent_prop'], $row2['key'], $row2['value'] );
 				}
@@ -125,7 +126,7 @@ class PageList
 		//$query .= ' LIMIT';
 		
 		$pages = array();
-		foreach ( DataBase::fetchAll($query) as $row )
+		foreach ( DataBase::getInstance( _DB_DSN_PAGES )->fetchAll($query) as $row )
 		{
 			$page = new Page();
 			$page->setByObjectVars($row);
@@ -133,7 +134,7 @@ class PageList
 			if ( ($flagLoad & PageList::$LOAD_LIST) > 0 )
 			{
 				$query = 'SELECT * FROM `'.DataBase::objectToTableName( Page::getEmptyPage() ).'` WHERE parent_id = \''.$page->getId().'\'';
-				foreach ( DataBase::fetchAll($query) as $row2 )
+				foreach ( DataBase::getInstance( _DB_DSN_PAGES )->fetchAll($query) as $row2 )
 				{
 					$page->addToList( $row2['parent_prop'], $row2['key'], $row2['value'] );
 				}
@@ -252,7 +253,7 @@ class PageList
 		$where = '_name = \''.$name.'\'';
 		if ( $lang !== null ) { $where .= ' AND _lang = \''.$lang.'\''; }
 		
-		return (DataBase::count( _DB_DSN_PAGES, $tableName, $where ) > 0);
+		return ( DataBase::getInstance( _DB_DSN_PAGES )->count( $tableName, $where ) > 0);
     }
 	
 	
@@ -439,6 +440,11 @@ class PageList
 			if( $page != null ) { return $page; }
 		}
 
+		if ( _DEBUG )
+		{
+			Debug::getInstance()->addError('The URL '.$relURL.' don\'t exist');
+		}
+		
 		return $this->getDefaultPage($lang, $flagLoad);
     }
 	
@@ -501,6 +507,11 @@ class PageList
     {
 		$pages = $this->getAll( 'WHERE _name = \''.$name.'\' AND _lang = \''.$lang.'\' ORDER BY _date LIMIT 1', $flagLoad);
 		if ( count($pages) > 0 ) return current ($pages);
+		
+		if ( _DEBUG )
+		{
+			Debug::getInstance()->addError('The page '.$name.','.$lang.' don\'t exist');
+		}
 		
         return $this->getDefaultPage( $lang, $flagLoad );
     }

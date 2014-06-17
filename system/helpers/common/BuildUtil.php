@@ -151,7 +151,16 @@ class BuildUtil extends InitUtil
 			$replacePage = preg_replace_callback( '/\{\{content:(.*?)\}\}/', function ($matches) use($page)
 			{
 				$currentPage = General::getInstance()->getCurrentPage();
-				return $currentPage->getContents()->getValue($matches[1]);
+				if( _DEBUG && !$currentPage->getContents()->hasValue($matches[1]) ) 
+				{
+					Debug::getInstance()->addError('The FleaVar {content:'.$matches[1].'}'
+						. ' don\'t exist for the page ['.$currentPage->getId().']' );
+				}
+				else
+				{
+					return $currentPage->getContents()->getValue($matches[1]);
+				}
+				
 			}, $replacePage );
 		
 			$replacePage = preg_replace_callback( '/\{\{pageNameToAbsUrl:(.*?)\}\}/', function ($matches) use($page)

@@ -9,8 +9,8 @@ function getFooter()
     
     if( $lang == 'all' )
     {
-    	$output .= '<li><a href="'.\Flea\BuildUtil::getInstance()->getAbsUrlByIdLang( 'basic/homepage', 'en' ).'">en</a></li>';
-    	$output .= '<li><a href="'.\Flea\BuildUtil::getInstance()->getAbsUrlByIdLang( 'basic/homepage', 'fr' ).'">fr</a></li>';
+    	$output .= '<li><a href="'.\Flea\BuildUtil::getInstance()->getAbsUrlByIdLang( 'home', 'en' ).'">en</a></li>';
+    	$output .= '<li><a href="'.\Flea\BuildUtil::getInstance()->getAbsUrlByIdLang( 'home', 'fr' ).'">fr</a></li>';
     }
     else if ( $lang == 'fr' )
     {

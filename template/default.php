@@ -30,7 +30,7 @@
 <body>
     
     <header>
-        <h1><a href="<?= Flea\BuildUtil::getInstance()->getAbsUrl( 'basic/homepage' ) ?>">FWK</a></h1>
+        <h1><a href="<?= Flea\BuildUtil::getInstance()->getAbsUrl( 'home' ) ?>">FWK</a></h1>
         <nav>
             <?php echo getMenu(); ?>
         </nav>

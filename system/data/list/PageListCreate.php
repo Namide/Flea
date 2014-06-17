@@ -51,18 +51,20 @@ class PageListCreate
 	{
 		$tableName = DataBase::objectToTableName( Page::getEmptyPage() );
 		
+		$db = DataBase::getInstance(_DB_DSN_PAGES);
+		
 		$pageVars = Page::getEmptyPage()->getObjectVars();
-		DataBase::create(_DB_DSN_PAGES, $pageVars, $tableName, true);
+		$db->create( $pageVars, $tableName, true);
 		$sql = 'CREATE TABLE `'.$tableName.'_array` ( page_id TEXT, page_prop TEXT, key TEXT, value TEXT );';
-		DataBase::execute(_DB_DSN_PAGES, $sql);
+		$db->execute( $sql);
 		
 		//$sql = '';
 		foreach ($list as $page) 
 		{
 			$pageVars = $page->getObjectVars();
-			DataBase::insert( _DB_DSN_PAGES, $pageVars, $tableName, true );
+			$db->insert( $pageVars, $tableName, true );
 			//DataBase::execute(_DB_DSN_PAGES, $sql);
-			print_r($pageVars);
+			
 			foreach ($pageVars as $key => $value)
 			{
 				
@@ -75,7 +77,7 @@ class PageListCreate
 						$obj['page_prop'] = $key;
 						$obj['key'] = $key2;
 						$obj['value'] = $val2;
-						DataBase::insert(_DB_DSN_PAGES, $obj, $tableName.'_array', true);
+						$db->insert( $obj, $tableName.'_array', true);
 						
 						//$sql = 'INSERT INTO `'.$tableName.'_array` VALUES ( \''.$pageVars['_id'].'\'';
 						//$sql .= ', \''.addslashes($key).'\', \''.addslashes($key2).'\', \''.addslashes($val2).'\' );';
