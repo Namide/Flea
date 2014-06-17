@@ -98,14 +98,9 @@ class PageList
 		{
 			$page = new Page();
 			$page->setByObjectVars($row);
-			
 			if ( ($flagLoad & PageList::$LOAD_LIST) > 0 )
 			{
-				$sql = 'SELECT * FROM `'.DataBase::objectToTableName( Page::getEmptyPage() ).'` WHERE parent_id = \''.$page->getId().'\'';
-				foreach ( DataBase::getInstance( _DB_DSN_PAGES )->fetchAll($query) as $row2 )
-				{
-					$page->addToList( $row2['parent_prop'], $row2['key'], $row2['value'] );
-				}
+				$page = $this->addListToPage($page);
 			}
 			
 			$pages[$page->getId()] = $page;
@@ -116,12 +111,11 @@ class PageList
 	
 	public function getByList( $where, $flagLoad = 0 )
 	{
-		
 		$table_page = DataBase::objectToTableName( Page::getEmptyPage() );
-		$table_list = DataBase::objectToTableName( Page::getEmptyPage() );
+		$table_list = $table_page.'_array';
 		
-		$query = 'SELECT * FROM `'.$table_page.'` INNER JOIN `'.$table_list.'` WHERE `'.$table_page.'._id` = `'.$table_list.'.parent_id`';
-		if ( $where !== null ) $query .= ' AND '.$where;
+		$query = 'SELECT * FROM `'.$table_page.'` INNER JOIN '.$table_list.' ON '.$table_page.'._id = '.$table_list.'.page_id';
+		if ( $where !== null ) $query .= ' WHERE '.$where;
 		$query .= ' ORDER BY _date;';
 		//$query .= ' LIMIT';
 		
@@ -133,11 +127,7 @@ class PageList
 			
 			if ( ($flagLoad & PageList::$LOAD_LIST) > 0 )
 			{
-				$query = 'SELECT * FROM `'.DataBase::objectToTableName( Page::getEmptyPage() ).'` WHERE parent_id = \''.$page->getId().'\'';
-				foreach ( DataBase::getInstance( _DB_DSN_PAGES )->fetchAll($query) as $row2 )
-				{
-					$page->addToList( $row2['parent_prop'], $row2['key'], $row2['value'] );
-				}
+				$page = $this->addListToPage($page);
 			}
 			
 			$pages[$page->getId()] = $page;
@@ -146,6 +136,21 @@ class PageList
 		return $pages;
 	}
 	
+	public function addListToPage( Page &$page )
+	{		
+		$table_page = DataBase::objectToTableName( Page::getEmptyPage() );
+		$table_list = $table_page.'_array';
+		
+		$query = 'SELECT * FROM `'.$table_list.'` WHERE page_id = \''.$page->getId().'\'';
+		
+		foreach ( DataBase::getInstance( _DB_DSN_PAGES )->fetchAll($query) as $row )
+		{
+			$page->addToList( $row['page_prop'], $row['value'], $row['key'] );
+		}
+		return $page;
+	}
+
+
 	/**
 	 * List of elements in the language
 	 * 
@@ -378,7 +383,10 @@ class PageList
 	 */
 	public function buildPage( &$page )
 	{
-		if( $page->getBuildFile() == '' )
+		//return $this->getAll( 'WHERE _lang = \''.$lang.'\' ORDER BY _date', $flagLoad );
+		$pages = $this->getAll('WHERE _id = \''.$page->getId().'\'', self::$LOAD_INIT | self::$LOAD_LIST );
+		
+		if( $page->getBuildFile() === '' )
 		{
 			return $page;
 		}
@@ -407,9 +415,11 @@ class PageList
 		
 		
 		// EXIST
-		$pages = $this->getAll( 'WHERE _url LIKE \''.$relURL.'\' ORDER BY _date', $flagLoad);
+		/*$pages = $this->getAll( 'WHERE _url LIKE \''.$relURL.'\' ORDER BY _date', $flagLoad);
+		if ( count($pages) > 0 ) return current ($pages);*/
+		$pages = $this->getByList( '_url LIKE \''.$relURL.'\' OR (page_prop = \'_additionalUrls\' AND value = \''.$relURL.'\')' );
 		if ( count($pages) > 0 ) return current ($pages);
-
+		
 
 		// EXIST WITHOUT "/" AT THE END
 		if ( strlen($relURL) > 0 && $relURL[strlen($relURL)-1] === '/' )
@@ -442,7 +452,7 @@ class PageList
 
 		if ( _DEBUG )
 		{
-			Debug::getInstance()->addError('The URL '.$relURL.' don\'t exist');
+			Debug::getInstance()->addError('The URL "'.$relURL.'" don\'t exist');
 		}
 		
 		return $this->getDefaultPage($lang, $flagLoad);

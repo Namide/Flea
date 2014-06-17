@@ -60,6 +60,7 @@ function adminBody()
 		
 		.error { color: red; }
 		.passed { color: green; }
+		strong { font-weight: bold; }
 		
 		body
 		{
@@ -95,6 +96,8 @@ function adminBody()
 
 		p { text-align: left; }
 
+		table h1, table h2, table h3, table h4, table h5, table h6 {  margin: 0; }
+		
 		h1 { font-size: 30px; color:#000; margin: 0; text-transform: uppercase; font-weight: lighter; }
 		h2 { font-size: 20px; color:#000; margin: 30px 0 10px 0; text-transform: uppercase; font-weight: lighter; }
 		h3 { font-size: 18px; color:#000; margin: 18px 0 10px 0; text-transform: uppercase; font-weight: lighter; }

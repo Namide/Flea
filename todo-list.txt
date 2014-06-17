@@ -69,9 +69,6 @@ TO-DO
 
 	get the abs URL with pageName and global GET
 
-	sort the Pages by date
-
-	"mustache" après le template !
 	
 	Url
 		suppression du GET de la page
@@ -88,7 +85,6 @@ TO-DO
 		phase cache
 		
 	singletons -> utilisable sans méthode getInstance() pour InitUtil, BuildUtil et TemplateUtil
-	language -> lang
 	
 	Flea.variables (old mustache) !
 		{{rootPath}}

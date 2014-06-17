@@ -126,62 +126,6 @@ function writeClass( $className, $t = true )
 			writeTest( 'getLangByNavigator', testString($lang->getLangByNavigator(), 'fr') );
 			writeTest( 'getList', testArray($lang->getList(), array('all', 'uk', 'fr')) );
 
-			writeClass('Element');
-			$element = new \Flea\Element();
-			$element->addTags( array('a:b','bb','yohé\glitch', 2) );
-			writeTest( 'addTags', testString( $element->hasTag('yohé\glitch'), true ) );
-			$element->removeTag( 'bb' );
-			writeTest( 'removeTag', testArray( $element->getTags(), array('a:b','yohé\glitch', 2) ) );
-			$element->addTag( 'hum' );
-			writeTest( 'addTag', testString( $element->hasTag('yohé\glitch'), true ) );
-			writeTest( 'hasTag', testString( $element->hasTag('hum'), true ) );
-			$element->addTag( 'hum' );
-			writeTest( 'hasTag', testString( $element->hasTag('hum'), true ) );
-			writeTest( 'hasTags', testString( $element->hasTags(array('hum', 'yohé\glitch', 2)), true ) );
-			writeTest( 'hasTags', testString( $element->hasTags(array('no')), false ) );
-			$element->setName('the id!');
-			writeTest( 'setId', testString( $element->getName(), 'the id!' ) );
-			$element->setLang('uk');
-			writeTest( 'setLang', testString( $element->getLang(), 'uk' ) );
-			$element->setType('wall');
-			writeTest( 'setLang', testString( $element->getType(), 'wall' ) );
-			$save = $element->getSave();
-			$element2 = new \Flea\Element();
-			eval( '$element2 = '.$save.';');
-			writeTest( 'getSave', testObject( $element, $element2 ) );
-			writeTest( 'create', testObject( $element, $element2 ) );
-			$element->removeTags();
-			writeTest( 'removeTags', testArray( $element->getTags(), array() ) );
-
-
-			writeClass('ElementList');
-			$elementList = \Flea\ElementList::getInstance();
-			$elementList->add($element);
-			writeTest( 'add', testObject( $elementList->getAll()[0], $element ) );
-			$element2->setLang('fr');
-			$element2->setName('whohoo-as\' /');
-			$elementList->add($element2);
-			writeTest( 'getElementsByLang', testObject( $elementList->getByLang('fr')[0], $element2 ) );
-			writeTest( 'getById', testObject( $elementList->getByName('whohoo-as\' /', 'fr'), $element2 ) );
-
-			
-			writeClass('DataUtil');
-			$datas = new \Flea\DataUtil(_TEMP_DIRECTORY);
-			$temp = 'yohé!';
-			$key = 'test-01';
-			if ( $datas->has($key) ) $datas->delete ($key);
-			$datas->add( 'test-01', $temp );
-			writeTest( 'add', testString( $datas->has($key), true ) );
-			writeTest( 'has', testString( $datas->has($key), true ) );
-			if ( $datas->has($key) ) $datas->delete ($key);
-			writeTest( 'delete', testString( $datas->has($key), false ) );
-			$temp = array( 'a'=>array(5,1,2), 'f'=>3 );
-			$datas->addJson($key, $temp);
-			writeTest( 'addJson', testString( $datas->has($key), true ) );
-			$temp2 = $datas->getJson($key, $temp);
-			writeTest( 'getJson', testString( $temp, $temp2 ) );
-			$temp2 = $datas->delete($key);
-			
 			writeClass('-');
 			
 		?>

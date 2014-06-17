@@ -23,4 +23,4 @@ $type = 'default'; // error404
 
 $tags = array( 'basic', 'home' );			
 // $tag				
-$contents = array( 'test01'=>'youhou ! ! !', 'test02'=>'hoé???', 'test02'=>'haha' );
+$contents = array( 'test01'=>'youhou ! ! !<a href="http://namide.com/">test "contents"</a>', 'test02'=>'hoé???', 'test02'=>'haha' );

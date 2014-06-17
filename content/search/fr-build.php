@@ -14,6 +14,8 @@
 		
 		<input type="text" name="s" placeholder="Votre recherche" >
 		<input type="submit" value="Chercher">
-	</form> 
+	</form>
+	
+	<a href="http://google.fr/">test</a>
 	
 </article>

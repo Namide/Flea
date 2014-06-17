@@ -151,21 +151,34 @@ class BuildUtil extends InitUtil
 			$replacePage = preg_replace_callback( '/\{\{content:(.*?)\}\}/', function ($matches) use($page)
 			{
 				$currentPage = General::getInstance()->getCurrentPage();
-				if( _DEBUG && !$currentPage->getContents()->hasValue($matches[1]) ) 
+				if( !$currentPage->getContents()->hasValue($matches[1]) ) 
 				{
-					Debug::getInstance()->addError('The FleaVar {content:'.$matches[1].'}'
+					if( _DEBUG )
+					{
+						Debug::getInstance()->addError('The FleaVar {{content:'.$matches[1].'}}'
 						. ' don\'t exist for the page ['.$currentPage->getId().']' );
+					}
+					return '';
 				}
-				else
-				{
-					return $currentPage->getContents()->getValue($matches[1]);
-				}
+				
+				return $currentPage->getContents()->getValue($matches[1]);
 				
 			}, $replacePage );
 		
 			$replacePage = preg_replace_callback( '/\{\{pageNameToAbsUrl:(.*?)\}\}/', function ($matches) use($page)
 			{
 				$lang = $page->getLang();
+				
+				if ( !PageList::getInstance()->has($matches[1], $lang) )
+				{
+					if( _DEBUG )
+					{
+						Debug::getInstance()->addError('The page {{pageNameToAbsUrl:'.$matches[1].'}}'
+						. ' don\'t exist for the language ['.$lang.']' );
+					}
+					return '';
+				}
+				
 				return BuildUtil::getInstance()->getAbsUrlByIdLang( $matches[1], $lang );
 			}, $replacePage );
 		}

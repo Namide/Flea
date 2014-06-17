@@ -1,7 +1,8 @@
 <?php
 
 		
-$url = 'en';		
+$url = 'en';
+$addUrl = '';
 $template = 'default';
 
 $visible = true;	

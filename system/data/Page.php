@@ -475,9 +475,14 @@ class Page
 		}
 	}
 	
-	public function addToList( $privateListName, $value, $key )
+	public function addToList( $privateListName, $value, $key = null )
 	{
-		$this[$privateListName]->add($value, $key);
+		if (	_DEBUG &&
+				get_class($this->$privateListName) != get_class( DataList::getEmptyDataList() ) )
+		{
+				Debug::getInstance()->addError('The propertie "'.$privateListName.'" don\'t exist or isn\'t a DataList object');
+		}
+		$this->$privateListName->add($value, $key);
 	}
 	
 	/**
