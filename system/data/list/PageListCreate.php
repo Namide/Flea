@@ -58,12 +58,10 @@ class PageListCreate
 		$sql = 'CREATE TABLE `'.$tableName.'_array` ( page_id TEXT, page_prop TEXT, key TEXT, value TEXT );';
 		$db->execute( $sql);
 		
-		//$sql = '';
 		foreach ($list as $page) 
 		{
 			$pageVars = $page->getObjectVars();
 			$db->insert( $pageVars, $tableName, true );
-			//DataBase::execute(_DB_DSN_PAGES, $sql);
 			
 			foreach ($pageVars as $key => $value)
 			{
@@ -78,15 +76,10 @@ class PageListCreate
 						$obj['key'] = $key2;
 						$obj['value'] = $val2;
 						$db->insert( $obj, $tableName.'_array', true);
-						
-						//$sql = 'INSERT INTO `'.$tableName.'_array` VALUES ( \''.$pageVars['_id'].'\'';
-						//$sql .= ', \''.addslashes($key).'\', \''.addslashes($key2).'\', \''.addslashes($val2).'\' );';
-						//DataBase::execute(_DB_DSN_PAGES, $sql);
 					}
 				}
 			}
 		}
-		//if ( $sql != '' ) { DataBase::execute(_DB_DSN_PAGES, $sql); }
 	}
 	
 	

@@ -406,7 +406,7 @@ class PageList
 	 */
     public function getByUrl( $relURL, $flagLoad = 0 )
     {
-		if( _DEBUG && !General::getInstance()->getPagesInitialised() )
+		if( _DEBUG && !General::getInstance()->isPagesInitialized() )
 		{
 			Debug::getInstance()->addError( 'All pages must be initialised after use getByUrl()' );
 		}

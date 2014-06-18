@@ -22,4 +22,4 @@ $type = 'default'; // error404
 
 $tags = array( 'basic', 'home' );			
 // $tag				
-// $contents	
+$contents = array('test03'=>'<a href="{{rootPath}}">Racine</a>');

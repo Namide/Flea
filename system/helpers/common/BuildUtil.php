@@ -71,7 +71,7 @@ class BuildUtil extends InitUtil
 	 * @param array $getUrl			Array of GET of the page (optional)
 	 * @return string				Absolute URL
 	 */
-	public function getAbsUrlByIdLang( $pageName, $lang, array $getUrl = null )
+	public function getAbsUrlByNameLang( $pageName, $lang, array $getUrl = null )
     {
 		$PageList = PageList::getInstance();
 		$page = $PageList->getByName($pageName, $lang);
@@ -87,7 +87,7 @@ class BuildUtil extends InitUtil
 	{
 		$pageList = PageList::getInstance();
 		$general = General::getInstance();
-        if ( _DEBUG && !$general->getPagesInitialised() )
+        if ( _DEBUG && !$general->isPagesInitialized() )
 		{
 			Debug::getInstance()->addError( 'All pages must be initialised after use BuildUtil class' );
 		}
@@ -106,7 +106,7 @@ class BuildUtil extends InitUtil
     {
 		$lang = General::getInstance()->getCurrentLang();
 		
-		return $this->getAbsUrlByIdLang($pageName, $lang);
+		return $this->getAbsUrlByNameLang($pageName, $lang);
     }
 	
 	/**
@@ -122,7 +122,7 @@ class BuildUtil extends InitUtil
 	 * - {{body}}				=> HTML body of the current page
 	 * - {{description}}		=> HTML description of the current page
 	 * - {{content:additionnal-label-content}}	=> $currentPage->getContent('additionnal-label-content');
-	 * - {{pageNameToAbsUrl:page-name}}			=> $buildUtil->getAbsUrlByIdLang( ‘page-name', $currentLanguage );	
+	 * - {{pageNameToAbsUrl:page-name}}			=> $buildUtil->getAbsUrlByNameLang( ‘page-name', $currentLanguage );	
 	 * 
 	 * @param string $text		Original text
 	 * @param Page $page		Current page
@@ -146,7 +146,7 @@ class BuildUtil extends InitUtil
 		$replacePage = str_replace('{{description}}', $currentPage->getHtmlDescription(), $replacePage);
 		
 			
-		if ( General::getInstance()->getPagesInitialised() && $page !== null )
+		if ( General::getInstance()->isPagesInitialized() && $page !== null )
 		{
 			$replacePage = preg_replace_callback( '/\{\{content:(.*?)\}\}/', function ($matches) use($page)
 			{
@@ -179,7 +179,7 @@ class BuildUtil extends InitUtil
 					return '';
 				}
 				
-				return BuildUtil::getInstance()->getAbsUrlByIdLang( $matches[1], $lang );
+				return BuildUtil::getInstance()->getAbsUrlByNameLang( $matches[1], $lang );
 			}, $replacePage );
 		}
 

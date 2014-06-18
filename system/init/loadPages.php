@@ -26,26 +26,7 @@
 
 namespace Flea;
 
-if (file_exists(_CONTENT_DIRECTORY.'initBegin.php') )
-{
-	include _CONTENT_DIRECTORY.'initBegin.php';
-}
-
-if (file_exists(_CONTENT_DIRECTORY.'initLang.php') )
-{
-	include _CONTENT_DIRECTORY.'initLang.php';
-}
-elseif ( _DEBUG )
-{
-	Debug::getInstance()->addError( 'The file: '._CONTENT_DIRECTORY.'initLang.php don\'t exist' );
-}
-
-if ( !DataBase::getInstance( _DB_DSN_PAGES )->exist( DataBase::objectToTableName(Page::getEmptyPage() ) ) )
-{
-	include_once _SYSTEM_DIRECTORY.'data/list/PageListCreate.php';
-	PageListCreate::getInstance()->addPagesByDir(_CONTENT_DIRECTORY);
-}
-General::getInstance()->setPagesInitialised(true);
+General::getInstance()->initializesPages();
 
 UrlUtil::getInstance();
 BuildUtil::getInstance();

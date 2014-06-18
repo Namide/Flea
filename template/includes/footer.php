@@ -9,16 +9,16 @@ function getFooter()
     
     if( $lang == 'all' )
     {
-    	$output .= '<li><a href="'.\Flea\BuildUtil::getInstance()->getAbsUrlByIdLang( 'home', 'en' ).'">en</a></li>';
-    	$output .= '<li><a href="'.\Flea\BuildUtil::getInstance()->getAbsUrlByIdLang( 'home', 'fr' ).'">fr</a></li>';
+    	$output .= '<li><a href="'.\Flea\BuildUtil::getInstance()->getAbsUrlByNameLang( 'home', 'en' ).'">en</a></li>';
+    	$output .= '<li><a href="'.\Flea\BuildUtil::getInstance()->getAbsUrlByNameLang( 'home', 'fr' ).'">fr</a></li>';
     }
     else if ( $lang == 'fr' )
     {
-    	$output .= '<li><a href="'.\Flea\BuildUtil::getInstance()->getAbsUrlByIdLang( $page->getName(), 'en' ).'">en</a></li>';
+    	$output .= '<li><a href="'.\Flea\BuildUtil::getInstance()->getAbsUrlByNameLang( $page->getName(), 'en' ).'">en</a></li>';
     }
     else
     {
-		$output .= '<li><a href="'.\Flea\BuildUtil::getInstance()->getAbsUrlByIdLang( $page->getName(), 'fr' ).'">fr</a></li>';
+		$output .= '<li><a href="'.\Flea\BuildUtil::getInstance()->getAbsUrlByNameLang( $page->getName(), 'fr' ).'">fr</a></li>';
     }
     
     $output .= '</ul>';

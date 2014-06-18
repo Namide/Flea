@@ -41,6 +41,22 @@ class Debug
 	private $_totalTime;
 	private $_timerList;
 	
+	private $_errorBackNum = 10;
+	public function setErrorBackNum( $num ) { $this->_errorBackNum = $num; }
+	public function getErrorBackNum() { return $this->_errorBackNum; }
+
+	private $_errorJsAlert = true;
+	public function setErrorJsAlert( $errorJsAlert ) { $this->_errorJsAlert = $errorJsAlert; }
+	public function getErrorJsAlert() { return $this->_errorJsAlert; }
+
+	private $_errorEcho = true;
+	public function setErrorEcho( $errorEcho ) { $this->_errorEcho = $errorEcho; }
+	public function getErrorEcho() { return $this->_errorEcho; }
+
+	private $_errorSjLog = true;
+	public function setErrorJsLog( $errorJsLog ) { $this->_errorSjLog = $errorJsLog; }
+	public function getErrorJsLog() { return $this->_errorSjLog; }
+
 	/**
 	 * Save an error message
 	 * 
@@ -48,7 +64,7 @@ class Debug
 	 */
 	public function addError( $msg )
 	{
-		$error = $msg.'\n'.$this->getDebugBacktrace(1, 10);
+		$error = $msg.'\n'.$this->getDebugBacktrace(1, $this->_errorBackNum);
 		array_push( $this->_errorList, $error );
 	}
 	
@@ -60,13 +76,22 @@ class Debug
 	{
 		if ( count($this->_errorList) > 0 )
 		{
-			echo '<script>'
-					. 'console.log("'.$this->delDoubleQuotes(implode('\n', $this->_errorList)).'");'
-					. 'alert("'.$this->delDoubleQuotes(implode('\n', $this->_errorList)).'");'
-					. '</script>';
-			echo $this->addHtmlReturns(implode( '<br>', $this->_errorList ));
 			
+			echo '<script>/*Errors*/';
+			if ( $this->_errorJsAlert )
+			{
+				echo 'alert("'.$this->delDoubleQuotes(implode('\n', $this->_errorList)).'");';
+			}
+			if ( $this->_errorJsLog )
+			{
+				echo 'console.log("'.$this->delDoubleQuotes(implode('\n', $this->_errorList)).'");';
+			}
+			echo '</script>';
 			
+			if ( $this->_errorEcho )
+			{
+				echo $this->addHtmlReturns(implode( '<br>', $this->_errorList ));
+			}
 		}
 	}
 	

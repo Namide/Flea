@@ -42,14 +42,35 @@ class General
 	 * 
 	 * @return bool		true if the pages are initialised, otherwise false
 	 */
-	public function getPagesInitialised() { return $this->_pagesInitialised; }
+	public function isPagesInitialized() { return $this->_pagesInitialised; }
 	
 	/**
 	 * All page initialised
-	 * 
-	 * @param bool $initialised		true if the pages are initialised, otherwise false
 	 */
-	public function setPagesInitialised( $initialised ) { $this->_pagesInitialised = $initialised; }
+	public function initializesPages()
+	{
+		if (file_exists(_CONTENT_DIRECTORY.'initBegin.php') )
+		{
+			include _CONTENT_DIRECTORY.'initBegin.php';
+		}
+
+		if (file_exists(_CONTENT_DIRECTORY.'initLang.php') )
+		{
+			include _CONTENT_DIRECTORY.'initLang.php';
+		}
+		elseif ( _DEBUG )
+		{
+			Debug::getInstance()->addError( 'The file: '._CONTENT_DIRECTORY.'initLang.php don\'t exist' );
+		}
+		
+		if ( !DataBase::getInstance( _DB_DSN_PAGES )->exist( DataBase::objectToTableName(Page::getEmptyPage() ) ) )
+		{
+			include_once _SYSTEM_DIRECTORY.'data/list/PageListCreate.php';
+			PageListCreate::getInstance()->addPagesByDir(_CONTENT_DIRECTORY);
+		}
+		
+		$this->_pagesInitialised = true;
+	}
 	
 	protected $_currentPageName;
 	/**
@@ -59,7 +80,7 @@ class General
 	 */
 	public function getCurrentPageName()
 	{
-		if ( _DEBUG && !General::getInstance()->getPagesInitialised() )
+		if ( _DEBUG && !General::getInstance()->isPagesInitialized() )
 		{
 			Debug::getInstance()->addError( 'You can\'t access to the current page name if the pages isn\'tinitialised' );
 		}
@@ -74,7 +95,7 @@ class General
 	 */
 	public function getCurrentPage()
 	{
-		if ( _DEBUG && !General::getInstance()->getPagesInitialised() )
+		if ( _DEBUG && !General::getInstance()->isPagesInitialized() )
 		{
 			Debug::getInstance()->addError( 'You can\'t access to the current page if the pages isn\'tinitialised' );
 		}
@@ -89,7 +110,7 @@ class General
 	 */
 	public function getCurrentLang()
 	{
-		if ( _DEBUG && !General::getInstance()->getPagesInitialised() )
+		if ( _DEBUG && !General::getInstance()->isPagesInitialized() )
 		{
 			Debug::getInstance()->addError( 'You can\'t access to the current language if the pages isn\'tinitialised' );
 		}
@@ -104,7 +125,7 @@ class General
 	 */
 	public function getCurrentGetUrl()
 	{
-		if ( _DEBUG && !General::getInstance()->getPagesInitialised() )
+		if ( _DEBUG && !General::getInstance()->isPagesInitialized() )
 		{
 			Debug::getInstance()->addError( 'You can\'t access to the current language if the pages isn\'tinitialised' );
 		}
@@ -119,7 +140,7 @@ class General
 	 */
 	public function getCurrentPageUrl()
 	{
-		if ( _DEBUG && !General::getInstance()->getPagesInitialised() )
+		if ( _DEBUG && !General::getInstance()->isPagesInitialized() )
 		{
 			Debug::getInstance()->addError( 'You can\'t access to the current language if the pages isn\'tinitialised' );
 		}

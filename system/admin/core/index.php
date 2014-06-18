@@ -110,6 +110,9 @@ function adminBody()
 		table td { padding:8px; }
 		table th { padding:16px 8px; }
 		table { border-spacing: 0; float:left; margin: 0 32px 32px 0; }
+		
+		ul, li { margin:0; padding:0; }
+		ul { padding-left:10px; }
 	</style>
 </head>
 
@@ -126,7 +129,11 @@ function adminBody()
 	
 	<?php
 		include_once _SYSTEM_DIRECTORY.'init/import.php';
-		if ( _DEBUG ) \Flea\Debug::getInstance()->dispatchErrors();
+		if ( _DEBUG )
+		{
+			echo '<strong>'.\Flea\Debug::getInstance()->getTimes('').'</strong><br><br>';
+			\Flea\Debug::getInstance()->dispatchErrors();
+		}
 	?>
 	
 </body>

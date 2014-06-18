@@ -57,7 +57,7 @@ class UrlUtil
 	 */
 	public function reset()
 	{
-		if( _DEBUG && !General::getInstance()->getPagesInitialised() )
+		if( _DEBUG && !General::getInstance()->isPagesInitialized() )
 		{
 			Debug::getInstance()->addError( 'All pages must be initialised after use UrlUtil class' );
 		}
