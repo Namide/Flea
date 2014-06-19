@@ -9,7 +9,7 @@ $template = 'default';
 $visible = true;	
 $cachable = true;
 
-$getEnabled = false;
+$getEnabled = true;
 $getExplicit = true;
 $date = '2014-05-01';
 

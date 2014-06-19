@@ -433,10 +433,12 @@ class PageList
 		$lang = LangList::getInstance()->getLangByNavigator();
 
 		// IS DYNAMIC PAGE
-		$pages = $this->getAll( 'WHERE _url LIKE \''.$relURL.'\' AND _lang = \''.$lang.'\' ORDER BY _date', $flagLoad);
+		$sql = 'SELECT _url FROM `'.DataBase::objectToTableName( Page::getEmptyPage() ).'`  WHERE SUBSTR( \''.$relURL.'\', 0, LENGTH(_url)+1 ) LIKE _url ORDER BY LENGTH(_url) DESC';
+		$pages = DataBase::getInstance(_DB_DSN_PAGES)->fetchAll($sql);
 		if ( count($pages) > 0 )
 		{
-			$bestScore = 0;
+			
+			/*$bestScore = 0;
 			$page = null;
 			foreach ($pages as $pageTemp)
 			{
@@ -447,9 +449,9 @@ class PageList
 					$page = $pageTemp;
 				}
 			}
-			if( $page != null ) { return $page; }
+			if( $page != null ) { return $page; }*/
 		}
-
+		
 		if ( _DEBUG )
 		{
 			Debug::getInstance()->addError('The URL "'.$relURL.'" don\'t exist');
