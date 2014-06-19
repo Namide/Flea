@@ -32,6 +32,7 @@ if ( _DEBUG )
 	error_reporting(E_ALL);
 }
 
+include_once _SYSTEM_DIRECTORY.'data/SqlQuery.php';
 include_once _SYSTEM_DIRECTORY.'data/DataBase.php';
 include_once _SYSTEM_DIRECTORY.'data/list/DataList.php';
 include_once _SYSTEM_DIRECTORY.'data/list/LangList.php';

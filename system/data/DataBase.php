@@ -51,9 +51,8 @@ class DataBase
 		
 		try
 		{
-			//$db = new \PDO( $dbDsnCache, _DB_USER, _DB_PASS, _DB_OPTIONS );
-			if ( _DEBUG ) { $this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING); }
-			else { $this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT); }
+			/*if ( _DEBUG ) { $this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING); }
+			else { $this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT); }*/
 			
 			$res = $this->_pdo->query($sql);
 			if ( $res )
@@ -80,10 +79,7 @@ class DataBase
 		try
 		{
 			$sql = 'SELECT 1 FROM `'.$tableName.'` LIMIT 1';
-			//$db = new \PDO($dbDsnCache, _DB_USER, _DB_PASS, _DB_OPTIONS );
-			/*if ( _DEBUG ) { $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING); }
-			else { $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT); }*/
-			$this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
+			/*$this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);*/
 			
 			$result = $this->_pdo->query($sql);
 			//$db = null;
@@ -183,9 +179,8 @@ class DataBase
 	{
 		try
 		{
-			//$db = new \PDO($dbDsnCache, _DB_USER, _DB_PASS, _DB_OPTIONS );
-			if ( _DEBUG ) { $this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING); }
-			else { $this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT); }
+			/*if ( _DEBUG ) { $this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING); }
+			else { $this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT); }*/
 			
 			//var_dump($request);
 			
@@ -213,14 +208,47 @@ class DataBase
 		return false;
 	}
 	
-	public function fetchAll( $request )
+	
+	public function fetchAll( SqlQuery $query )
 	{
 		try
 		{
-			if ( _DEBUG ) { $this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING); }
-			else { $this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT); }
+			$stmt = $this->_pdo->prepare( $query->getRequest() );
 			
-			//var_dump($request);
+			if ( $stmt === false )
+			{
+				return array();
+			}
+			
+			$binds = $query->getBinds();
+			if ( $binds !== null )
+			{
+				foreach ($binds as $bind)
+				{
+					$stmt->bindValue($bind[0], $bind[1], $bind[2]);
+				}
+			}
+			$stmt->execute();
+			$arrValues = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+			$stmt = null;
+			
+			return $arrValues;
+		}
+		catch(PDOException $e)
+		{
+			if ( _DEBUG )
+			{
+				Debug::getInstance()->addError( 'fetch_all() database error: '.$e->getMessage() );
+			}
+		}
+		return false;
+	}
+	
+	
+	/*public function fetchAll( $request )
+	{
+		try
+		{
 			$stmt = $this->_pdo->prepare($request);
 			
 			if ( $stmt === false )
@@ -231,16 +259,6 @@ class DataBase
 			$stmt->execute();
 			$arrValues = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 			return $arrValues;
-			
-			//$db = new \PDO($dbDsnCache, _DB_USER, _DB_PASS, _DB_OPTIONS );
-			//$sth = $db->prepare($request);
-			//$sth->execute();
-			//return $sth->fetchAll();
-			
-			
-			//$db = new \PDO($dbDsnCache, _DB_USER, _DB_PASS, _DB_OPTIONS );
-			//$db->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );//Error Handling
-			//return $db->query($request);
 		}
 		catch(PDOException $e)
 		{
@@ -250,7 +268,7 @@ class DataBase
 			}
 		}
 		return false;
-	}
+	}*/
 	
 	
 	private function __construct( $dbDsnCache ) 
@@ -258,6 +276,15 @@ class DataBase
 		try
 		{
 			$this->_pdo = new \PDO($dbDsnCache, _DB_USER, _DB_PASS, _DB_OPTIONS );
+			
+			if ( _DEBUG )
+			{
+				$this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING);
+			}
+			else
+			{
+				$this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
+			}
 		}
 		catch(PDOException $e)
 		{

@@ -24,6 +24,8 @@
  * THE SOFTWARE.
  */
 
+namespace Flea;
+
 /**
  *
  * @author Namide
@@ -31,12 +33,15 @@
 class SqlQuery
 {
 	public static $TYPE_CREATE = 1;
-	public static $TYPE_READ = 2;
+	public static $TYPE_SELECT = 2;
 	public static $TYPE_UPDATE = 3;
 	public static $TYPE_INSERT = 4;
 	public static $TYPE_DELETE = 5;
 	
 	protected static $_TEMP = null;
+	/**
+	 * @return SqlQuery
+	 */
 	public static function getTemp()
 	{
 		if ( self::$_TEMP === null ) { self::$_TEMP = new SqlQuery(); }
@@ -50,11 +55,15 @@ class SqlQuery
 	protected $_binds;
 	public function getBinds() { return $this->_binds; }
 	public function setBinds( array $binds ) { $this->_binds = $this->_binds + $binds; }
-	public function addBind( $key, $value ) { $this->_binds[$key] = $value; }
+	public function addBind( $key, $value, $pdoParamType )
+	{
+		$this->_binds[] = array($key, $value, $pdoParamType);
+	}
 	
 	
 	// CREATE
 	protected $_create;
+	public function getCreate() { return $this->_create; }
 	public function setCreate( $create )
 	{
 		$this->_type = self::$TYPE_CREATE;
@@ -63,46 +72,53 @@ class SqlQuery
 	
 	// READ
 	protected $_select;
+	public function getSelect() { return $this->_select; }
 	public function setSelect( $select )
 	{
-		$this->_type = self::$TYPE_READ;
+		$this->_type = self::$TYPE_SELECT;
 		$this->_select = $select;
 	}
 	
 	protected $_where;
+	public function getWhere() { return $this->_where; }
 	public function setWhere( $where ) { $this->_where = $where; }
 	
 	protected $_from;
+	public function getFrom() { return $this->_from; }
 	public function setFrom( $from ) { $this->_from = $from; }
 	
 	protected $_groupBy;
+	public function getGroupBy() { return $this->_groupBy; }
 	public function setGroupBy( $groupBy ) { $this->_groupBy = $groupBy; }
 	
 	protected $_having;
+	public function getHaving() { return $this->_having; }
 	public function setHaving( $having ) { $this->_having = $having; }
 	
 	protected $_orderBy;
+	public function getOrderBy() { return $this->_orderBy; }
 	public function setOrderBy( $orderBy ) { $this->_orderBy = $orderBy; }
 	
 	protected $_limit;
+	public function getLimit() { return $this->_limit; }
 	public function setLimit( $limit ) { $this->_limit = $limit; }
 	
 	// INSERT
 	protected $_insert;
+	public function getInsert() { return $this->_insert; }
 	public function setInsert( $insert )
 	{
 		$this->_type = self::$TYPE_INSERT;
 		$this->_insert = $insert;
 	}
 	
-	protected $_into;
-	public function setInto( $into ) { $this->_into = $into; }
-
 	protected $_values;
+	public function getValues() { return $this->_values; }
 	public function setValues( $values ) { $this->_values = $values; }
 
 	// UPDATE
 	protected $_update;
+	public function getUpdate() { return $this->_update; }
 	public function setUpdate( $update )
 	{
 		$this->_type = self::$TYPE_UPDATE;
@@ -110,10 +126,12 @@ class SqlQuery
 	}
 	
 	protected $_set;
+	public function getSet() { return $this->_set; }
 	public function setSet( $set ) { $this->_set = $set; }
 	
 	// DELETE
 	protected $_delete;
+	public function getDelete() { return $this->_delete; }
 	public function setDelete( $delete )
 	{
 		$this->_type = self::$TYPE_UPDATE;
@@ -139,7 +157,6 @@ class SqlQuery
 		$this->_update = '';
 		$this->_set = '';
 		$this->_insert = '';
-		$this->_into = '';
 		$this->_values = '';
 		$this->_delete = '';
 		$this->_binds = array();
@@ -147,7 +164,7 @@ class SqlQuery
 	
 	public function initSelect( $select, $from, $where = '', $orderBy = '', $limit = '' )
 	{
-		$this->_type = self::$TYPE_READ;
+		$this->_type = self::$TYPE_SELECT;
 		$this->_select = $select;
 		$this->_from = $from;
 		$this->_where = $where;
@@ -155,22 +172,52 @@ class SqlQuery
 		$this->_limit = $limit;
 	}
 	
-	public function initInsertValues( $insert, $into, $values = '', array $binds = array() )
+	public function initInsertValues( $insert, $values = '', array $binds = array() )
 	{
 		$this->_type = self::$TYPE_INSERT;
 		$this->_insert = $insert;
-		$this->_into = $into;
 		$this->_values = $values;
 		$this->_binds = $binds;
 	}
 	
-	public function initInsertSet( $insert, $into, $set = '', array $binds = array() )
+	public function initInsertSet( $insert, $set = '', array $binds = array() )
 	{
 		$this->_type = self::$TYPE_INSERT;
 		$this->_insert = $insert;
-		$this->_into = $into;
 		$this->_set = $set;
 		$this->_binds = $binds;
+	}
+	
+	public function initCreate( $createTable, array $getObjectVars )
+	{
+		$this->_type = self::$TYPE_CREATE;
+		$this->_create = 'TABLE `'.$createTable.'` (';
+		
+		$first = true;
+		foreach ( $getObjectVars as $key => $value )
+		{
+			if ( gettype($value) == "boolean" )
+			{
+				$this->_create .= ( ($first)?'':', ' ).$key.' BOOLEAN';
+				if ( $first ) $first = false;
+			}
+			elseif ( gettype($value) == "integer" )
+			{
+				$this->_create .= ( ($first)?'':', ' ).$key.' INT';
+				if ( $first ) $first = false;
+			}
+			elseif ( gettype($value) == "double" )
+			{
+				$this->_create .= ( ($first)?'':', ' ).$key.' DOUBLE';
+				if ( $first ) $first = false;
+			}
+			elseif ( gettype($value) == "string" )
+			{
+				$this->_create .= ( ($first)?'':', ' ).$key.' TEXT';
+				if ( $first ) $first = false;
+			}
+		}
+		$this->_create .= ' );';
 	}
 	
 	public function getRequest()
@@ -181,7 +228,7 @@ class SqlQuery
 				return $this->getRequestCreate();
 				break;
 				
-			case self::$TYPE_READ:
+			case self::$TYPE_SELECT:
 				return $this->getRequestRead();
 				break;
 			
@@ -224,7 +271,7 @@ class SqlQuery
 		}
 		if(_DEBUG && $this->_from == '')
 		{
-			Flea\Debug::getInstance()->addError('For a TYPE_READ SQL query You must init the var "from"');
+			Flea\Debug::getInstance()->addError('For a TYPE_SELECT SQL query You must init the var "from"');
 		}
 		$request = 'SELECT ' . $this->_select;
 		$request .= ' FROM ' . $this->_from;
@@ -244,13 +291,8 @@ class SqlQuery
 			{
 				Flea\Debug::getInstance()->addError('For a TYPE_INSERT SQL query You must init the var "insert"');
 			}
-			if($this->_into == '')
-			{
-				Flea\Debug::getInstance()->addError('For a TYPE_INSERT SQL query You must init the var "into"');
-			}
 		}
 		$request = 'INSERT ' . $this->_insert;
-		$request .= ' INTO ' . $this->_into;
 		if($this->_values != '') { $request .= ' VALUES (' . $this->_values . ')'; }
 		if($this->_set != '') { $request .= ' SET ' . $this->_groupBy; }
 		if($this->_select != '') { $request .= ' SELECT ' . $this->_select; }
