@@ -76,12 +76,15 @@ class DataBase
 	
 	public function exist( $tableName )
     {
+		
 		try
 		{
 			$sql = 'SELECT 1 FROM `'.$tableName.'` LIMIT 1';
-			/*$this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);*/
 			
+			$att = $this->_pdo->getAttribute(\PDO::ATTR_ERRMODE);
+			$this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
 			$result = $this->_pdo->query($sql);
+			$this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, $att);
 			//$db = null;
 		}
 		catch (PDOException $e)
@@ -92,7 +95,7 @@ class DataBase
 		return ($result !== false);
 	}
 	
-    public function create( array $getObjectVars, $tableName, $exec = true )
+    /*public function create( array $getObjectVars, $tableName, $exec = true )
     {
 		$sqls = array();
 		$sqls[0] = 'CREATE TABLE `'.$tableName.'` ( ';
@@ -130,9 +133,9 @@ class DataBase
 		}
 		
 		return false;
-    }
+    }*/
 
-	public function insert( array $getObjectVars, $tableName, $exec = true )
+	/*public function insert( array $getObjectVars, $tableName, $exec = true )
     {
 		$sqls[0] = 'INSERT INTO `'.$tableName.'` VALUES ( ';
 		$binds = array();
@@ -173,9 +176,9 @@ class DataBase
 		}
 		
 		return $sql;
-    }
+    }*/
 	
-	public function execute( $request, array $binds = null )
+	public function execute( SqlQuery $query )
 	{
 		try
 		{
@@ -184,8 +187,11 @@ class DataBase
 			
 			//var_dump($request);
 			
-			$stmt = $this->_pdo->prepare($request); // Préparation de ton statement
+			//var_dump($query->getBinds());
 			
+			$stmt = $this->_pdo->prepare( $query->getRequest() ); // Préparation de ton statement
+			
+			$binds = $query->getBinds();
 			if ( $binds !== null )
 			{
 				foreach ($binds as $bind)
@@ -193,6 +199,7 @@ class DataBase
 					$stmt->bindValue($bind[0], $bind[1], $bind[2]);
 				}
 			}
+			
 			$stmt->execute();
 			$stmt = null;
 			

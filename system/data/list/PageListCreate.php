@@ -53,19 +53,28 @@ class PageListCreate
 		
 		$db = DataBase::getInstance(_DB_DSN_PAGES);
 		
-		$pageVars = Page::getEmptyPage()->getObjectVars();
-		$db->create( $pageVars, $tableName, true);
-		$sql = 'CREATE TABLE `'.$tableName.'_array` ( page_id TEXT, page_prop TEXT, key TEXT, value TEXT );';
-		$db->execute( $sql);
+		/*$pageVars = Page::getEmptyPage()->getObjectVars();
+		$db->create( $pageVars, $tableName, true);*/
+		$request = SqlQuery::getTemp( SqlQuery::$TYPE_CREATE );
+		$request->initCreate($tableName, Page::getEmptyPage()->getObjectVars() );
+		$db->execute( $request );
+		
+		$request = SqlQuery::getTemp( SqlQuery::$TYPE_CREATE );
+		$request->initCreate($tableName.'_array', array( 'page_id'=>'TEXT', 'page_prop'=>'TEXT', 'key'=>'TEXT', 'value'=>'TEXT') );
+		/*$sql = 'CREATE TABLE `'.$tableName.'_array` ( page_id TEXT, page_prop TEXT, key TEXT, value TEXT );';*/
+		$db->execute( $request );
 		
 		foreach ($list as $page) 
 		{
 			$pageVars = $page->getObjectVars();
-			$db->insert( $pageVars, $tableName, true );
+			/*$db->insert( $pageVars, $tableName, true );*/
+			
+			$request = SqlQuery::getTemp( SqlQuery::$TYPE_INSERT );
+			$request->initInsertValues( 'INTO `'.$tableName.'`', $pageVars);
+			$db->execute($request);
 			
 			foreach ($pageVars as $key => $value)
 			{
-				
 				if(	gettype($value) == 'array' )
 				{
 					foreach ($value as $key2 => $val2)
@@ -75,7 +84,11 @@ class PageListCreate
 						$obj['page_prop'] = $key;
 						$obj['key'] = $key2;
 						$obj['value'] = $val2;
-						$db->insert( $obj, $tableName.'_array', true);
+						//$db->insert( $obj, $tableName.'_array', true);
+						
+						$request->clean( SqlQuery::$TYPE_INSERT );
+						$request->initInsertValues( 'INTO `'.$tableName.'_array`', $obj );
+						$db->execute($request);
 					}
 				}
 			}

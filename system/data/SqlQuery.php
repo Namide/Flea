@@ -42,9 +42,10 @@ class SqlQuery
 	/**
 	 * @return SqlQuery
 	 */
-	public static function getTemp()
+	public static function getTemp( $type = 0 )
 	{
 		if ( self::$_TEMP === null ) { self::$_TEMP = new SqlQuery(); }
+		else self::$_TEMP->clean( $type );
 		return self::$_TEMP;
 	}
 	
@@ -172,12 +173,40 @@ class SqlQuery
 		$this->_limit = $limit;
 	}
 	
-	public function initInsertValues( $insert, $values = '', array $binds = array() )
+	public function initInsertValues( $insert, array $values = array() )
 	{
 		$this->_type = self::$TYPE_INSERT;
 		$this->_insert = $insert;
-		$this->_values = $values;
-		$this->_binds = $binds;
+		
+		$this->_values = '';
+		$first = true;
+		foreach ( $values as $key => $value )
+		{
+			if ( gettype($value) == 'boolean' )
+			{
+				$this->_values .= ( ($first)?':':', :' ).$key;
+				$this->_binds[] = array( ':'.$key, (($value)?'1':'0'), \PDO::PARAM_BOOL );
+				$first = false;
+			}
+			elseif ( gettype($value) == 'integer' )
+			{
+				$this->_values .= ( ($first)?':':', :' ).$key;
+				$this->_binds[] = array( ':'.$key, $value, \PDO::PARAM_INT );
+				$first = false;
+			}
+			elseif ( gettype($value) == 'double' )
+			{
+				$this->_values .= ( ($first)?':':', :' ).$key;
+				$this->_binds[] = array( ':'.$key, $value, \PDO::PARAM_STR );
+				$first = false;
+			}
+			elseif ( gettype($value) == 'string' )
+			{
+				$this->_values .= ( ($first)?':':', :' ).$key;
+				$this->_binds[] = array( ':'.$key, $value, \PDO::PARAM_STR );
+				$first = false;
+			}
+		}
 	}
 	
 	public function initInsertSet( $insert, $set = '', array $binds = array() )
