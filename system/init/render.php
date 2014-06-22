@@ -37,6 +37,7 @@ if ( _DEBUG )
 if ( _CACHE )
 {
 	
+	include_once _SYSTEM_DIRECTORY.'data/SqlQuery.php';
 	include_once _SYSTEM_DIRECTORY.'data/DataBase.php';
 	include_once _SYSTEM_DIRECTORY.'helpers/system/Cache.php';
 	include_once _SYSTEM_DIRECTORY.'helpers/system/UrlUtil.php';

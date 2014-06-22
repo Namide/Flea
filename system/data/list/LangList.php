@@ -108,7 +108,7 @@ class LangList
 		$acceptedLanguages = filter_input(INPUT_SERVER, 'HTTP_ACCEPT_LANGUAGE', FILTER_SANITIZE_STRING);
         $langList = explode( ',', $acceptedLanguages );
         $langLower = strtolower( substr( chop( $langList[0] ), 0, 2 ) );
-
+		
 		if ( $this->has($langLower) )
 		{
 			return $langLower;

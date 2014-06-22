@@ -45,7 +45,7 @@ class Debug
 	public function setErrorBackNum( $num ) { $this->_errorBackNum = $num; }
 	public function getErrorBackNum() { return $this->_errorBackNum; }
 
-	private $_errorJsAlert = true;
+	private $_errorJsAlert = false;
 	public function setErrorJsAlert( $errorJsAlert ) { $this->_errorJsAlert = $errorJsAlert; }
 	public function getErrorJsAlert() { return $this->_errorJsAlert; }
 
@@ -53,9 +53,9 @@ class Debug
 	public function setErrorEcho( $errorEcho ) { $this->_errorEcho = $errorEcho; }
 	public function getErrorEcho() { return $this->_errorEcho; }
 
-	private $_errorSjLog = true;
-	public function setErrorJsLog( $errorJsLog ) { $this->_errorSjLog = $errorJsLog; }
-	public function getErrorJsLog() { return $this->_errorSjLog; }
+	private $_errorJsLog = true;
+	public function setErrorJsLog( $errorJsLog ) { $this->_errorJsLog = $errorJsLog; }
+	public function getErrorJsLog() { return $this->_errorJsLog; }
 
 	/**
 	 * Save an error message

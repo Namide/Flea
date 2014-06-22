@@ -27,7 +27,6 @@
 namespace Flea;
 
 /**
- * Description of PageList
  *
  * @author Namide
  */
@@ -45,39 +44,6 @@ class PageList
 	 */
 	public function getAll( SqlQuery $query = null, $flagLoad = 0 )
 	{
-		/*$sql = 'SELECT';
-		if ( $flagLoad == PageList::$LOAD_INIT )
-		{
-			$first = true;
-			foreach (Page::getEmptyPage()->getObjectVars() as $key => $value)
-			{
-				if ( gettype($value) != 'array' && gettype($value) != 'object' )
-				{
-					if ( !$first ) { $sql .= ' ,'; }
-					$sql .= ' '.$key;
-					$first = false;
-				}
-			}
-		}
-		elseif ( $flagLoad == PageList::$LOAD_INIT | PageList::$LOAD_LIST )
-		{
-			$sql .= ' *';
-		}
-		else
-		{
-			$sql .= ' *';
-		}
-
-		$sql .= ' FROM `'.DataBase::objectToTableName( Page::getEmptyPage() ).'`';
-		if ( $query !== null )
-		{
-			$sql .= ' '.$query.';';
-		}
-		else
-		{
-			$sql .= ' ORDER BY _date;';
-		}*/
-		
 		if ( $query === null )
 			$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
 		else
@@ -90,8 +56,8 @@ class PageList
 		if ( $query->getFrom() == '' )
 			$query->setFrom('`'.DataBase::objectToTableName( Page::getEmptyPage() ).'`');
 		
-		if ( $query->getWhere() == '' )
-			$query->setWhere($where);
+		/*if ( $query->getWhere() == '' )
+			$query->setWhere($where);*/
 		
 		if ( $query->getOrderBy() == '' )
 			$query->setOrderBy('_date');
@@ -100,6 +66,7 @@ class PageList
 		foreach ( DataBase::getInstance( _DB_DSN_PAGES )->fetchAll($query) as $row )
 		{
 			$page = new Page();
+			if ( isset($row['']) )
 			$page->setByObjectVars($row);
 			if ( ($flagLoad & PageList::$LOAD_LIST) > 0 )
 			{
@@ -112,7 +79,7 @@ class PageList
 		return $pages;
 	}
 	
-	public function getByList( $where = '', $flagLoad = 0 )
+	public function getByList( SqlQuery $query, $flagLoad = 0 )
 	{
 		$table_page = DataBase::objectToTableName( Page::getEmptyPage() );
 		$table_list = $table_page.'_array';
@@ -124,13 +91,13 @@ class PageList
 		
 		$pages = array();
 		
-		$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
+		$query->setType( SqlQuery::$TYPE_SELECT );
 		$query->setSelect('*');
 		$query->setFrom('`'.$table_page.'` '
-						. 'INNER JOIN '.$table_list.' '
+						. 'LEFT JOIN '.$table_list.' '
 						. 'ON '.$table_page.'._id = '.$table_list.'.page_id');
-		$query->setWhere($where);
-		$query->setOrderBy('_date');
+		//$query->setWhere($where);
+		//$query->setOrderBy('_date');
 		
 		foreach ( DataBase::getInstance( _DB_DSN_PAGES )->fetchAll($query) as $row )
 		{
@@ -155,10 +122,19 @@ class PageList
 		
 		//$query = 'SELECT * FROM `'.$table_list.'` WHERE page_id = \''.$page->getId().'\'';
 		$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
-		$query->initSelect( '*', '`'.$table_list.'`', '\''.$page->getId().'\'' );
+		$query->initSelect( '*', '`'.$table_list.'`', 'page_id = \''.$page->getId().'\'' );
 		foreach ( DataBase::getInstance( _DB_DSN_PAGES )->fetchAll($query) as $row )
 		{
-			$page->addToList( $row['page_prop'], $row['value'], $row['key'] );
+			if ( $row['page_prop'] == '_contents' )
+			{
+				$data = BuildUtil::getInstance ()->replaceFleaVars ($row['value'], $page);
+			}
+			else
+			{
+				$data = $row['value'];
+			}
+			
+			$page->addToList( $row['page_prop'], $data, $row['key'] );
 		}
 		return $page;
 	}
@@ -201,8 +177,9 @@ class PageList
 	 */
 	public function getByTag( $tag, $lang, $flagLoad = 0 )
     {
-		$where = ' _lang = \''.$lang.'\' AND _tag = \''.$tag.'\'';
-		return $this->getByList ( $where, $flagLoad );
+		$query = SqlQuery::getTemp();
+		$query->setWhere(' _lang = \''.$lang.'\' AND _tag = \''.$tag.'\'');
+		return $this->getByList ( $query, $flagLoad );
     }
 	
 	/**
@@ -212,20 +189,24 @@ class PageList
 	 * @param string $lang	Language of the elements
 	 * @return array		List of elements
 	 */
-	public function getWithOneOfTags( array $tags, $lang, $flagLoad )
+	public function getWithOneOfTags( array $tags, $lang, $flagLoad = 0 )
     {
-		$where = ' _lang = \''.$lang.'\' AND (';
+		$where = '_lang = \''.$lang.'\' AND page_prop = \'_tags\' AND (';
 		
 		$first = true;
 		foreach ($tags as $tag)
 		{
 			if ( !$first ) $where .= ' OR';
-			$where .= ' _tags = \''.$tag.'\'';
+			$where .= ' value = \''.$tag.'\'';
 			$first = false;
 		}
 		$where .= ')';
 		
-		return $this->getByList ( $where, $flagLoad );
+		$query = SqlQuery::getTemp();
+		$query->setWhere($where);
+		return $this->getByList ( $query, $flagLoad );
+		
+		//return $this->getByList ( $where, $flagLoad );
     }
     
 	/**
@@ -247,7 +228,10 @@ class PageList
 			$first = false;
 		}
 		
-		return $this->getByList ( $where, $flagLoad );
+		$query = SqlQuery::getTemp();
+		$query->setWhere($where);
+		return $this->getByList ( $query, $flagLoad );
+		//return $this->getByList ( $where, $flagLoad );
     }
 	
 	/**
@@ -437,8 +421,16 @@ class PageList
 		// EXIST
 		/*$pages = $this->getAll( 'WHERE _url LIKE \''.$relURL.'\' ORDER BY _date', $flagLoad);
 		if ( count($pages) > 0 ) return current ($pages);*/
-		$pages = $this->getByList( '_url LIKE \''.$relURL.'\' OR (page_prop = \'_additionalUrls\' AND value = \''.$relURL.'\')' );
+		
+		$query = SqlQuery::getTemp();
+		$query->setWhere( '_url LIKE \''.$relURL.'\' OR (page_prop = \'_additionalUrls\' AND value = \''.$relURL.'\')' );
+		$pages = $this->getByList( $query );
+		//$pages = $this->getByList( '_url LIKE \''.$relURL.'\' OR (page_prop = \'_additionalUrls\' AND value = \''.$relURL.'\')' );
 		if ( count($pages) > 0 ) return current ($pages);
+		
+		/*var_dump($relURL);
+		var_dump($query->getRequest());*/
+		
 		
 
 		// EXIST WITHOUT "/" AT THE END
@@ -456,29 +448,22 @@ class PageList
 		$lang = LangList::getInstance()->getLangByNavigator();
 
 		// IS DYNAMIC PAGE
-		/*$sql = 'SELECT _url FROM `'.DataBase::objectToTableName( Page::getEmptyPage() ).'`  WHERE SUBSTR( \''.$relURL.'\', 0, LENGTH(_url)+1 ) LIKE _url ORDER BY LENGTH(_url) DESC';*/
-		
 		$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
-		$query->setSelect('_url');
+		$query->setSelect('_id');
 		$query->setFrom('`'.DataBase::objectToTableName( Page::getEmptyPage() ).'`');
-		$query->setWhere('SUBSTR( \''.$relURL.'\', 0, LENGTH(_url)+1 ) LIKE _url');
+		$query->setWhere('SUBSTR( \''.$relURL.'\', 0, LENGTH(_url)+1 ) LIKE _url AND _getEnabled = 1');
 		$query->setOrderBy('LENGTH(_url) DESC');
 		
 		$pages = DataBase::getInstance(_DB_DSN_PAGES)->fetchAll($query);
 		if ( count($pages) > 0 )
 		{
-			/*$bestScore = 0;
-			$page = null;
 			foreach ($pages as $pageTemp)
 			{
-				$scoreTemp = $pageTemp->comparePageUrl($relURL);
-				if ( $scoreTemp > $bestScore )
-				{
-					$bestScore = $scoreTemp;
-					$page = $pageTemp;
-				}
+				$query->clean();
+				$query->setWhere('_id LIKE \''.$pageTemp['_id'].'\'');
+				$pagesTemp = $this->getByList( $query, $flagLoad );
+				if ( count($pagesTemp) > 0 ) return current ($pagesTemp);
 			}
-			if( $page != null ) { return $page; }*/
 		}
 		
 		if ( _DEBUG )
@@ -498,39 +483,28 @@ class PageList
     public function getDefaultPage( $lang, $flagLoad = 0 )
     {
         $query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
-		$query->setWhere('_type = \''.Page::$TYPE_DEFAULT.'\' AND _lang = \''.$lang.'\'');
 		$query->setOrderBy('_date');
 		$query->setLimit(1);
+		
+		$query->setWhere('_type = \''.Page::$TYPE_DEFAULT.'\' AND _lang = \''.$lang.'\'');
 		$pages = $this->getAll( $query, $flagLoad);
 		if ( count($pages) > 0 ) return current($pages);
 		
 		/* IF THE LANGUAGE OF THE DEFAULT PAGE DON'T EXIST */
-		$query->clean(SqlQuery::$TYPE_SELECT);
 		$query->setWhere('_type = \''.Page::$TYPE_DEFAULT.'\'');
-		$query->setOrderBy('_date');
-		$query->setLimit(1);
 		$pages = $this->getAll( $query, $flagLoad);
 		if ( count($pages) > 0 ) return current($pages);
 		
 		/* IF THE DEFAULT PAGE DON'T EXIST */
-		$query->clean(SqlQuery::$TYPE_SELECT);
 		$query->setWhere('_lang = \''.$lang.'\'');
-		$query->setOrderBy('_date');
-		$query->setLimit(1);
 		$pages = $this->getAll( $query, $flagLoad);
 		if ( count($pages) > 0 ) return current($pages);
 		
-		$query->clean(SqlQuery::$TYPE_SELECT);
 		$query->setWhere('_type = \''.Page::$TYPE_ERROR404.'\' AND _lang = \''.$lang.'\'');
-		$query->setOrderBy('_date');
-		$query->setLimit(1);
 		$pages = $this->getAll( $query, $flagLoad);
 		if ( count($pages) > 0 ) return current($pages);
 
-		$query->clean(SqlQuery::$TYPE_SELECT);
 		$query->setWhere('_type = \''.Page::$TYPE_ERROR404.'\'');
-		$query->setOrderBy('_date');
-		$query->setLimit(1);
 		$pages = $this->getAll( $query, $flagLoad);
 		if ( count($pages) > 0 ) return current($pages);
 

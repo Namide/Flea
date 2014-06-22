@@ -53,8 +53,10 @@ class Cache
 		
 		if ( !$this->_db->exist($tableName) )
 		{
-			$sql = 'CREATE TABLE `'.$tableName.'` ( url TEXT, header TEXT, content TEXT );';
-			$this->_db->execute( $sql);
+			//$sql = 'CREATE TABLE `'.$tableName.'` ( url TEXT, header TEXT, content TEXT );';
+			$sql = SqlQuery::getTemp(SqlQuery::$TYPE_CREATE);
+			$sql->initCreate($tableName, array( 'url'=>'TEXT', 'header'=>'TEXT', 'content'=>'TEXT' ) );
+			$this->_db->execute( $sql );
 		}
     }
 	
@@ -86,9 +88,10 @@ class Cache
 		$obj['url'] = $url;
 		$obj['header'] = $header;
 		$obj['content'] = &$content;
-		$this->_db->insert( $obj, $this->_tableName, true);
-			
-		//$this->_dataUtil->add( $fileName, $this->_content );
+		
+		$query = SqlQuery::getTemp(SqlQuery::$TYPE_INSERT);
+		$query->initInsertValues('INTO `'.$this->_tableName.'`', $obj);
+		$this->_db->execute( $query );
 	}
 	
 	/**
@@ -96,8 +99,9 @@ class Cache
 	 */
 	public function echoSaved( $url )
 	{
-		$query = 'SELECT * FROM `'.$this->_tableName.'` WHERE url LIKE \''.$url.'\'';
-		
+		//$query = 'SELECT * FROM `'.$this->_tableName.'` WHERE url LIKE \''.$url.'\'';
+		$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
+		$query->initSelect('*', '`'.$this->_tableName.'`', 'url LIKE \''.$url.'\'');
 		$row = $this->_db->fetchAll($query);
 		if ( $row > 0 ) 
 		{

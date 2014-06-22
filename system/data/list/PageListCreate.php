@@ -109,7 +109,7 @@ class PageListCreate
 				$file != ".." &&
 				is_dir($dir.'/'.$file) )
 			{
-				$list1 = $this->addPageByDirRecurs( $dir.'/'.$file.'/', $fileDirRel.'/'.$file );
+				$list1 = $this->addPageByDirRecurs( $dir.'/'.$file.'/', (($fileDirRel != '')?$fileDirRel.'/':'').$file );
 				$list2 = $this->createPage( (($fileDirRel != '')?$fileDirRel.'/':'').$file );
 				
 				

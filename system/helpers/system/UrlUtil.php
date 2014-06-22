@@ -72,8 +72,14 @@ class UrlUtil
 			else { $pageGet[$key] = $value; }
 		}
 		
+		
 		$page = PageList::getInstance()->getByUrl( $relURL );
 		$pageUrl = $this->dynamicPageUrlToPageUrl( $page, $relURL, $pageGet );
+		
+		
+		
+		// 
+		// 
 		
 		General::getInstance()->setCurrentUrl($pageUrl, $pageGet);
 		General::getInstance()->setCurrentPage($page);
@@ -117,17 +123,19 @@ class UrlUtil
 	{
 		$pageUrl = $page->getPageUrl();
 		
-		if( substr($relUrl, 0, strlen($pageUrl)) == $pageUrl &&
+		if( strlen(substr($relUrl, 0, strlen($pageUrl))) > 1 &&
 			$page->getGetEnabled() )
 		{
 			$restUrl = substr($relUrl, strlen($pageUrl)+1);
 			$this->explodeDynamicUrlToGet( $restUrl, $pageGet, $page->getGetExplicit() );
 		}
+		
 		return $pageUrl;
 	}
 	
 	private function explodeDynamicUrlToGet( $restUrl, array &$pageGet, $isExplicit )
 	{
+		
 		$getTemp = explode( '/', $restUrl );
 		if ( $isExplicit )
 		{
