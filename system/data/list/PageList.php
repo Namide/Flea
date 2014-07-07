@@ -66,7 +66,7 @@ class PageList
 		foreach ( DataBase::getInstance( _DB_DSN_PAGES )->fetchAll($query) as $row )
 		{
 			$page = new Page();
-			if ( isset($row['']) )
+			//if ( isset($row['']) )
 			$page->setByObjectVars($row);
 			if ( ($flagLoad & PageList::$LOAD_LIST) > 0 )
 			{
@@ -428,11 +428,8 @@ class PageList
 		//$pages = $this->getByList( '_url LIKE \''.$relURL.'\' OR (page_prop = \'_additionalUrls\' AND value = \''.$relURL.'\')' );
 		if ( count($pages) > 0 ) return current ($pages);
 		
-		/*var_dump($relURL);
-		var_dump($query->getRequest());*/
 		
 		
-
 		// EXIST WITHOUT "/" AT THE END
 		if ( strlen($relURL) > 0 && $relURL[strlen($relURL)-1] === '/' )
 		{
@@ -548,6 +545,7 @@ class PageList
 		$query->setOrderBy('_date');
 		$query->setLimit(1);
 		$pages = $this->getAll( $query, $flagLoad);
+		
 		if ( count($pages) > 0 ) return current ($pages);
 		
 		if ( _DEBUG )

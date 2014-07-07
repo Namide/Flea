@@ -45,6 +45,16 @@ class General
 	public function isPagesInitialized() { return $this->_pagesInitialised; }
 	
 	/**
+	 * Database of the pages initialized
+	 * 
+	 * @return bool		true if the databases are initialised, otherwise false
+	 */
+	public function isDBInitialized()
+	{
+		return DataBase::getInstance( _DB_DSN_PAGES )->exist( DataBase::objectToTableName(Page::getEmptyPage() ) );
+	}
+	
+	/**
 	 * All page initialised
 	 */
 	public function initializesPages()
@@ -63,7 +73,7 @@ class General
 			Debug::getInstance()->addError( 'The file: '._CONTENT_DIRECTORY.'initLang.php don\'t exist' );
 		}
 		
-		if ( !DataBase::getInstance( _DB_DSN_PAGES )->exist( DataBase::objectToTableName(Page::getEmptyPage() ) ) )
+		if ( !$this->isDBInitialized() )
 		{
 			include_once _SYSTEM_DIRECTORY.'data/list/PageListCreate.php';
 			PageListCreate::getInstance()->addPagesByDir(_CONTENT_DIRECTORY);
