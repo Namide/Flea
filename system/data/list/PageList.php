@@ -56,9 +56,6 @@ class PageList
 		if ( $query->getFrom() == '' )
 			$query->setFrom('`'.DataBase::objectToTableName( Page::getEmptyPage() ).'`');
 		
-		/*if ( $query->getWhere() == '' )
-			$query->setWhere($where);*/
-		
 		if ( $query->getOrderBy() == '' )
 			$query->setOrderBy('_date');
 		
@@ -66,7 +63,6 @@ class PageList
 		foreach ( DataBase::getInstance( _DB_DSN_PAGES )->fetchAll($query) as $row )
 		{
 			$page = new Page();
-			//if ( isset($row['']) )
 			$page->setByObjectVars($row);
 			if ( ($flagLoad & PageList::$LOAD_LIST) > 0 )
 			{
@@ -139,7 +135,27 @@ class PageList
 		return $page;
 	}
 
-
+	/**
+	 * Update the current page.
+	 * Used to build the body with the "build file" (ex: en-build.php).
+	 * 
+	 * @param Page $page	Page to update
+	 * @return Page			Same page updated
+	 */
+	public function buildPage( &$page )
+	{
+		if( $page->getBuildFile() === '' )
+		{
+			return $page;
+		}
+		
+		ob_start();
+		$page = $this->initPage( $page, $page->getBuildFile() );
+		$page->setHtmlBody( ob_get_clean() );
+		
+		return $page;
+	}
+	
 	/**
 	 * List of elements in the language
 	 * 
@@ -377,30 +393,7 @@ class PageList
         return $page;
     }
 	
-	/**
-	 * Update the current page.
-	 * Used to build the body with the "build file" (ex: en-build.php).
-	 * 
-	 * @param Page $page	Page to update
-	 * @return Page			Same page updated
-	 */
-	public function buildPage( &$page )
-	{
-		/*$query = SqlQuery::getTemp();
-		$query->setWhere('_id = \''.$page->getId().'\'');
-        $pages = $this->getAll('_id = \''.$query.'\'', self::$LOAD_INIT | self::$LOAD_LIST );*/
-		
-		if( $page->getBuildFile() === '' )
-		{
-			return $page;
-		}
-		
-		ob_start();
-		$page = $this->initPage( $page, $page->getBuildFile() );
-		$page->setHtmlBody( ob_get_clean() );
-		
-		return $page;
-	}
+	
 
 	/**
 	 * Get the page by relative URL

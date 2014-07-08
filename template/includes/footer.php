@@ -16,10 +16,15 @@ function getFooter()
     {
     	$output .= '<li><a href="'.\Flea\BuildUtil::getInstance()->getAbsUrlByNameLang( $page->getName(), 'en' ).'">en</a></li>';
     }
-    else
+    elseif ( Flea\PageList::getInstance()->has( $page->getName(), 'fr') )
     {
 		$output .= '<li><a href="'.\Flea\BuildUtil::getInstance()->getAbsUrlByNameLang( $page->getName(), 'fr' ).'">fr</a></li>';
     }
+	else
+	{
+		$default = Flea\PageList::getInstance()->getDefaultPage('fr');
+		$output .= '<li><a href="'. \Flea\BuildUtil::getInstance()->getAbsUrlByNameLang( $default->getName(), $default->getLang() ) .'">fr</a></li>';
+	}
     
     $output .= '</ul>';
     return $output;

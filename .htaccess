@@ -2,12 +2,16 @@
 #AddType x-mapp-php6 .php					# 1and1
 #AddHandler x-mapp-php6 .php					# 1and1
 
+<FilesMatch "\.(sqlite)$">
+	Order allow,deny
+	Deny from all
+</FilesMatch>
 
 <IfModule mod_rewrite.c>
-RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ /index.php?_u=$1 [L,QSA]
+	RewriteEngine On
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteRule ^(.*)$ /index.php?_u=$1 [L,QSA]
 </IfModule>
 
 
