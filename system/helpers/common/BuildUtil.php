@@ -164,13 +164,10 @@ class BuildUtil extends InitUtil
 		
 		$replacePage = str_replace('{{lang}}', $general->getCurrentLang(), $replacePage);
 		
-		
-		//$currentPage = $general->getCurrentPage();
 		if ( $page === null )
 		{
 			$page = $general->getCurrentPage();
 		}
-		
 		
 		$replacePage = str_replace('{{pageContentPath}}', _ROOT_URL._CONTENT_DIRECTORY.$page->getName(), $replacePage);
 
