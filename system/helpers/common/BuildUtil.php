@@ -109,6 +109,32 @@ class BuildUtil extends InitUtil
 		return $this->getAbsUrlByNameLang($pageName, $lang);
     }
 	
+	public function getContentOfPage(	$contentKey, Page &$page, $replaceFleaVars = false )
+	{
+		if ( $page->getContents()->length() < 1 )
+		{
+			PageList::getInstance()->addListToPage($page);
+		}
+		
+		if( !$page->getContents()->hasKey( $contentKey ) ) 
+		{
+			if( _DEBUG )
+			{
+				Debug::getInstance()->addError('The content "'.$contentKey.'" '
+				. ' don\'t exist for the page ['.$page->getId().']' );
+			}
+			return '';
+		}
+
+		$content = $page->getContents()->getValue($contentKey);
+		if ( $replaceFleaVars )
+		{
+			return $this->replaceFleaVars($content, $page);
+		}
+		
+		return $content;
+	}
+	
 	/**
 	 * Format the text by converting the Flea variables to real datas.
 	 * List of Flea variables :
@@ -135,18 +161,26 @@ class BuildUtil extends InitUtil
 		$replacePage = str_replace('{{contentPath}}', _ROOT_URL._CONTENT_DIRECTORY, $replacePage);
 		
 		$general = General::getInstance();
-		$currentPage = $general->getCurrentPage();
 		
 		$replacePage = str_replace('{{lang}}', $general->getCurrentLang(), $replacePage);
-		$replacePage = str_replace('{{pageContentPath}}', _ROOT_URL._CONTENT_DIRECTORY.$currentPage->getName(), $replacePage);
+		
+		
+		//$currentPage = $general->getCurrentPage();
+		if ( $page === null )
+		{
+			$page = $general->getCurrentPage();
+		}
+		
+		
+		$replacePage = str_replace('{{pageContentPath}}', _ROOT_URL._CONTENT_DIRECTORY.$page->getName(), $replacePage);
 
-		$replacePage = str_replace('{{title}}', $currentPage->getHtmlTitle(), $replacePage);
-		$replacePage = str_replace('{{header}}', $currentPage->getHtmlHeader(), $replacePage);
-		$replacePage = str_replace('{{body}}', $currentPage->getHtmlBody(), $replacePage);
-		$replacePage = str_replace('{{description}}', $currentPage->getHtmlDescription(), $replacePage);
+		$replacePage = str_replace('{{title}}', $page->getHtmlTitle(), $replacePage);
+		$replacePage = str_replace('{{header}}', $page->getHtmlHeader(), $replacePage);
+		$replacePage = str_replace('{{body}}', $page->getHtmlBody(), $replacePage);
+		$replacePage = str_replace('{{description}}', $page->getHtmlDescription(), $replacePage);
 		
 			
-		if ( General::getInstance()->isPagesInitialized() && $page !== null )
+		if ( /*General::getInstance()->isPagesInitialized() &&*/ $page !== null )
 		{
 			$replacePage = preg_replace_callback( '/\{\{content:(.*?)\}\}/', function ($matches) use($page)
 			{
