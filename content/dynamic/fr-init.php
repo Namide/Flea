@@ -16,7 +16,7 @@ $date = '2014-05-01';
 //$htmlBody = '<h1>Page d\'accueil</h1>{{pageNameToAbsUrl:ef}}';
 $htmlDescription = 'description';
 $htmlHeader = '';
-$htmlTitle = 'accueil';
+$htmlTitle = 'Dynamic page';
 
 $type = 'default'; // error404
 // $phpHeader		

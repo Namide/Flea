@@ -51,7 +51,7 @@ class PageListCreate
 	{
 		$tableName = DataBase::objectToTableName( Page::getEmptyPage() );
 		
-		$db = DataBase::getInstance(_DB_DSN_PAGES);
+		$db = DataBase::getInstance(_DB_DSN_CONTENT);
 		
 		/*$pageVars = Page::getEmptyPage()->getObjectVars();
 		$db->create( $pageVars, $tableName, true);*/

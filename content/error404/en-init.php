@@ -16,7 +16,7 @@ $date = '2014-05-01';
 $htmlBody = '<h1>Error 404</h1>';
 $htmlDescription = 'description';
 $htmlHeader = '';
-$htmlTitle = 'accueil';
+$htmlTitle = 'Error';
 
 $type = Flea\Page::$TYPE_ERROR404; // error404
 $phpHeader = 'HTTP/1.0 404 Not Found';	

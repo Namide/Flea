@@ -39,7 +39,7 @@ define( '_URL_REWRITING', false );
 define( '_DEBUG', true );
 
 // Cache activated => TRUE, deactivated => FALSE
-define( '_CACHE', true );
+define( '_CACHE', false );
 
 // Maximum number of files in the cache directory
 // It is better to have 5 beyond the maximum number of cachable pages
@@ -51,7 +51,7 @@ define( '_MAX_PAGE_CACHE', 50 );
  */
 
 define( '_DB_DSN_CACHE', 'sqlite:'._CONTENT_DIRECTORY.'cache.sqlite' );
-define( '_DB_DSN_PAGES', 'sqlite:'._CONTENT_DIRECTORY.'pages.sqlite' );
+define( '_DB_DSN_CONTENT', 'sqlite:'._CONTENT_DIRECTORY.'content.sqlite' );
 define( '_DB_USER', null );
 define( '_DB_PASS', null );
 define( '_DB_OPTIONS', null );

@@ -60,7 +60,7 @@ class PageList
 			$query->setOrderBy('_date');
 		
 		$pages = array();
-		foreach ( DataBase::getInstance( _DB_DSN_PAGES )->fetchAll($query) as $row )
+		foreach ( DataBase::getInstance( _DB_DSN_CONTENT )->fetchAll($query) as $row )
 		{
 			$page = new Page();
 			$page->setByObjectVars($row);
@@ -95,7 +95,7 @@ class PageList
 		//$query->setWhere($where);
 		//$query->setOrderBy('_date');
 		
-		foreach ( DataBase::getInstance( _DB_DSN_PAGES )->fetchAll($query) as $row )
+		foreach ( DataBase::getInstance( _DB_DSN_CONTENT )->fetchAll($query) as $row )
 		{
 			$page = new Page();
 			$page->setByObjectVars($row);
@@ -119,7 +119,7 @@ class PageList
 		//$query = 'SELECT * FROM `'.$table_list.'` WHERE page_id = \''.$page->getId().'\'';
 		$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
 		$query->initSelect( '*', '`'.$table_list.'`', 'page_id = \''.$page->getId().'\'' );
-		foreach ( DataBase::getInstance( _DB_DSN_PAGES )->fetchAll($query) as $row )
+		foreach ( DataBase::getInstance( _DB_DSN_CONTENT )->fetchAll($query) as $row )
 		{
 			if ( $row['page_prop'] == '_contents' )
 			{
@@ -165,7 +165,7 @@ class PageList
 	public function getAllByLang( $lang, $flagLoad = 0 )
 	{
 		$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
-		$query->setWhere('_lang = \''.$lang.'\'');
+		$query->setWhere('_lang = \''.$lang.'\' AND _visible = 1');
 		return $this->getAll( $query, $flagLoad );
 	}
 	
@@ -180,7 +180,7 @@ class PageList
 	public function getAllByName( $name, $flagLoad = 0 )
 	{
 		$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
-		$query->setWhere('_name = \''.$name.'\'');
+		$query->setWhere('_name = \''.$name.'\' AND _visible = 1');
 		return $this->getAll( $query, $flagLoad );
 	}
 	
@@ -194,7 +194,7 @@ class PageList
 	public function getByTag( $tag, $lang, $flagLoad = 0 )
     {
 		$query = SqlQuery::getTemp();
-		$query->setWhere(' _lang = \''.$lang.'\' AND _tag = \''.$tag.'\'');
+		$query->setWhere(' _lang = \''.$lang.'\' AND _tag = \''.$tag.'\' AND _visible = 1');
 		return $this->getByList ( $query, $flagLoad );
     }
 	
@@ -207,7 +207,7 @@ class PageList
 	 */
 	public function getWithOneOfTags( array $tags, $lang, $flagLoad = 0 )
     {
-		$where = '_lang = \''.$lang.'\' AND page_prop = \'_tags\' AND (';
+		$where = '_lang = \''.$lang.'\' AND page_prop = \'_tags\' AND _visible = 1 AND (';
 		
 		$first = true;
 		foreach ($tags as $tag)
@@ -234,7 +234,7 @@ class PageList
 	 */
 	public function getWithAllTags( array $tags, $lang, $flagLoad = 0 )
     {
-		$where = ' _lang = \''.$lang.'\' AND ';
+		$where = ' _lang = \''.$lang.'\' AND AND _visible = 1 ';
 		
 		$first = true;
 		foreach ($tags as $tag)
@@ -259,7 +259,7 @@ class PageList
     public function getByLang( $lang, $flagLoad = 0 )
     {
 		$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
-		$query->setWhere('_lang = \''.$lang.'\'');
+		$query->setWhere('_lang = \''.$lang.'\' AND _visible = 1');
         return $this->getAll( $query, $flagLoad );
     }
 	
@@ -274,10 +274,10 @@ class PageList
     {
 		$tableName = DataBase::objectToTableName( Page::getEmptyPage() );
 		
-		$where = '_name = \''.$name.'\'';
+		$where = '_name = \''.$name.'\' AND _visible = 1';
 		if ( $lang !== null ) { $where .= ' AND _lang = \''.$lang.'\''; }
 		
-		return ( DataBase::getInstance( _DB_DSN_PAGES )->count( $tableName, $where ) > 0);
+		return ( DataBase::getInstance( _DB_DSN_CONTENT )->count( $tableName, $where ) > 0);
     }
 	
 	
@@ -444,7 +444,7 @@ class PageList
 		$query->setWhere('SUBSTR( \''.$relURL.'\', 0, LENGTH(_url)+1 ) LIKE _url AND _getEnabled = 1');
 		$query->setOrderBy('LENGTH(_url) DESC');
 		
-		$pages = DataBase::getInstance(_DB_DSN_PAGES)->fetchAll($query);
+		$pages = DataBase::getInstance(_DB_DSN_CONTENT)->fetchAll($query);
 		if ( count($pages) > 0 )
 		{
 			foreach ($pages as $pageTemp)
