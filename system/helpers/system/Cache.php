@@ -68,7 +68,9 @@ class Cache
 	 */
 	public function isWrited( $strUrl )
 	{
-		return $this->_db->count( $this->_tableName, 'url LIKE \''.$strUrl.'\'' ) > 0;
+		$query = SqlQuery::getTemp();
+		$query->initCount($this->_tableName, 'url LIKE \''.$strUrl.'\'' );
+		return $this->_db->count( $query ) > 0;
 	}
 	
 	/**
@@ -200,10 +202,9 @@ allow from all
 	 */
 	public function getNumFilesSaved()
 	{
-		return $this->_db->count($this->_tableName);
-		/*$dir = $cacheDirectory;
-		if ( substr($dir, -1, 1) === '/' ) { $dir = substr($dir, 0, -1); }
-		return self::getNumFilesRecurs($dir);*/
+		$query = SqlQuery::getTemp();
+		$query->initCount( $this->_tableName );
+		return $this->_db->count( $query );
 	}
 	
 	/*private static function getNumFilesRecurs( $dir )

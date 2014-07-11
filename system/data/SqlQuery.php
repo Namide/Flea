@@ -173,6 +173,58 @@ class SqlQuery
 		$this->_limit = $limit;
 	}
 	
+	public function initSelectValues( $select, $from, array $keys = array(), array $signs = array(), array $values = array(), $orderBy = '', $limit = '' )
+	{
+		$this->_type = self::$TYPE_SELECT;
+		$this->_select = $select;
+		$this->_from = $from;
+		$this->_orderBy = $orderBy;
+		$this->_limit = $limit;
+		
+		$this->_where = '';
+		$first = true;
+		$length = count($keys);
+		for( $i = 0; $i < $length; $i++ )
+		{
+			$key = $keys[i];
+			$sign = $signs[i];
+			$value = $values[i];
+			
+			if ( gettype($value) == 'boolean' )
+			{
+				$this->_where .= ( ($first)?' ':' AND' ).$key.' '.$sign.' :'.$key;
+				$this->_binds[] = array( ':'.$key, (($value)?'1':'0'), \PDO::PARAM_BOOL );
+				$first = false;
+			}
+			elseif ( gettype($value) == 'integer' )
+			{
+				$this->_where .= ( ($first)?' ':' AND' ).$key.' '.$sign.' :'.$key;
+				$this->_binds[] = array( ':'.$key, $value, \PDO::PARAM_INT );
+				$first = false;
+			}
+			elseif ( gettype($value) == 'double' )
+			{
+				$this->_where .= ( ($first)?' ':' AND' ).$key.' '.$sign.' :'.$key;
+				$this->_binds[] = array( ':'.$key, $value, \PDO::PARAM_STR );
+				$first = false;
+			}
+			elseif ( gettype($value) == 'string' )
+			{
+				$this->_where .= ( ($first)?' ':' AND' ).$key.' '.$sign.' :'.$key;
+				$this->_binds[] = array( ':'.$key, $value, \PDO::PARAM_STR );
+				$first = false;
+			}
+		}
+	}
+	
+	public function initCount( $from, $where = '' )
+	{
+		$this->_type = self::$TYPE_SELECT;
+		$this->_select = 'COUNT(*)';
+		$this->_from = $from;
+		$this->_where = $where;
+	}
+	
 	public function initInsertValues( $insert, array $values = array() )
 	{
 		$this->_type = self::$TYPE_INSERT;
@@ -217,6 +269,15 @@ class SqlQuery
 		$this->_binds = $binds;
 	}
 	
+	public function initUpdateSet( $update, $set = '', array $binds = array(), $where = '' )
+	{
+		$this->_type = self::$TYPE_UPDATE;
+		$this->_set = $set;
+		$this->_binds = $binds;
+		$this->_where = $where;
+	}
+
+
 	public function initCreate( $createTable, array $getObjectVars )
 	{
 		$this->_type = self::$TYPE_CREATE;

@@ -274,10 +274,13 @@ class PageList
     {
 		$tableName = DataBase::objectToTableName( Page::getEmptyPage() );
 		
+		$query = SqlQuery::getTemp();
+		$query->initCount($tableName);
 		$where = '_name = \''.$name.'\' AND _visible = 1';
 		if ( $lang !== null ) { $where .= ' AND _lang = \''.$lang.'\''; }
+		$query->setWhere($where);
 		
-		return ( DataBase::getInstance( _DB_DSN_CONTENT )->count( $tableName, $where ) > 0);
+		return ( DataBase::getInstance( _DB_DSN_CONTENT )->count( $query ) > 0);
     }
 	
 	

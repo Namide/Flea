@@ -43,35 +43,25 @@ class DataBase
 		return stripslashes(get_class($obj));
 	}
 	
-	public function count( $tableName, $where = null )
+	public function count( SqlQuery $query )
 	{
-		$sql = 'SELECT COUNT(*) FROM `'.$tableName.'`';
-		if ( $where !== null ) { $sql .= ' WHERE '.$where; }
-		$sql .= ';';
-		
 		try
 		{
-			/*if ( _DEBUG ) { $this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING); }
-			else { $this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT); }*/
-			
-			$res = $this->_pdo->query($sql);
+			$res = $this->_pdo->query( $query->getRequest() );
 			if ( $res )
 			{
 				$count = $res->fetchColumn();
 				$res = null;
-				//$db = null;
 				return $count;
 			}
 			
 			$res = null;
-			//$db = null;
 			return 0;
 		}
 		catch (PDOException $e)
 		{
 			return 0;
-		}	
-		
+		}
 	}
 	
 	public function exist( $tableName )
@@ -85,7 +75,6 @@ class DataBase
 			$this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
 			$result = $this->_pdo->query($sql);
 			$this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, $att);
-			//$db = null;
 		}
 		catch (PDOException $e)
 		{
@@ -95,101 +84,11 @@ class DataBase
 		return ($result !== false);
 	}
 	
-    /*public function create( array $getObjectVars, $tableName, $exec = true )
-    {
-		$sqls = array();
-		$sqls[0] = 'CREATE TABLE `'.$tableName.'` ( ';
-		$first = true;
-		foreach ( $getObjectVars as $key => $value )
-		{
-
-			if ( gettype($value) == "boolean" )
-			{
-				$sqls[0] .= ( ($first)?'':', ' ).$key.' BOOLEAN';
-				if ( $first ) $first = false;
-			}
-			elseif ( gettype($value) == "integer" )
-			{
-				$sqls[0] .= ( ($first)?'':', ' ).$key.' INT';
-				if ( $first ) $first = false;
-			}
-			elseif ( gettype($value) == "double" )
-			{
-				$sqls[0] .= ( ($first)?'':', ' ).$key.' DOUBLE';
-				if ( $first ) $first = false;
-			}
-			elseif ( gettype($value) == "string" )
-			{
-				$sqls[0] .= ( ($first)?'':', ' ).$key.' TEXT';
-				if ( $first ) $first = false;
-			}
-		}
-		$sqls[0] .= ' );';
-		$sql = implode('', $sqls);
-		
-		if ( $exec )
-		{
-			return DataBase::execute( $sql );
-		}
-		
-		return false;
-    }*/
-
-	/*public function insert( array $getObjectVars, $tableName, $exec = true )
-    {
-		$sqls[0] = 'INSERT INTO `'.$tableName.'` VALUES ( ';
-		$binds = array();
-		$first = true;
-		foreach ( $getObjectVars as $key => $value )
-		{
-			if ( gettype($value) == 'boolean' )
-			{
-				$sqls[0] .= ( ($first)?':':', :' ).$key;
-				$binds[] = array( ':'.$key, (($value)?'1':'0'), \PDO::PARAM_BOOL );
-				$first = false;
-			}
-			elseif ( gettype($value) == 'integer' )
-			{
-				$sqls[0] .= ( ($first)?':':', :' ).$key;
-				$binds[] = array( ':'.$key, $value, \PDO::PARAM_INT );
-				$first = false;
-			}
-			elseif ( gettype($value) == 'double' )
-			{
-				$sqls[0] .= ( ($first)?':':', :' ).$key;
-				$binds[] = array( ':'.$key, $value, \PDO::PARAM_STR );
-				$first = false;
-			}
-			elseif ( gettype($value) == 'string' )
-			{
-				$sqls[0] .= ( ($first)?':':', :' ).$key;
-				$binds[] = array( ':'.$key, $value, \PDO::PARAM_STR );
-				$first = false;
-			}
-		}
-		$sqls[0] .= ' );';
-		$sql = implode('', $sqls);
-		
-		if ( $exec )
-		{
-			DataBase::execute( $sql, $binds );
-		}
-		
-		return $sql;
-    }*/
-	
 	public function execute( SqlQuery $query )
 	{
 		try
 		{
-			/*if ( _DEBUG ) { $this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING); }
-			else { $this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT); }*/
-			
-			//var_dump($request);
-			
-			//var_dump($query->getBinds());
-			
-			$stmt = $this->_pdo->prepare( $query->getRequest() ); // Préparation de ton statement
+			$stmt = $this->_pdo->prepare( $query->getRequest() );
 			
 			$binds = $query->getBinds();
 			if ( $binds !== null )
@@ -250,33 +149,6 @@ class DataBase
 		}
 		return false;
 	}
-	
-	
-	/*public function fetchAll( $request )
-	{
-		try
-		{
-			$stmt = $this->_pdo->prepare($request);
-			
-			if ( $stmt === false )
-			{
-				return array();
-			}
-			
-			$stmt->execute();
-			$arrValues = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-			return $arrValues;
-		}
-		catch(PDOException $e)
-		{
-			if ( _DEBUG )
-			{
-				Debug::getInstance()->addError( 'Execution database error: '.$e->getMessage() );
-			}
-		}
-		return false;
-	}*/
-	
 	
 	private function __construct( $dbDsnCache ) 
     {

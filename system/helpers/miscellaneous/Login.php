@@ -54,48 +54,164 @@ class User
 class Login
 {
 	private static $_INSTANCE = array();
+	private static $_HASH_ALGO = 'whirlpool';
+	
+	private static $_TABLE_NAME_USERS = 'login_users';
+	private static $_TABLE_NAME_LOGS = 'login_logs';
+	
+	/**
+	 * @var DataBase
+	 */
 	private $_db;
+	
+	private static $_IS_SESSION_STARTED = false;
+	
+	private $_user = null;
 	
 	public function isConnected()
 	{
-		
-	}
-	
-	public function getUser()
-	{
-		if ( !$this->isConnected() )
+		if( isset( $_SESSION['login_token'] ) )
 		{
-			if ( _DEBUG ) Debug::getInstance()->addError ('User is\'n connectet');
-			return false;
+			return true;
 		}
-	}
-	
-	public function connect( $email, $pass )
-	{
-		
-	}
-	
-	public function disconnect()
-	{
-		
-	}
-	
-	private function __construct( $dbDsn )
-	{
-		session_start();
-		$this->_db = DataBase::getInstance($dbDsn);
+		return false;
 	}
 	
 	/**
 	 * 
-	 * @param string $dbDsnCache
+	 * @return User
+	 */
+	public function getUser()
+	{
+		if ( !$this->isConnected() )
+		{
+			if ( _DEBUG ) Debug::getInstance()->addError ('User is\'n connected');
+			return false;
+		}
+		
+		if ( $this->_user == null )
+		{
+			$keys = array( 'token' );
+			$signs = array( '=' );
+			$values = array( $_SESSION['login_token'] );
+
+			$query = SqlQuery::getTemp();
+			$query->initSelectValues('*', self::$_TABLE_NAME_USERS, $keys, $signs, $values );
+			$rows = $this->_db->fetchAll($query);
+			if ( count( $rows ) < 1 ) return false;
+
+			$this->_user = new User( $rows['id'], $rows['email'], $rows['token'] );
+		}
+		
+		return $this->_user;
+	}
+	
+	public function connect( $email, $realPass )
+	{
+		$time = time();
+		
+		// anti brute-force -->
+			$query = SqlQuery::getTemp( SqlQuery::$TYPE_INSERT );
+			$datas = array();
+			$datas['user_email'] = $email;
+			$datas['time'] = $time;
+			$datas['ip'] = $_SERVER["REMOTE_ADDR"];
+			$query->initInsertValues( 'INTO `'.self::$_TABLE_NAME_LOGS.'`', $datas );
+			$this->_db->execute($query);
+
+			$query2 = SqlQuery::getTemp();
+			$query2->initCount( self::$_TABLE_NAME_LOGS, 'user_email = \''.$email.'\' AND time > '.($time-2) );
+			if ( $this->_db->count($query2) > 1 ) return false;
+		// <-- anti brute-force
+		
+		$cryptedPass = hash( self::$_HASH_ALGO, $realPass.$email );
+		$keys = array( 'email', 'pass' );
+		$signs = array( '=', '=' );
+		$values = array( $email, $cryptedPass );
+		$query3 = SqlQuery::getTemp();
+		$query3->initSelectValues('*', self::$_TABLE_NAME_USERS, $keys, $signs, $values );
+		$rows = $this->_db->fetchAll($query3);
+		if ( count( $rows ) < 1 ) return false;
+		
+		$token = md5( rand(0, 9999).microtime() );
+		$query4 = SqlQuery::getTemp( SqlQuery::$TYPE_UPDATE );
+		$query4->setSet('token = \''.$token.'\'');
+		$query4->setWhere( 'id = '.$rows['id'] );
+		
+		if( $this->_db->execute($query4) )
+		{
+			$_SESSION['login_token'] = $token;
+		}
+	}
+	
+	public function disconnect()
+	{
+		$user = $this->getUser();
+		if ( $user != false )
+		{
+			$token = md5( rand(0, 9999).microtime() );
+			$query = SqlQuery::getTemp( SqlQuery::$TYPE_UPDATE );
+			$query->setSet('token = \''.$token.'\'');
+			$query->setWhere( 'id = '.$user->getId() );
+			$this->_db->execute($query);
+		}
+			
+		$this->_user = null;
+
+		session_unset();
+		session_destroy();
+	}
+	
+	private function create()
+	{
+		$req1 = SqlQuery::getTemp( SqlQuery::$TYPE_CREATE );
+		$create1 = 'TABLE IF NOT EXISTS `'.self::$_TABLE_NAME_USERS.'` ( '
+			. 'id INT AUTO_INCREMENT PRIMARY KEY, '
+			. 'email TEXT, pass TEXT, '
+			. 'token TEXT );';
+		$req1->setCreate($create1);
+		$this->_db->execute( $req1 );
+
+		$req2 = SqlQuery::getTemp( SqlQuery::$TYPE_CREATE );
+		$create2 = 'TABLE IF NOT EXISTS `'.self::$_TABLE_NAME_LOGS.'` ( '
+			. 'user_email TEXT, '
+			. 'time INT, '
+			. 'ip TEXT );';
+		$req2->setCreate( $create2 );
+		$this->_db->execute( $req2 );
+	}
+	
+	private function isDBInitialized()
+	{
+		return $this->_db->exist( self::$_TABLE_NAME_USERS );
+	}
+	
+	private function __construct( $dbDsn )
+	{
+		if ( !self::$_IS_SESSION_STARTED )
+		{
+			session_start();
+			self::$_IS_SESSION_STARTED = true;
+		}
+		
+		$this->_db = DataBase::getInstance($dbDsn);
+		
+		if ( !$this->isDBInitialized() )
+		{
+			$this->create();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param string $dbDsn
 	 * @return DataBase
 	 */
 	public static function getInstance( $dbDsn ) 
     {
 		if(!isset(self::$_INSTANCE[$dbDsn]))
         {
-            self::$_INSTANCE[$dbDsn] = new DataBase($dbDsn);
+            self::$_INSTANCE[$dbDsn] = new Login($dbDsn);
         }
         return self::$_INSTANCE[$dbDsn];
     }
