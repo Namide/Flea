@@ -121,7 +121,7 @@ class Login
 	public function getUserList()
 	{
 		if (	!$this->isConnected() ||
-				!$this->getUserConnected()->getRole() == User::$ROLE_ADMIN )
+				$this->getUserConnected()->getRole() != User::$ROLE_ADMIN )
 		{
 			return false;
 		}
@@ -135,7 +135,7 @@ class Login
 	public function addUser( $email, $pass, $role = 1 )
 	{
 		if (	!$this->isConnected() ||
-				!$this->getUserConnected()->getRole() == User::$ROLE_ADMIN )
+				$this->getUserConnected()->getRole() != User::$ROLE_ADMIN )
 		{
 			return false;
 		}
