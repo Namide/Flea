@@ -186,31 +186,31 @@ class SqlQuery
 		$length = count($keys);
 		for( $i = 0; $i < $length; $i++ )
 		{
-			$key = $keys[i];
-			$sign = $signs[i];
-			$value = $values[i];
+			$key = $keys[$i];
+			$sign = $signs[$i];
+			$value = $values[$i];
 			
 			if ( gettype($value) == 'boolean' )
 			{
-				$this->_where .= ( ($first)?' ':' AND' ).$key.' '.$sign.' :'.$key;
+				$this->_where .= ( ($first)?' ':' AND ' ).$key.' '.$sign.' :'.$key;
 				$this->_binds[] = array( ':'.$key, (($value)?'1':'0'), \PDO::PARAM_BOOL );
 				$first = false;
 			}
 			elseif ( gettype($value) == 'integer' )
 			{
-				$this->_where .= ( ($first)?' ':' AND' ).$key.' '.$sign.' :'.$key;
+				$this->_where .= ( ($first)?' ':' AND ' ).$key.' '.$sign.' :'.$key;
 				$this->_binds[] = array( ':'.$key, $value, \PDO::PARAM_INT );
 				$first = false;
 			}
 			elseif ( gettype($value) == 'double' )
 			{
-				$this->_where .= ( ($first)?' ':' AND' ).$key.' '.$sign.' :'.$key;
+				$this->_where .= ( ($first)?' ':' AND ' ).$key.' '.$sign.' :'.$key;
 				$this->_binds[] = array( ':'.$key, $value, \PDO::PARAM_STR );
 				$first = false;
 			}
 			elseif ( gettype($value) == 'string' )
 			{
-				$this->_where .= ( ($first)?' ':' AND' ).$key.' '.$sign.' :'.$key;
+				$this->_where .= ( ($first)?' ':' AND ' ).$key.' '.$sign.' :'.$key;
 				$this->_binds[] = array( ':'.$key, $value, \PDO::PARAM_STR );
 				$first = false;
 			}
@@ -228,7 +228,7 @@ class SqlQuery
 	public function initInsertValues( $insert, array $values = array() )
 	{
 		$this->_type = self::$TYPE_INSERT;
-		$this->_insert = $insert;
+		$this->_insert = $insert.' (';
 		
 		$this->_values = '';
 		$first = true;
@@ -236,29 +236,34 @@ class SqlQuery
 		{
 			if ( gettype($value) == 'boolean' )
 			{
+				$this->_insert .= ( ($first)?'':', ' ).$key;
 				$this->_values .= ( ($first)?':':', :' ).$key;
 				$this->_binds[] = array( ':'.$key, (($value)?'1':'0'), \PDO::PARAM_BOOL );
 				$first = false;
 			}
 			elseif ( gettype($value) == 'integer' )
 			{
+				$this->_insert .= ( ($first)?'':', ' ).$key;
 				$this->_values .= ( ($first)?':':', :' ).$key;
 				$this->_binds[] = array( ':'.$key, $value, \PDO::PARAM_INT );
 				$first = false;
 			}
 			elseif ( gettype($value) == 'double' )
 			{
+				$this->_insert .= ( ($first)?'':', ' ).$key;
 				$this->_values .= ( ($first)?':':', :' ).$key;
 				$this->_binds[] = array( ':'.$key, $value, \PDO::PARAM_STR );
 				$first = false;
 			}
 			elseif ( gettype($value) == 'string' )
 			{
+				$this->_insert .= ( ($first)?'':', ' ).$key;
 				$this->_values .= ( ($first)?':':', :' ).$key;
 				$this->_binds[] = array( ':'.$key, $value, \PDO::PARAM_STR );
 				$first = false;
 			}
 		}
+		$this->_insert .= ')';
 	}
 	
 	public function initInsertSet( $insert, $set = '', array $binds = array() )
@@ -337,7 +342,7 @@ class SqlQuery
 			default :
 				if( _DEBUG && $this->_type == 0 )
 				{
-					Flea\Debug::getInstance()->addError('No type declared for this SQL request');
+					Debug::getInstance()->addError('No type declared for this SQL request');
 				}
 		}
 		
@@ -348,7 +353,7 @@ class SqlQuery
 	{
 		if(_DEBUG && $this->_create == '')
 		{
-			Flea\Debug::getInstance()->addError('For a TYPE_CREATE SQL query You must init the var "create"');
+			Debug::getInstance()->addError('For a TYPE_CREATE SQL query You must init the var "create"');
 		}
 		return 'CREATE '.$this->_create;
 	}
@@ -361,7 +366,7 @@ class SqlQuery
 		}
 		if(_DEBUG && $this->_from == '')
 		{
-			Flea\Debug::getInstance()->addError('For a TYPE_SELECT SQL query You must init the var "from"');
+			Debug::getInstance()->addError('For a TYPE_SELECT SQL query You must init the var "from"');
 		}
 		$request = 'SELECT ' . $this->_select;
 		$request .= ' FROM ' . $this->_from;
@@ -379,7 +384,7 @@ class SqlQuery
 		{
 			if($this->_insert == '')
 			{
-				Flea\Debug::getInstance()->addError('For a TYPE_INSERT SQL query You must init the var "insert"');
+				Debug::getInstance()->addError('For a TYPE_INSERT SQL query You must init the var "insert"');
 			}
 		}
 		$request = 'INSERT ' . $this->_insert;
@@ -395,11 +400,11 @@ class SqlQuery
 		{
 			if($this->_update == '')
 			{
-				Flea\Debug::getInstance()->addError('For a TYPE_UPDATE SQL query You must init the var "update"');
+				Debug::getInstance()->addError('For a TYPE_UPDATE SQL query You must init the var "update"');
 			}
 			if($this->_set == '')
 			{
-				Flea\Debug::getInstance()->addError('For a TYPE_UPDATE SQL query You must init the var "set"');
+				Debug::getInstance()->addError('For a TYPE_UPDATE SQL query You must init the var "set"');
 			}
 		}
 		$request = 'UPDATE ' . $this->_update;
@@ -416,11 +421,11 @@ class SqlQuery
 		{
 			if($this->_delete == '')
 			{
-				Flea\Debug::getInstance()->addError('For a TYPE_DELETE SQL query You must init the var "delete"');
+				Debug::getInstance()->addError('For a TYPE_DELETE SQL query You must init the var "delete"');
 			}
 			if($this->_from == '')
 			{
-				Flea\Debug::getInstance()->addError('For a TYPE_DELETE SQL query You must init the var "from"');
+				Debug::getInstance()->addError('For a TYPE_DELETE SQL query You must init the var "from"');
 			}
 		}
 		$request = 'DELETE ' . $this->_delete;

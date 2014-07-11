@@ -72,14 +72,8 @@ class UrlUtil
 			else { $pageGet[$key] = $value; }
 		}
 		
-		
 		$page = PageList::getInstance()->getByUrl( $relURL );
 		$pageUrl = $this->dynamicPageUrlToPageUrl( $page, $relURL, $pageGet );
-		
-		
-		
-		// 
-		// 
 		
 		General::getInstance()->setCurrentUrl($pageUrl, $pageGet);
 		General::getInstance()->setCurrentPage($page);

@@ -137,9 +137,29 @@ class General
 	{
 		if ( _DEBUG && !General::getInstance()->isPagesInitialized() )
 		{
-			Debug::getInstance()->addError( 'You can\'t access to the current language if the pages isn\'tinitialised' );
+			Debug::getInstance()->addError( 'You can\'t access to the current global variable GET if the pages isn\'tinitialised' );
 		}
 		return $this->_currentGetUrl;
+	}
+	
+	protected $_currentPostUrl = null;
+	/**
+	 * Current $_POST
+	 * 
+	 * @return array		POST variables
+	 */
+	public function getCurrentPostUrl()
+	{
+		if ( $this->_currentPostUrl === null )
+		{
+			$this->_currentPostUrl = array();
+			foreach ( $_POST as $key => $value )
+			{
+				$this->_currentPostUrl[$key] = filter_input( INPUT_POST, $key, FILTER_SANITIZE_STRING );
+			}
+		}
+		
+		return $this->_currentPostUrl;
 	}
 	
 	protected $_currentPageUrl;
@@ -175,12 +195,17 @@ class General
 	 * 
 	 * @param type $pageUrl		URL of the page
 	 * @param array $getUrl		List of the global variables GET
+	 * @param array $postUrl	List of the global variables POST
 	 */
-	public function setCurrentUrl( $pageUrl, array $getUrl = null )
+	public function setCurrentUrl( $pageUrl, array $getUrl = null, array $postUrl = null )
 	{
 		if ( $getUrl === null )
 		{
 			$getUrl = array();
+		}
+		if ( $postUrl === null )
+		{
+			$postUrl = array();
 		}
 		
 		$this->_currentPageUrl = $pageUrl;

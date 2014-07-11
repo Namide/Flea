@@ -30,8 +30,8 @@ define( '_DB_LOGIN', 'sqlite:'._CONTENT_DIRECTORY.'login.sqlite' );
 
 class User
 {
-	protected $_id;
-	public function getId() { return $this->_id; }
+	public static $ROLE_BASIC = 1;
+	public static $ROLE_ADMIN = 2;
 	
 	protected $_email;
 	public function getEmail() { return $this->_email; }
@@ -39,11 +39,14 @@ class User
 	protected $_token;
 	public function getToken() { return $this->_token; }
 	
-	public function __construct( $id, $email, $token )
+	protected $_role;
+	public function getRole() { return $this->_role; }
+	
+	public function __construct( $email, $token, $role = 1 )
 	{
-		$this->_id = $id;
 		$this->_email = $email;
 		$this->_token = $token;
+		$this->_role = $role;
 	}
 }
 
@@ -54,17 +57,18 @@ class User
 class Login
 {
 	private static $_INSTANCE = array();
-	private static $_HASH_ALGO = 'whirlpool';
 	
+	private static $_HASH_ALGO = 'whirlpool';
 	private static $_TABLE_NAME_USERS = 'login_users';
 	private static $_TABLE_NAME_LOGS = 'login_logs';
+	
+	private static $_IS_SESSION_STARTED = false;
 	
 	/**
 	 * @var DataBase
 	 */
 	private $_db;
 	
-	private static $_IS_SESSION_STARTED = false;
 	
 	private $_user = null;
 	
@@ -81,7 +85,7 @@ class Login
 	 * 
 	 * @return User
 	 */
-	public function getUser()
+	public function getUserConnected()
 	{
 		if ( !$this->isConnected() )
 		{
@@ -98,12 +102,56 @@ class Login
 			$query = SqlQuery::getTemp();
 			$query->initSelectValues('*', self::$_TABLE_NAME_USERS, $keys, $signs, $values );
 			$rows = $this->_db->fetchAll($query);
-			if ( count( $rows ) < 1 ) return false;
+			if ( count( $rows ) < 1 )
+			{
+				return false;
+			}
 
-			$this->_user = new User( $rows['id'], $rows['email'], $rows['token'] );
+			$this->_user = new User( $rows[0]['email'], $rows[0]['token'], $rows[0]['role'] );
 		}
 		
 		return $this->_user;
+	}
+	
+	public function passEncrypt( $realPass, $email )
+	{
+		return hash( self::$_HASH_ALGO, $realPass.$email );
+	}
+	
+	public function getUserList()
+	{
+		if (	!$this->isConnected() ||
+				!$this->getUserConnected()->getRole() == User::$ROLE_ADMIN )
+		{
+			return false;
+		}
+		
+		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
+		$query->initSelectValues( 'email, role', self::$_TABLE_NAME_USERS );
+		$rows = $this->_db->fetchAll($query);
+		return $rows;
+	}
+
+	public function addUser( $email, $pass, $role = 1 )
+	{
+		if (	!$this->isConnected() ||
+				!$this->getUserConnected()->getRole() == User::$ROLE_ADMIN )
+		{
+			return false;
+		}
+		
+		$query = SqlQuery::getTemp( SqlQuery::$TYPE_INSERT );
+		$values = array();
+		$values['email'] = $email;
+		$values['pass'] = $this->passEncrypt($pass, $email);
+		$values['role'] = $role;
+		$values['token'] = $this->generateToken();
+		$insert = 'INTO `'.self::$_TABLE_NAME_USERS.'`';
+		$query->initInsertValues($insert, $values);
+		
+		$this->_db->execute($query);
+		
+		return true;
 	}
 	
 	public function connect( $email, $realPass )
@@ -113,6 +161,7 @@ class Login
 		// anti brute-force -->
 			$query = SqlQuery::getTemp( SqlQuery::$TYPE_INSERT );
 			$datas = array();
+			//$datas['id'] = null;
 			$datas['user_email'] = $email;
 			$datas['time'] = $time;
 			$datas['ip'] = $_SERVER["REMOTE_ADDR"];
@@ -124,7 +173,7 @@ class Login
 			if ( $this->_db->count($query2) > 1 ) return false;
 		// <-- anti brute-force
 		
-		$cryptedPass = hash( self::$_HASH_ALGO, $realPass.$email );
+		$cryptedPass = $this->passEncrypt($realPass, $email);
 		$keys = array( 'email', 'pass' );
 		$signs = array( '=', '=' );
 		$values = array( $email, $cryptedPass );
@@ -133,10 +182,11 @@ class Login
 		$rows = $this->_db->fetchAll($query3);
 		if ( count( $rows ) < 1 ) return false;
 		
-		$token = md5( rand(0, 9999).microtime() );
+		$token = $this->generateToken();
 		$query4 = SqlQuery::getTemp( SqlQuery::$TYPE_UPDATE );
+		$query4->setUpdate( self::$_TABLE_NAME_USERS );
 		$query4->setSet('token = \''.$token.'\'');
-		$query4->setWhere( 'id = '.$rows['id'] );
+		$query4->setWhere( 'email = \''.$rows[0]['email'].'\'' );
 		
 		if( $this->_db->execute($query4) )
 		{
@@ -146,13 +196,15 @@ class Login
 	
 	public function disconnect()
 	{
-		$user = $this->getUser();
-		if ( $user != false )
+		if ( $this->isConnected() )
 		{
-			$token = md5( rand(0, 9999).microtime() );
+			$user = $this->getUserConnected();
+			
+			$token = $this->generateToken();
 			$query = SqlQuery::getTemp( SqlQuery::$TYPE_UPDATE );
+			$query->setUpdate(self::$_TABLE_NAME_USERS);
 			$query->setSet('token = \''.$token.'\'');
-			$query->setWhere( 'id = '.$user->getId() );
+			$query->setWhere( 'email = \''.$user->getEmail().'\'' );
 			$this->_db->execute($query);
 		}
 			
@@ -162,13 +214,20 @@ class Login
 		session_destroy();
 	}
 	
+	private function generateToken()
+	{
+		return md5( rand(0, 9999).microtime() );
+	}
+	
 	private function create()
 	{
 		$req1 = SqlQuery::getTemp( SqlQuery::$TYPE_CREATE );
 		$create1 = 'TABLE IF NOT EXISTS `'.self::$_TABLE_NAME_USERS.'` ( '
-			. 'id INT AUTO_INCREMENT PRIMARY KEY, '
-			. 'email TEXT, pass TEXT, '
-			. 'token TEXT );';
+			. 'email TEXT UNIQUE, '
+			. 'pass TEXT, '
+			. 'role INT DEFAULT 0, '
+			. 'token TEXT DEFAULT \''.$this->generateToken().'\' '
+			. ');';
 		$req1->setCreate($create1);
 		$this->_db->execute( $req1 );
 
