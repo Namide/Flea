@@ -194,7 +194,7 @@ class PageList
 	public function getByTag( $tag, $lang/*, $flagLoad = 0*/ )
     {
 		$query = SqlQuery::getTemp();
-		$query->setWhere(' _lang = \''.$lang.'\' AND _tag = \''.$tag.'\' AND _visible = 1');
+		$query->setWhere(' _lang = \''.$lang.'\' AND page_prop = \'_tags\' AND value = \''.$tag.'\' AND _visible = 1');
 		return $this->getByList ( $query/*, $flagLoad*/ );
     }
 	

@@ -146,6 +146,7 @@ class Page
 				$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
 				$where = 'page_id = \''.$this->getId().'\' AND page_prop = \'_tags\'';
 				$query->initSelect( 'value', '`'.$table_list.'`', $where );
+				
 				foreach ( DataBase::getInstance( _DB_DSN_CONTENT )->fetchAll($query) as $row )
 				{
 					$this->_tags->add( $row['value'] );
