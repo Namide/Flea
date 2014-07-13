@@ -57,7 +57,7 @@ class PageList
 			$query->setFrom('`'.DataBase::objectToTableName( Page::getEmptyPage() ).'`');
 		
 		if ( $query->getOrderBy() == '' )
-			$query->setOrderBy('_date');
+			$query->setOrderBy('_date DESC');
 		
 		$pages = array();
 		foreach ( DataBase::getInstance( _DB_DSN_CONTENT )->fetchAll($query) as $row )
@@ -94,6 +94,9 @@ class PageList
 						. 'ON '.$table_page.'._id = '.$table_list.'.page_id');
 		//$query->setWhere($where);
 		//$query->setOrderBy('_date');
+		
+		if ( $query->getOrderBy() == '' )
+			$query->setOrderBy('_date DESC');
 		
 		foreach ( DataBase::getInstance( _DB_DSN_CONTENT )->fetchAll($query) as $row )
 		{
@@ -476,7 +479,6 @@ class PageList
     public function getDefaultPage( $lang/*, $flagLoad = 0*/ )
     {
         $query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
-		$query->setOrderBy('_date');
 		$query->setLimit(1);
 		
 		$query->setWhere('_type = \''.Page::$TYPE_DEFAULT.'\' AND _lang = \''.$lang.'\'');
@@ -522,7 +524,6 @@ class PageList
     {
 		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
 		$query->setWhere('_visible = 1 AND _lang = \''.$lang.'\'');
-		$query->setOrderBy('_date');
 		$pages = $this->getAll( $query/*, $flagLoad*/);
 		return $pages;
     }
@@ -538,7 +539,6 @@ class PageList
     {
 		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
 		$query->setWhere('_name = \''.$name.'\' AND _lang = \''.$lang.'\'');
-		$query->setOrderBy('_date');
 		$query->setLimit(1);
 		$pages = $this->getAll( $query/*, $flagLoad*/);
 		
