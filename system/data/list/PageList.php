@@ -49,12 +49,16 @@ class PageList
 		else
 			$query->setType ( SqlQuery::$TYPE_SELECT );
 		
+		if ( $query->getWhere() == '' )
+			$query->setWhere( '_visible = 1' );
 		
 		if ( $query->getSelect() == '' )
 			$query->setSelect('*');
 		
 		if ( $query->getFrom() == '' )
 			$query->setFrom('`'.DataBase::objectToTableName( Page::getEmptyPage() ).'`');
+		
+		//if (  )
 		
 		if ( $query->getOrderBy() == '' )
 			$query->setOrderBy('_date DESC');
