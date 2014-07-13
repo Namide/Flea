@@ -42,7 +42,7 @@ class PageList
 	 * 
 	 * @return array All the elements
 	 */
-	public function getAll( SqlQuery $query = null, $flagLoad = 0 )
+	public function getAll( SqlQuery $query = null/*, $flagLoad = 0*/ )
 	{
 		if ( $query === null )
 			$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
@@ -64,10 +64,10 @@ class PageList
 		{
 			$page = new Page();
 			$page->setByObjectVars($row);
-			if ( ($flagLoad & PageList::$LOAD_LIST) > 0 )
+			/*if ( ($flagLoad & PageList::$LOAD_LIST) > 0 )
 			{
 				$page = $this->addListToPage($page);
-			}
+			}*/
 			
 			$pages[$page->getId()] = $page;
 		}
@@ -75,7 +75,7 @@ class PageList
 		return $pages;
 	}
 	
-	public function getByList( SqlQuery $query, $flagLoad = 0 )
+	public function getByList( SqlQuery $query/*, $flagLoad = 0*/ )
 	{
 		$table_page = DataBase::objectToTableName( Page::getEmptyPage() );
 		$table_list = $table_page.'_array';
@@ -100,10 +100,10 @@ class PageList
 			$page = new Page();
 			$page->setByObjectVars($row);
 			
-			if ( ($flagLoad & PageList::$LOAD_LIST) > 0 )
+			/*if ( ($flagLoad & PageList::$LOAD_LIST) > 0 )
 			{
 				$page = $this->addListToPage($page);
-			}
+			}*/
 			
 			$pages[$page->getId()] = $page;
 		}
@@ -111,7 +111,7 @@ class PageList
 		return $pages;
 	}
 	
-	public function addListToPage( Page &$page )
+	/*public function addListToPage( Page &$page )
 	{		
 		$table_page = DataBase::objectToTableName( Page::getEmptyPage() );
 		$table_list = $table_page.'_array';
@@ -133,7 +133,7 @@ class PageList
 			$page->addToList( $row['page_prop'], $data, $row['key'] );
 		}
 		return $page;
-	}
+	}*/
 
 	/**
 	 * Update the current page.
@@ -162,11 +162,11 @@ class PageList
 	 * @param string $lang	Language
 	 * @return array		All the page for this language
 	 */
-	public function getAllByLang( $lang, $flagLoad = 0 )
+	public function getAllByLang( $lang/*, $flagLoad = 0*/ )
 	{
 		$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
 		$query->setWhere('_lang = \''.$lang.'\' AND _visible = 1');
-		return $this->getAll( $query, $flagLoad );
+		return $this->getAll( $query/*, $flagLoad*/ );
 	}
 	
 	final protected function __construct() { }
@@ -177,11 +177,11 @@ class PageList
 	 * @param string $name	Name of the elements
 	 * @return array		List of the elements with the name
 	 */
-	public function getAllByName( $name, $flagLoad = 0 )
+	public function getAllByName( $name/*, $flagLoad = 0*/ )
 	{
 		$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
 		$query->setWhere('_name = \''.$name.'\' AND _visible = 1');
-		return $this->getAll( $query, $flagLoad );
+		return $this->getAll( $query/*, $flagLoad*/ );
 	}
 	
 	/**
@@ -191,11 +191,11 @@ class PageList
 	 * @param string $lang	Language of the element
 	 * @return array		List of the elements
 	 */
-	public function getByTag( $tag, $lang, $flagLoad = 0 )
+	public function getByTag( $tag, $lang/*, $flagLoad = 0*/ )
     {
 		$query = SqlQuery::getTemp();
 		$query->setWhere(' _lang = \''.$lang.'\' AND _tag = \''.$tag.'\' AND _visible = 1');
-		return $this->getByList ( $query, $flagLoad );
+		return $this->getByList ( $query/*, $flagLoad*/ );
     }
 	
 	/**
@@ -205,7 +205,7 @@ class PageList
 	 * @param string $lang	Language of the elements
 	 * @return array		List of elements
 	 */
-	public function getWithOneOfTags( array $tags, $lang, $flagLoad = 0 )
+	public function getWithOneOfTags( array $tags, $lang/*, $flagLoad = 0*/ )
     {
 		$where = '_lang = \''.$lang.'\' AND page_prop = \'_tags\' AND _visible = 1 AND (';
 		
@@ -220,7 +220,7 @@ class PageList
 		
 		$query = SqlQuery::getTemp();
 		$query->setWhere($where);
-		return $this->getByList ( $query, $flagLoad );
+		return $this->getByList ( $query/*, $flagLoad*/ );
 		
 		//return $this->getByList ( $where, $flagLoad );
     }
@@ -232,7 +232,7 @@ class PageList
 	 * @param string $lang	Language of the elements
 	 * @return array		List of elements
 	 */
-	public function getWithAllTags( array $tags, $lang, $flagLoad = 0 )
+	public function getWithAllTags( array $tags, $lang/*, $flagLoad = 0*/ )
     {
 		$where = ' _lang = \''.$lang.'\' AND AND _visible = 1 ';
 		
@@ -246,7 +246,7 @@ class PageList
 		
 		$query = SqlQuery::getTemp();
 		$query->setWhere($where);
-		return $this->getByList ( $query, $flagLoad );
+		return $this->getByList ( $query/*, $flagLoad*/ );
 		//return $this->getByList ( $where, $flagLoad );
     }
 	
@@ -256,11 +256,11 @@ class PageList
 	 * @param string $lang	Language of the elements
 	 * @return array		List of elements
 	 */
-    public function getByLang( $lang, $flagLoad = 0 )
+    public function getByLang( $lang/*, $flagLoad = 0*/ )
     {
 		$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
 		$query->setWhere('_lang = \''.$lang.'\' AND _visible = 1');
-        return $this->getAll( $query, $flagLoad );
+        return $this->getAll( $query/*, $flagLoad*/ );
     }
 	
 	/**
@@ -404,7 +404,7 @@ class PageList
 	 * @param string $relURL	Relative URL
 	 * @return Page				Corresponding page
 	 */
-    public function getByUrl( $relURL, $flagLoad = 0 )
+    public function getByUrl( $relURL/*, $flagLoad = 0*/ )
     {
 		if( _DEBUG && !General::getInstance()->isPagesInitialized() )
 		{
@@ -433,7 +433,7 @@ class PageList
 			
 			$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
 			$query->setWhere('_url LIKE \''.$urlTemp.'\'');
-			$pages = $this->getAll( $query, $flagLoad);
+			$pages = $this->getAll( $query/*, $flagLoad*/);
 			if ( count($pages) > 0 ) return current ($pages);
 		}
 
@@ -454,7 +454,7 @@ class PageList
 			{
 				$query->clean();
 				$query->setWhere('_id LIKE \''.$pageTemp['_id'].'\'');
-				$pagesTemp = $this->getByList( $query, $flagLoad );
+				$pagesTemp = $this->getByList( $query/*, $flagLoad*/ );
 				if ( count($pagesTemp) > 0 ) return current ($pagesTemp);
 			}
 		}
@@ -464,7 +464,7 @@ class PageList
 			Debug::getInstance()->addError('The URL "'.$relURL.'" don\'t exist');
 		}
 		
-		return $this->getDefaultPage($lang, $flagLoad);
+		return $this->getDefaultPage($lang/*, $flagLoad*/);
     }
 	
 	/**
@@ -473,32 +473,32 @@ class PageList
 	 * @param string $lang	Language
 	 * @return Page			default page
 	 */
-    public function getDefaultPage( $lang, $flagLoad = 0 )
+    public function getDefaultPage( $lang/*, $flagLoad = 0*/ )
     {
         $query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
 		$query->setOrderBy('_date');
 		$query->setLimit(1);
 		
 		$query->setWhere('_type = \''.Page::$TYPE_DEFAULT.'\' AND _lang = \''.$lang.'\'');
-		$pages = $this->getAll( $query, $flagLoad);
+		$pages = $this->getAll( $query/*, $flagLoad*/);
 		if ( count($pages) > 0 ) return current($pages);
 		
 		/* IF THE LANGUAGE OF THE DEFAULT PAGE DON'T EXIST */
 		$query->setWhere('_type = \''.Page::$TYPE_DEFAULT.'\'');
-		$pages = $this->getAll( $query, $flagLoad);
+		$pages = $this->getAll( $query/*, $flagLoad*/);
 		if ( count($pages) > 0 ) return current($pages);
 		
 		/* IF THE DEFAULT PAGE DON'T EXIST */
 		$query->setWhere('_lang = \''.$lang.'\'');
-		$pages = $this->getAll( $query, $flagLoad);
+		$pages = $this->getAll( $query/*, $flagLoad*/);
 		if ( count($pages) > 0 ) return current($pages);
 		
 		$query->setWhere('_type = \''.Page::$TYPE_ERROR404.'\' AND _lang = \''.$lang.'\'');
-		$pages = $this->getAll( $query, $flagLoad);
+		$pages = $this->getAll( $query/*, $flagLoad*/);
 		if ( count($pages) > 0 ) return current($pages);
 
 		$query->setWhere('_type = \''.Page::$TYPE_ERROR404.'\'');
-		$pages = $this->getAll( $query, $flagLoad);
+		$pages = $this->getAll( $query/*, $flagLoad*/);
 		if ( count($pages) > 0 ) return current($pages);
 
 		// CREATE PAGE ERROR 404
@@ -518,12 +518,12 @@ class PageList
 	 * @param string $lang	Language
 	 * @return array		List of the visible pages
 	 */
-    public function getAllVisible( $lang, $flagLoad = 0 )
+    public function getAllVisible( $lang/*, $flagLoad = 0*/ )
     {
 		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
 		$query->setWhere('_visible = 1 AND _lang = \''.$lang.'\'');
 		$query->setOrderBy('_date');
-		$pages = $this->getAll( $query, $flagLoad);
+		$pages = $this->getAll( $query/*, $flagLoad*/);
 		return $pages;
     }
 	
@@ -534,13 +534,13 @@ class PageList
 	 * @param string $lang	Language
 	 * @return Page			Page corresponding
 	 */
-    public function getByName( $name, $lang, $flagLoad = 0 )
+    public function getByName( $name, $lang/*, $flagLoad = 0*/ )
     {
 		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
 		$query->setWhere('_name = \''.$name.'\' AND _lang = \''.$lang.'\'');
 		$query->setOrderBy('_date');
 		$query->setLimit(1);
-		$pages = $this->getAll( $query, $flagLoad);
+		$pages = $this->getAll( $query/*, $flagLoad*/);
 		
 		if ( count($pages) > 0 ) return current ($pages);
 		
@@ -549,7 +549,7 @@ class PageList
 			Debug::getInstance()->addError('The page '.$name.','.$lang.' don\'t exist');
 		}
 		
-        return $this->getDefaultPage( $lang, $flagLoad );
+        return $this->getDefaultPage( $lang/*, $flagLoad*/ );
     }
 	
 	/**
@@ -559,12 +559,12 @@ class PageList
 	 * @param string $url	Relative URL
 	 * @return boolean		URL exist
 	 */
-	public function hasUrl( $url, $flagLoad = 0 )
+	public function hasUrl( $url/*, $flagLoad = 0*/ )
     {
 		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
 		$query->setWhere('_url = \''.$url.'\'');
 		$query->setLimit(1);
-		$pages = $this->getAll( $query, $flagLoad );
+		$pages = $this->getAll( $query/*, $flagLoad*/ );
 		return ( count($pages) > 0 );
     }
 	

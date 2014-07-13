@@ -171,13 +171,12 @@ class UrlUtil
 	 * Relative URL of the page
 	 * 
 	 * @param Page $page		Object Page
-	 * @param string $lang		Language of the page
 	 * @param array $getUrl		List of GETs (optional)
 	 * @return string			Relative URL of the page
 	 */
-	public function getRelUrlByIdLang( Page &$page, $lang, array $getUrl = null )
+	public function getRelUrlByIdLang( Page &$page/*, $lang*/, array $getUrl = null )
     {
-		$page = PageList::getInstance()->getByName( $page->getName(), $lang );
+		//$page = PageList::getInstance()->getByName( $page->getName(), $lang );
 		$url = $this->getRelUrlByPageUrl( $page->getPageUrl(), $getUrl, $page->getGetExplicit() );
 		
 		return $url;

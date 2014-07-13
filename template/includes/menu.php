@@ -7,7 +7,7 @@ function getMenu()
 	
 	if ( $lang == 'all' ) return '';
 	
-    
+	
 	$pageList = \Flea\PageList::getInstance();
 
 	$output = '<ul>';

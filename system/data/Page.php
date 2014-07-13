@@ -134,9 +134,31 @@ class Page
 	 */
 	public function getTags()
 	{
+		if ( $this->_tags === null )
+		{
+			$this->_tags = new DataList(false);
+			
+			$table_page = DataBase::objectToTableName( $this );
+			if ( DataBase::getInstance( _DB_DSN_CONTENT )->exist($table_page) )
+			{
+				$table_list = $table_page.'_array';
+
+				$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
+				$where = 'page_id = \''.$this->getId().'\' AND page_prop = \'_tags\'';
+				$query->initSelect( 'value', '`'.$table_list.'`', $where );
+				foreach ( DataBase::getInstance( _DB_DSN_CONTENT )->fetchAll($query) as $row )
+				{
+					$this->_tags->add( $row['value'] );
+				}
+			}
+		}
+		
 		return $this->_tags;
 	}
 	
+	/**
+	 * @var DataList 
+	 */
 	private $_contents;
 	/**
 	 * A content is a pair with key and value.
@@ -146,6 +168,27 @@ class Page
 	 */
 	public function getContents()
 	{
+		if ( $this->_contents === null )
+		{
+			$this->_contents = new DataList(true);
+			
+			$table_page = DataBase::objectToTableName( $this );
+			if ( DataBase::getInstance( _DB_DSN_CONTENT )->exist($table_page) )
+			{
+				$table_list = $table_page.'_array';
+
+				$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
+				$where = 'page_id = \''.$this->getId().'\' AND page_prop = \'_contents\'';
+				$query->initSelect( 'key, value', '`'.$table_list.'`', $where );
+				foreach ( DataBase::getInstance( _DB_DSN_CONTENT )->fetchAll($query) as $row )
+				{
+					$content = BuildUtil::getInstance ()->replaceFleaVars ( $row['value'], $this );
+					$this->_contents->add($content, $row['key']);
+				}
+			}
+			
+			
+		}
 		return $this->_contents;
 	}
 	
@@ -245,7 +288,30 @@ class Page
 	 * 
 	 * @return DataList
 	 */
-    public function getAdditionalUrls() { return $this->_additionalUrls; }
+    public function getAdditionalUrls()
+	{
+		if ( $this->_additionalUrls === null )
+		{
+			$this->_additionalUrls = new DataList(false);
+			
+			$table_page = DataBase::objectToTableName( $this );
+			if ( DataBase::getInstance( _DB_DSN_CONTENT )->exist($table_page) )
+			{
+				$table_list = $table_page.'_array';
+
+				$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
+				$where = 'page_id = \''.$this->getId().'\' AND page_prop = \'_additionalUrls\'';
+				$query->initSelect( 'value', '`'.$table_list.'`', $where );
+				foreach ( DataBase::getInstance( _DB_DSN_CONTENT )->fetchAll($query) as $row )
+				{
+					$this->_additionalUrls->add( $row['value'] );
+				}
+			}
+		}
+		
+		return $this->_additionalUrls;
+		
+	}
 	
 	/**
 	 * Compare the URL, if this page accept GET it can accept others URL.
@@ -410,8 +476,8 @@ class Page
 		}
 		$this->setLang( $lang );
 		$this->setName( $name );
-		$this->_contents = new DataList(true);
-		$this->_tags = new DataList(false);
+		$this->_contents = null;//new DataList(true);
+		$this->_tags = null;//new DataList(false);
 		
 		$this->_type = '';
 		$this->_date = '';
@@ -420,7 +486,7 @@ class Page
         $this->_getEnabled = false;
 		$this->_getExplicit = true;
 		$this->_cachable = true;
-		$this->_additionalUrls = new DataList(false);
+		$this->_additionalUrls = null;//new DataList(false);
 		
 		$this->_url = '';
 		
@@ -475,7 +541,7 @@ class Page
 		}
 	}
 	
-	public function addToList( $privateListName, $value, $key = null )
+	/*public function addToList( $privateListName, $value, $key = null )
 	{
 		if (	_DEBUG &&
 				get_class($this->$privateListName) != get_class( DataList::getEmptyDataList() ) )
@@ -483,7 +549,7 @@ class Page
 				Debug::getInstance()->addError('The propertie "'.$privateListName.'" don\'t exist or isn\'t a DataList object');
 		}
 		$this->$privateListName->add($value, $key);
-	}
+	}*/
 	
 	/**
 	 * Get a script for create the same object

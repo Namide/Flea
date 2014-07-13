@@ -50,6 +50,13 @@ class BuildUtil extends InitUtil
 		return PageList::getInstance()->getByName($pageName, $lang);
 	}
 
+	public function getAbsUrlByPage( Page $page, array $getUrl = null )
+    {
+		$relUrl = UrlUtil::getInstance()->getRelUrlByIdLang($page, $getUrl);
+		
+        return _ROOT_URL.$relUrl;
+    }
+	
 	/**
 	 * Get the absoulte URL of a page by his page URL
 	 * 
@@ -75,7 +82,7 @@ class BuildUtil extends InitUtil
     {
 		$PageList = PageList::getInstance();
 		$page = $PageList->getByName($pageName, $lang);
-		$relUrl = UrlUtil::getInstance()->getRelUrlByIdLang($page, $lang, $getUrl);
+		$relUrl = UrlUtil::getInstance()->getRelUrlByIdLang($page, $getUrl);
 		
         return _ROOT_URL.$relUrl;
     }
@@ -108,6 +115,29 @@ class BuildUtil extends InitUtil
 		
 		return $this->getAbsUrlByNameLang($pageName, $lang);
     }
+	
+	/**
+	 * Return the equivalent page in other language.
+	 * Return the default page if this one don't exist
+	 * 
+	 * @param string $lang
+	 * @param Page $page
+	 * @return Page
+	 */
+	public function getOtherLang( $lang, Page $page = null )
+	{
+		$pageList = PageList::getInstance();
+		if ( $page === null )
+		{
+			$page = General::getInstance()->getCurrentPage();
+		}
+		if ( $pageList->has( $page->getName(), $lang) )
+		{
+			return $pageList->getByName($page->getName(), $lang);
+		}
+		
+		return $pageList->getDefaultPage($lang);
+	}
 	
 	public function getContentOfPage(	$contentKey, Page &$page, $replaceFleaVars = false )
 	{
@@ -156,7 +186,13 @@ class BuildUtil extends InitUtil
 	 */
 	public function replaceFleaVars( $text, Page &$page = null )
     {
-		$replacePage = str_replace('{{rootPath}}', _ROOT_URL, $text);
+		$replacePage = str_replace('{{title}}', $page->getHtmlTitle(), $text);
+		$replacePage = str_replace('{{header}}', $page->getHtmlHeader(), $replacePage);
+		$replacePage = str_replace('{{body}}', $page->getHtmlBody(), $replacePage);
+		$replacePage = str_replace('{{description}}', $page->getHtmlDescription(), $replacePage);
+		
+		
+		$replacePage = str_replace('{{rootPath}}', _ROOT_URL, $replacePage);
 		$replacePage = str_replace('{{templatePath}}', _ROOT_URL._TEMPLATE_DIRECTORY, $replacePage);
 		$replacePage = str_replace('{{contentPath}}', _ROOT_URL._CONTENT_DIRECTORY, $replacePage);
 		
@@ -169,13 +205,14 @@ class BuildUtil extends InitUtil
 			$page = $general->getCurrentPage();
 		}
 		
-		$replacePage = str_replace('{{pageContentPath}}', _ROOT_URL._CONTENT_DIRECTORY.$page->getName(), $replacePage);
+		$replacePage = str_replace('{{pageContentPath}}', _ROOT_URL._CONTENT_DIRECTORY.$page->getName().'/', $replacePage);
 
-		$replacePage = str_replace('{{title}}', $page->getHtmlTitle(), $replacePage);
-		$replacePage = str_replace('{{header}}', $page->getHtmlHeader(), $replacePage);
-		$replacePage = str_replace('{{body}}', $page->getHtmlBody(), $replacePage);
-		$replacePage = str_replace('{{description}}', $page->getHtmlDescription(), $replacePage);
 		
+		$replacePage = preg_replace_callback( '/\{\{urlPageToAbsoluteUrl:(.*?)\}\}/', function ($matches)
+		{
+			return BuildUtil::getInstance()->getAbsUrlByPageUrl($matches[1]);
+
+		}, $replacePage );
 			
 		if ( /*General::getInstance()->isPagesInitialized() &&*/ $page !== null )
 		{

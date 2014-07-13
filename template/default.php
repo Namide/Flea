@@ -39,7 +39,7 @@
     <div id="content">
     
         {{body}}
-		{{content:test03}}
+		
     </div>
     
     <footer>
