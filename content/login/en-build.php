@@ -55,7 +55,7 @@ function addUser( \Flea\Login $login )
 	$form = '<form method="post" action="'.$currentUrl.'">
 				<input class="field" type="text" name="addUserEmail" placeholder="E-mail" value="" required="required" pattern="^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"/>
 				<input class="field" type="password" name="addUserPass" placeholder="Password" value="" required="required"/>
-				<input type="submit" name="add" value="add"></div>
+				<input type="submit" name="add" value="add">
 			</form>';
 	return $form;
 }
@@ -76,7 +76,7 @@ function connectUser( \Flea\Login $login )
 	$form = '<form method="post" action="'.$currentUrl.'">
 				<input class="field" type="text" name="connectUserEmail" placeholder="E-mail" value="" required="required"/>
 				<input class="field" type="password" name="connectUserPass" placeholder="Password" value="" required="required"/>
-				<input type="submit" name="connect" value="connect"></div>
+				<input type="submit" name="connect" value="connect">
 			</form>';
 	return $form;
 }
@@ -114,7 +114,7 @@ function disconnectUser( \Flea\Login $login )
 	
 	$form = '<form method="post" action="'.$currentUrl.'">
 				<input type="hidden" name="disconnectUser" value="1">
-				<input type="submit" name="disconnect" value="disconnect"></div>
+				<input type="submit" name="disconnect" value="disconnect">
 			</form>';
 	return $form;
 }

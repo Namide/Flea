@@ -217,12 +217,13 @@ class SqlQuery
 		}
 	}
 	
-	public function initCount( $from, $where = '' )
+	public function initCount( $from, array $whereList = null, array $signList = null )
 	{
 		$this->_type = self::$TYPE_SELECT;
 		$this->_select = 'COUNT(*)';
 		$this->_from = $from;
-		$this->_where = $where;
+		if ( $whereList !== null )
+			$this->_where = $this->getStrFromBinding( $whereList, ' AND ', $signList );
 	}
 	
 	public function initInsertValues( $insert, array $values = array() )
@@ -274,14 +275,13 @@ class SqlQuery
 		$this->_binds = $binds;
 	}
 	
-	public function initUpdateSet( $update, $set = '', array $binds = array(), $where = '' )
+	public function initUpdateSet( $update, array $setList, array $whereList )
 	{
 		$this->_type = self::$TYPE_UPDATE;
-		$this->_set = $set;
-		$this->_binds = $binds;
-		$this->_where = $where;
+		$this->_update = $update;
+		$this->_set = $this->getStrFromBinding( $setList, ', ' );
+		$this->_where = $this->getStrFromBinding( $whereList, ' AND ' );
 	}
-
 
 	public function initCreate( $createTable, array $getObjectVars )
 	{
@@ -313,6 +313,77 @@ class SqlQuery
 			}
 		}
 		$this->_create .= ' );';
+	}
+	
+	private function getStrFromBinding( array $valueList /* associative array */, $strGlue = ', ', array $signList = null )
+	{
+		
+		$values = array();
+		$signs = array();
+		$keys = array();
+		$i = 0;
+		foreach ($valueList as $key => $value)
+		{
+			$values[$i] = $value;
+			$keys[$i] = $key;
+			
+			if ( $signList === null || !isset($signList[$i]) )
+				$signs[$i] = '=';
+			else
+				$signs[$i] = $signList[$i];
+			
+			$i++;
+		}
+		
+		$output = '';
+		
+		$first = true;
+		$l = count($values);
+		for( $i = 0; $i < $l; $i++ )
+		{
+			$key = $keys[$i];
+			$sign = $signs[$i];
+			$value = $values[$i];
+			
+			if ( gettype($value) == 'boolean' )
+			{
+				$output .= ( ($first)?' ':$strGlue ).$key.' '.$sign.' :'.$key;
+				if ( !array_key_exists(':'.$key, $this->_binds) )
+				{
+					$this->_binds[] = array( ':'.$key, (($value)?'1':'0'), \PDO::PARAM_BOOL );
+				}
+				$first = false;
+			}
+			elseif ( gettype($value) == 'integer' )
+			{
+				$output .= ( ($first)?' ':$strGlue ).$key.' '.$sign.' :'.$key;
+				if ( !array_key_exists(':'.$key, $this->_binds) )
+				{
+					$this->_binds[] = array( ':'.$key, $value, \PDO::PARAM_INT );
+				}
+				$first = false;
+			}
+			elseif ( gettype($value) == 'double' )
+			{
+				$output .= ( ($first)?' ':$strGlue ).$key.' '.$sign.' :'.$key;
+				if ( !array_key_exists(':'.$key, $this->_binds) )
+				{
+					$this->_binds[] = array( ':'.$key, $value, \PDO::PARAM_STR );
+				}
+				$first = false;
+			}
+			elseif ( gettype($value) == 'string' )
+			{
+				$output .= ( ($first)?' ':$strGlue ).$key.' '.$sign.' :'.$key;
+				if ( !array_key_exists(':'.$key, $this->_binds) )
+				{
+					$this->_binds[] = array( ':'.$key, $value, \PDO::PARAM_STR );
+				}
+				$first = false;
+			}
+		}
+		
+		return $output;
 	}
 	
 	public function getRequest()

@@ -69,7 +69,7 @@ class Cache
 	public function isWrited( $strUrl )
 	{
 		$query = SqlQuery::getTemp();
-		$query->initCount($this->_tableName, 'url LIKE \''.$strUrl.'\'' );
+		$query->initCount($this->_tableName, array('url'=>$strUrl), array('LIKE') );
 		return $this->_db->count( $query ) > 0;
 	}
 	

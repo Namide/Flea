@@ -3,7 +3,6 @@ Flea
 
 Lightweight PHP framework
 - Quick to install
-- No database
 - Cache Management
 - Simple and permissive urls
 - Lightweight

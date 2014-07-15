@@ -117,6 +117,23 @@ class Login
 	{
 		if( isset( $_SESSION['login_token'] ) )
 		{
+			throw new \Exception('todo optimise binds DataBase and add user in DB test');
+			/*if ( $this->_user == null )
+			{
+				$keys = array( 'token' );
+				$signs = array( '=' );
+				$values = array( $_SESSION['login_token'] );
+
+				$query = SqlQuery::getTemp();
+				$query->initSelectValues('*', LoginTableName::$TABLE_NAME_USERS, $keys, $signs, $values );
+				$rows = $this->_db->fetchAll($query);
+				if ( count( $rows ) < 1 )
+				{
+					return false;
+				}
+				$this->_db->count($query);
+				
+			}*/
 			return true;
 		}
 		return false;
@@ -268,7 +285,7 @@ class Login
 			$this->_db->execute($query);
 
 			$query2 = SqlQuery::getTemp();
-			$query2->initCount( LoginTableName::$TABLE_NAME_LOGS, 'user_email = \''.$email.'\' AND time > '.($time-2) );
+			$query2->initCount( LoginTableName::$TABLE_NAME_LOGS, array('user_email'=>$email, 'time'=>($time-2) ), array('=', '>') );
 			if ( $this->_db->count($query2) > 1 ) return false;
 		// <-- anti-brute-force
 		
