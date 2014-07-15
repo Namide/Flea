@@ -89,7 +89,6 @@ class DataBase
 		try
 		{
 			$stmt = $this->_pdo->prepare( $query->getRequest() );
-			
 			$binds = $query->getBinds();
 			if ( $binds !== null )
 			{

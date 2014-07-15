@@ -28,10 +28,19 @@ namespace Flea;
 
 define( '_DB_LOGIN', 'sqlite:'._CONTENT_DIRECTORY.'login.sqlite' );
 
+class LoginTableName
+{
+	public static $TABLE_NAME_DATAS = 'login_datas';
+	public static $TABLE_NAME_USERS = 'login_users';
+	public static $TABLE_NAME_LOGS = 'login_logs';
+}
+
 class User
 {
 	public static $ROLE_BASIC = 1;
 	public static $ROLE_ADMIN = 2;
+	
+	private $_db;
 	
 	protected $_email;
 	public function getEmail() { return $this->_email; }
@@ -42,12 +51,46 @@ class User
 	protected $_role;
 	public function getRole() { return $this->_role; }
 	
-	public function __construct( $email, $token, $role = 1 )
+	public function __construct( $db )
+	{
+		$this->_db = $db;
+	}
+	
+	public function initUser( $email, $token, $role = 1 )
 	{
 		$this->_email = $email;
 		$this->_token = $token;
 		$this->_role = $role;
 	}
+	
+	private $_datas;
+	/**
+	 * A data is a pair with key and value.
+	 * You can't add 2 datas with same label.
+	 * 
+	 * @return DataList 
+	 */
+	public function getDatas()
+	{
+		if ( $this->_datas === null )
+		{
+			$this->_datas = new DataList(true);
+			
+			if ( DataBase::getInstance( _DB_DSN_CONTENT )->exist(LoginTableName::$TABLE_NAME_DATAS) )
+			{
+				$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
+				$where = 'user_email = \''.$this->getEmail().'\'';
+				$query->initSelect('key, value', '`'.LoginTableName::$TABLE_NAME_DATAS.'`', $where);
+				foreach ( $this->_db->fetchAll($query) as $row )
+				{
+					$content = BuildUtil::getInstance ()->replaceFleaVars ($row['value'], $this);
+					$this->_datas->add($content, $row['key']);
+				}
+			}
+		}
+		return $this->_datas;
+	}
+	
 }
 
 /**
@@ -59,8 +102,6 @@ class Login
 	private static $_INSTANCE = array();
 	
 	private static $_HASH_ALGO = 'whirlpool';
-	private static $_TABLE_NAME_USERS = 'login_users';
-	private static $_TABLE_NAME_LOGS = 'login_logs';
 	
 	private static $_IS_SESSION_STARTED = false;
 	
@@ -100,14 +141,15 @@ class Login
 			$values = array( $_SESSION['login_token'] );
 
 			$query = SqlQuery::getTemp();
-			$query->initSelectValues('*', self::$_TABLE_NAME_USERS, $keys, $signs, $values );
+			$query->initSelectValues('*', LoginTableName::$TABLE_NAME_USERS, $keys, $signs, $values );
 			$rows = $this->_db->fetchAll($query);
 			if ( count( $rows ) < 1 )
 			{
 				return false;
 			}
 
-			$this->_user = new User( $rows[0]['email'], $rows[0]['token'], $rows[0]['role'] );
+			$this->_user = new User( $this->_db );
+			$this->_user->initUser( $rows[0]['email'], $rows[0]['token'], $rows[0]['role'] );
 		}
 		
 		return $this->_user;
@@ -118,7 +160,7 @@ class Login
 		return hash( self::$_HASH_ALGO, $realPass.$email );
 	}
 	
-	public function getUserList()
+	public function getUserList( $dataKey = null, $dataValue = null )
 	{
 		if (	!$this->isConnected() ||
 				$this->getUserConnected()->getRole() != User::$ROLE_ADMIN )
@@ -126,10 +168,41 @@ class Login
 			return false;
 		}
 		
+		$list = array();
+		
+		$tnu = LoginTableName::$TABLE_NAME_USERS;
+		$tnd = LoginTableName::$TABLE_NAME_DATAS;
+		
 		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
-		$query->initSelectValues( 'email, role', self::$_TABLE_NAME_USERS );
-		$rows = $this->_db->fetchAll($query);
-		return $rows;
+		$query->initSelectValues( 'email, role', $tnu );
+		if ( $dataKey !== null && $dataValue !== null )
+		{
+			$query->setFrom('`'.$tnu.'` '
+						. 'LEFT JOIN '.$tnd.' '
+						. 'ON '.$tnu.'.email = '.$tnd.'.user_email');
+			$query->setWhere( $tnd.'.key = \''.$dataKey.'\' AND '.$tnd.'.value = \''.$dataValue.'\'' );
+		}
+		$where = '';
+		foreach ($this->_db->fetchAll($query) as $user)
+		{
+			$list[$user['email']] = array();
+			$list[$user['email']]['role'] = $user['role'];
+			$list[$user['email']]['datas'] = array();
+			$where .= ($where == '') ? 'user_email = \''.$user['email'].'\'' : ' OR user_email = \''.$user['email'].'\'';
+		}
+		
+		$query2 = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
+		$query2->initSelect( 'user_email, key, value', $tnd, $where);
+		foreach ($this->_db->fetchAll($query2) as $value)
+		{
+			$email = $value['user_email'];
+			if ( isset($list[$email]) )
+			{
+				$list[$email]['datas'][$value['key']] = $value['value'];
+			}
+		}
+		
+		return $list;
 	}
 
 	public function addUser( $email, $pass, $role = 1 )
@@ -146,45 +219,71 @@ class Login
 		$values['pass'] = $this->passEncrypt($pass, $email);
 		$values['role'] = $role;
 		$values['token'] = $this->generateToken();
-		$insert = 'INTO `'.self::$_TABLE_NAME_USERS.'`';
+		$insert = 'INTO `'.LoginTableName::$TABLE_NAME_USERS.'`';
 		$query->initInsertValues($insert, $values);
-		
 		$this->_db->execute($query);
 		
 		return true;
+	}
+	
+	public function addDataToUser( $userEmail, $dataKey, $dataValue )
+	{
+		if (	!$this->isConnected() ||
+				!(
+					$this->getUserConnected()->getRole() == User::$ROLE_ADMIN ||
+					$this->getUserConnected()->getEmail() == $userEmail
+				)
+			)
+		{
+			return false;
+		}
+		
+		if ( DataBase::getInstance( _DB_DSN_CONTENT )->exist(LoginTableName::$TABLE_NAME_DATAS) )
+		{
+			$query = SqlQuery::getTemp( SqlQuery::$TYPE_INSERT );
+			$values = array();
+			$values['user_email'] = $userEmail;
+			$values['key'] = $dataKey;
+			$values['value'] = $dataValue;
+			$insert = 'INTO `'.LoginTableName::$TABLE_NAME_DATAS.'`';
+			$query->initInsertValues($insert, $values);
+			
+			return $this->_db->execute($query);
+		}
+		
 	}
 	
 	public function connect( $email, $realPass )
 	{
 		$time = time();
 		
-		// anti brute-force -->
+		// anti-brute-force -->
 			$query = SqlQuery::getTemp( SqlQuery::$TYPE_INSERT );
 			$datas = array();
 			//$datas['id'] = null;
 			$datas['user_email'] = $email;
 			$datas['time'] = $time;
 			$datas['ip'] = $_SERVER["REMOTE_ADDR"];
-			$query->initInsertValues( 'INTO `'.self::$_TABLE_NAME_LOGS.'`', $datas );
+			$query->initInsertValues( 'INTO `'.LoginTableName::$TABLE_NAME_LOGS.'`', $datas );
 			$this->_db->execute($query);
 
 			$query2 = SqlQuery::getTemp();
-			$query2->initCount( self::$_TABLE_NAME_LOGS, 'user_email = \''.$email.'\' AND time > '.($time-2) );
+			$query2->initCount( LoginTableName::$TABLE_NAME_LOGS, 'user_email = \''.$email.'\' AND time > '.($time-2) );
 			if ( $this->_db->count($query2) > 1 ) return false;
-		// <-- anti brute-force
+		// <-- anti-brute-force
 		
 		$cryptedPass = $this->passEncrypt($realPass, $email);
 		$keys = array( 'email', 'pass' );
 		$signs = array( '=', '=' );
 		$values = array( $email, $cryptedPass );
 		$query3 = SqlQuery::getTemp();
-		$query3->initSelectValues('*', self::$_TABLE_NAME_USERS, $keys, $signs, $values );
+		$query3->initSelectValues('*', LoginTableName::$TABLE_NAME_USERS, $keys, $signs, $values );
 		$rows = $this->_db->fetchAll($query3);
 		if ( count( $rows ) < 1 ) return false;
 		
 		$token = $this->generateToken();
 		$query4 = SqlQuery::getTemp( SqlQuery::$TYPE_UPDATE );
-		$query4->setUpdate( self::$_TABLE_NAME_USERS );
+		$query4->setUpdate( LoginTableName::$TABLE_NAME_USERS );
 		$query4->setSet('token = \''.$token.'\'');
 		$query4->setWhere( 'email = \''.$rows[0]['email'].'\'' );
 		
@@ -202,7 +301,7 @@ class Login
 			
 			$token = $this->generateToken();
 			$query = SqlQuery::getTemp( SqlQuery::$TYPE_UPDATE );
-			$query->setUpdate(self::$_TABLE_NAME_USERS);
+			$query->setUpdate( LoginTableName::$TABLE_NAME_USERS );
 			$query->setSet('token = \''.$token.'\'');
 			$query->setWhere( 'email = \''.$user->getEmail().'\'' );
 			$this->_db->execute($query);
@@ -222,7 +321,7 @@ class Login
 	private function create()
 	{
 		$req1 = SqlQuery::getTemp( SqlQuery::$TYPE_CREATE );
-		$create1 = 'TABLE IF NOT EXISTS `'.self::$_TABLE_NAME_USERS.'` ( '
+		$create1 = 'TABLE IF NOT EXISTS `'.LoginTableName::$TABLE_NAME_USERS.'` ( '
 			. 'email TEXT UNIQUE, '
 			. 'pass TEXT, '
 			. 'role INT DEFAULT 0, '
@@ -232,17 +331,25 @@ class Login
 		$this->_db->execute( $req1 );
 
 		$req2 = SqlQuery::getTemp( SqlQuery::$TYPE_CREATE );
-		$create2 = 'TABLE IF NOT EXISTS `'.self::$_TABLE_NAME_LOGS.'` ( '
+		$create2 = 'TABLE IF NOT EXISTS `'.LoginTableName::$TABLE_NAME_LOGS.'` ( '
 			. 'user_email TEXT, '
 			. 'time INT, '
 			. 'ip TEXT );';
 		$req2->setCreate( $create2 );
 		$this->_db->execute( $req2 );
+		
+		$req3 = SqlQuery::getTemp( SqlQuery::$TYPE_CREATE );
+		$create3 = 'TABLE IF NOT EXISTS `'.LoginTableName::$TABLE_NAME_DATAS.'` ( '
+			. 'user_email TEXT, '
+			. 'key INT, '
+			. 'value TEXT );';
+		$req3->setCreate( $create3 );
+		$this->_db->execute( $req3 );
 	}
 	
 	private function isDBInitialized()
 	{
-		return $this->_db->exist( self::$_TABLE_NAME_USERS );
+		return $this->_db->exist( LoginTableName::$TABLE_NAME_USERS );
 	}
 	
 	private function __construct( $dbDsn )

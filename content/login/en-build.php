@@ -84,13 +84,17 @@ function connectUser( \Flea\Login $login )
 	
 function getUserList( \Flea\Login $login )
 {
-	$list = $login->getUserList();
+	$list = $login->getUserList('group', 'CD');
 	$output = '';
 	if ( is_array($list) )
 	{
-		foreach ($list as $user)
+		foreach ($list as $userMail => $userDatas)
 		{
-			$output .= $user['email'].' role:'.$user['role'].'<br>';
+			$output .= $userMail.'<br>-role: '.$userDatas['role'].'<br>';
+			foreach ($userDatas['datas'] as $dataKey => $dataValue )
+			{
+				$output .= '-'.$dataKey.': '.$dataValue.'<br>';
+			}
 		}
 	}
 	return $output;
