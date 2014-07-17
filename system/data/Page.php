@@ -144,7 +144,8 @@ class Page
 				$table_list = $table_page.'_array';
 
 				$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
-				$where = 'page_id = \''.$this->getId().'\' AND page_prop = \'_tags\'';
+				//$where = 'page_id = \''.$this->getId().'\' AND page_prop = \'_tags\'';
+				$where = array( 'page_id'=>$this->getId(), 'page_prop'=>'_tags' );
 				$query->initSelect( 'value', '`'.$table_list.'`', $where );
 				
 				foreach ( DataBase::getInstance( _DB_DSN_CONTENT )->fetchAll($query) as $row )
@@ -179,7 +180,8 @@ class Page
 				$table_list = $table_page.'_array';
 
 				$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
-				$where = 'page_id = \''.$this->getId().'\' AND page_prop = \'_contents\'';
+				//$where = 'page_id = \''.$this->getId().'\' AND page_prop = \'_contents\'';
+				$where = array( 'page_id'=>$this->getId(), 'page_prop'=>'_contents' );
 				$query->initSelect( 'key, value', '`'.$table_list.'`', $where );
 				foreach ( DataBase::getInstance( _DB_DSN_CONTENT )->fetchAll($query) as $row )
 				{
@@ -301,7 +303,8 @@ class Page
 				$table_list = $table_page.'_array';
 
 				$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
-				$where = 'page_id = \''.$this->getId().'\' AND page_prop = \'_additionalUrls\'';
+				//$where = 'page_id = \''.$this->getId().'\' AND page_prop = \'_additionalUrls\'';
+				$where = array( 'page_id'=>$this->getId(), 'page_prop'=>'_additionalUrls' );
 				$query->initSelect( 'value', '`'.$table_list.'`', $where );
 				foreach ( DataBase::getInstance( _DB_DSN_CONTENT )->fetchAll($query) as $row )
 				{

@@ -79,7 +79,8 @@ class User
 			if ( DataBase::getInstance( _DB_DSN_CONTENT )->exist(LoginTableName::$TABLE_NAME_DATAS) )
 			{
 				$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
-				$where = 'user_email = \''.$this->getEmail().'\'';
+				//$where = 'user_email = \''.$this->getEmail().'\'';
+				$where = array( 'user_email'=>$this->getEmail() );
 				$query->initSelect('key, value', '`'.LoginTableName::$TABLE_NAME_DATAS.'`', $where);
 				foreach ( $this->_db->fetchAll($query) as $row )
 				{
@@ -153,12 +154,13 @@ class Login
 		
 		if ( $this->_user == null )
 		{
-			$keys = array( 'token' );
+			/*$keys = array( 'token' );
 			$signs = array( '=' );
-			$values = array( $_SESSION['login_token'] );
+			$values = array( $_SESSION['login_token'] );*/
 
 			$query = SqlQuery::getTemp();
-			$query->initSelectValues('*', LoginTableName::$TABLE_NAME_USERS, $keys, $signs, $values );
+			$where = array( 'token'=>$_SESSION['login_token'] );
+			$query->initSelect('*', LoginTableName::$TABLE_NAME_USERS, $where, $signs );
 			$rows = $this->_db->fetchAll($query);
 			if ( count( $rows ) < 1 )
 			{
@@ -191,7 +193,7 @@ class Login
 		$tnd = LoginTableName::$TABLE_NAME_DATAS;
 		
 		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
-		$query->initSelectValues( 'email, role', $tnu );
+		$query->initSelect( 'email, role', $tnu );
 		if ( $dataKey !== null && $dataValue !== null )
 		{
 			$query->setFrom('`'.$tnu.'` '
@@ -209,7 +211,8 @@ class Login
 		}
 		
 		$query2 = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
-		$query2->initSelect( 'user_email, key, value', $tnd, $where);
+		$query2->initSelect( 'user_email, key, value', $tnd);
+		$query2->setWhere($where);
 		foreach ($this->_db->fetchAll($query2) as $value)
 		{
 			$email = $value['user_email'];
@@ -290,11 +293,9 @@ class Login
 		// <-- anti-brute-force
 		
 		$cryptedPass = $this->passEncrypt($realPass, $email);
-		$keys = array( 'email', 'pass' );
-		$signs = array( '=', '=' );
-		$values = array( $email, $cryptedPass );
+		$where3 = array( 'email'=>$email, 'pass'=>$cryptedPass );
 		$query3 = SqlQuery::getTemp();
-		$query3->initSelectValues('*', LoginTableName::$TABLE_NAME_USERS, $keys, $signs, $values );
+		$query3->initSelect('*', LoginTableName::$TABLE_NAME_USERS, $where3 );
 		$rows = $this->_db->fetchAll($query3);
 		if ( count( $rows ) < 1 ) return false;
 		

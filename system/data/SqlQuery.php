@@ -27,7 +27,8 @@
 namespace Flea;
 
 /**
- *
+ * Requests data helper
+ * 
  * @author Namide
  */
 class SqlQuery
@@ -40,7 +41,10 @@ class SqlQuery
 	
 	protected static $_TEMP = null;
 	/**
-	 * @return SqlQuery
+	 * Create a temporary request object.
+	 * Used to reduce memory (avoid to create other request objects)
+	 * 
+	 * @return self		SqlQuery object
 	 */
 	public static function getTemp( $type = 0 )
 	{
@@ -50,10 +54,25 @@ class SqlQuery
 	}
 	
 	protected $_type;
+	/**
+	 * Type of the request :
+	 * - self::$TYPE_CREATE
+	 * - self::$TYPE_SELECT
+	 * - self::$TYPE_UPDATE
+	 * - self::$TYPE_INSERT
+	 * - self::$TYPE_DELETE
+	 * 
+	 * @return int		Type of the request
+	 */
 	public function getType() { return $this->_type; }
 	public function setType( $type ) { $this->_type = $type; }
 	
 	protected $_binds;
+	/**
+	 * Used in PDO to securise datas injected in the data base
+	 * 
+	 * @return array	Binds like binds in PDO object
+	 */
 	public function getBinds() { return $this->_binds; }
 	public function setBinds( array $binds ) { $this->_binds = $this->_binds + $binds; }
 	public function addBind( $key, $value, $pdoParamType )
@@ -144,6 +163,11 @@ class SqlQuery
 		$this->clean( $type );
 	}
 	
+	/**
+	 * Clean the datas in your object
+	 * 
+	 * @param int		Type of the next SqlQuery
+	 */
 	public function clean( $type = 0 )
 	{
 		$this->_type = $type;
@@ -163,58 +187,25 @@ class SqlQuery
 		$this->_binds = array();
 	}
 	
-	public function initSelect( $select, $from, $where = '', $orderBy = '', $limit = '' )
+	/**
+	 * Initialize you SqlQuery with a self::$TYPE_SELECT request
+	 * 
+	 * @param string	$select			results column names
+	 * @param string	$from			tables on which door the order 
+	 * @param array		$whereList		filter in associative array
+	 * @param array		$whereSigns		signs of the $whereList ('=', '<', 'LIKE'...)
+	 * @param string	$orderBy		sorting of the result data
+	 * @param string	$limit			count of results
+	 */
+	public function initSelect( $select, $from, array $whereList = null, array $whereSigns = null, $orderBy = '', $limit = '' )
 	{
 		$this->_type = self::$TYPE_SELECT;
 		$this->_select = $select;
 		$this->_from = $from;
-		$this->_where = $where;
+		if ( $whereList !== null )
+			$this->_where = $this->getStrFromBinding($whereList, ' AND ', $whereSigns );
 		$this->_orderBy = $orderBy;
 		$this->_limit = $limit;
-	}
-	
-	public function initSelectValues( $select, $from, array $keys = array(), array $signs = array(), array $values = array(), $orderBy = '', $limit = '' )
-	{
-		$this->_type = self::$TYPE_SELECT;
-		$this->_select = $select;
-		$this->_from = $from;
-		$this->_orderBy = $orderBy;
-		$this->_limit = $limit;
-		
-		$this->_where = '';
-		$first = true;
-		$length = count($keys);
-		for( $i = 0; $i < $length; $i++ )
-		{
-			$key = $keys[$i];
-			$sign = $signs[$i];
-			$value = $values[$i];
-			
-			if ( gettype($value) == 'boolean' )
-			{
-				$this->_where .= ( ($first)?' ':' AND ' ).$key.' '.$sign.' :'.$key;
-				$this->_binds[] = array( ':'.$key, (($value)?'1':'0'), \PDO::PARAM_BOOL );
-				$first = false;
-			}
-			elseif ( gettype($value) == 'integer' )
-			{
-				$this->_where .= ( ($first)?' ':' AND ' ).$key.' '.$sign.' :'.$key;
-				$this->_binds[] = array( ':'.$key, $value, \PDO::PARAM_INT );
-				$first = false;
-			}
-			elseif ( gettype($value) == 'double' )
-			{
-				$this->_where .= ( ($first)?' ':' AND ' ).$key.' '.$sign.' :'.$key;
-				$this->_binds[] = array( ':'.$key, $value, \PDO::PARAM_STR );
-				$first = false;
-			}
-			elseif ( gettype($value) == 'string' )
-			{
-				$this->_where .= ( ($first)?' ':' AND ' ).$key.' '.$sign.' :'.$key;
-				$this->_binds[] = array( ':'.$key, $value, \PDO::PARAM_STR );
-				$first = false;
-			}
-		}
 	}
 	
 	public function initCount( $from, array $whereList = null, array $signList = null )
@@ -265,14 +256,6 @@ class SqlQuery
 			}
 		}
 		$this->_insert .= ')';
-	}
-	
-	public function initInsertSet( $insert, $set = '', array $binds = array() )
-	{
-		$this->_type = self::$TYPE_INSERT;
-		$this->_insert = $insert;
-		$this->_set = $set;
-		$this->_binds = $binds;
 	}
 	
 	public function initUpdateSet( $update, array $setList, array $whereList )

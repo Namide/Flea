@@ -103,7 +103,9 @@ class Cache
 	{
 		//$query = 'SELECT * FROM `'.$this->_tableName.'` WHERE url LIKE \''.$url.'\'';
 		$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
-		$query->initSelect('*', '`'.$this->_tableName.'`', 'url LIKE \''.$url.'\'');
+		$where = array('url'=>$url);
+		$sign = array('LIKE');
+		$query->initSelect('*', '`'.$this->_tableName.'`', $where, $sign );
 		$row = $this->_db->fetchAll($query);
 		if ( $row > 0 ) 
 		{
