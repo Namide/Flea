@@ -118,23 +118,25 @@ class Login
 	{
 		if( isset( $_SESSION['login_token'] ) )
 		{
-			throw new \Exception('todo optimise binds DataBase and add user in DB test');
-			/*if ( $this->_user == null )
+			//throw new \Exception('todo optimise binds DataBase and add user in DB test');
+			if ( $this->_user === null )
 			{
-				$keys = array( 'token' );
+				/*$keys = array( 'token' );
 				$signs = array( '=' );
 				$values = array( $_SESSION['login_token'] );
 
 				$query = SqlQuery::getTemp();
-				$query->initSelectValues('*', LoginTableName::$TABLE_NAME_USERS, $keys, $signs, $values );
+				$query->initSelectValues('*', LoginTableName::$TABLE_NAME_USERS, $keys, $signs, $values );*/
+				
+				$where = array( 'token'=>$_SESSION['login_token'] );
+				$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
+				$query->initSelect('*', LoginTableName::$TABLE_NAME_USERS, $where );
 				$rows = $this->_db->fetchAll($query);
 				if ( count( $rows ) < 1 )
 				{
 					return false;
 				}
-				$this->_db->count($query);
-				
-			}*/
+			}
 			return true;
 		}
 		return false;
@@ -160,7 +162,7 @@ class Login
 
 			$query = SqlQuery::getTemp();
 			$where = array( 'token'=>$_SESSION['login_token'] );
-			$query->initSelect('*', LoginTableName::$TABLE_NAME_USERS, $where, $signs );
+			$query->initSelect('*', LoginTableName::$TABLE_NAME_USERS, $where );
 			$rows = $this->_db->fetchAll($query);
 			if ( count( $rows ) < 1 )
 			{

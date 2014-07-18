@@ -84,7 +84,7 @@ function connectUser( \Flea\Login $login )
 	
 function getUserList( \Flea\Login $login )
 {
-	$list = $login->getUserList('group', 'CD');
+	$list = $login->getUserList('group', 'admin');
 	$output = '';
 	if ( is_array($list) )
 	{

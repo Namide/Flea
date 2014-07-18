@@ -49,9 +49,11 @@ class DataBaseCRUD
 		return $this->_db->execute( $request );
 	}
 
-	public function read()
+	public function read( array $whereList, array $whereSign = null, $orderBy = '', $limit = ''  )
 	{
-		
+		$request = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
+		$request->initSelect('*', $this->_table, $whereList, $signList, $orderBy, $limit);
+		return $this->_db->fetchAll( $request );
 	}
 	
 	public function insert( $values )
@@ -61,16 +63,18 @@ class DataBaseCRUD
 		return $this->_db->execute( $request );
 	}
 	
-	public function update()
+	public function update( array $setList, array $whereList = null )
 	{
-		//$request = SqlQuery::getTemp( SqlQuery::$TYPE_UPDATE );
-		//$request->initUpdateSet($update, $set, $binds, $where);
-		
+		$request = SqlQuery::getTemp( SqlQuery::$TYPE_UPDATE );
+		$request->initUpdateSet( $this->_table, $setList, $whereList);
+		return $this->_db->execute( $request );
 	}
 	
-	public function delete()
+	public function delete( array $whereList )
 	{
-		
+		$request = SqlQuery::getTemp( SqlQuery::$TYPE_DELETE );
+		$request->initUpdateSet( $this->_table, $whereList );
+		return $this->_db->execute( $request );
 	}
 	
 	public function exist()

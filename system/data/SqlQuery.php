@@ -258,12 +258,13 @@ class SqlQuery
 		$this->_insert .= ')';
 	}
 	
-	public function initUpdateSet( $update, array $setList, array $whereList )
+	public function initUpdateSet( $update, array $setList, array $whereList = null )
 	{
 		$this->_type = self::$TYPE_UPDATE;
 		$this->_update = $update;
 		$this->_set = $this->getStrFromBinding( $setList, ', ' );
-		$this->_where = $this->getStrFromBinding( $whereList, ' AND ' );
+		if ( $where !== null )
+			$this->_where = $this->getStrFromBinding( $whereList, ' AND ' );
 	}
 
 	public function initCreate( $createTable, array $getObjectVars )
@@ -296,6 +297,15 @@ class SqlQuery
 			}
 		}
 		$this->_create .= ' );';
+	}
+	
+	public function initDelete( $from, array $whereList )
+	{
+		$this->_type = self::$TYPE_DELETE;
+		$this->_delete = 'FROM '.$from;
+		
+		if ( $whereList !== null )
+			$this->_where = $this->getStrFromBinding( $whereList, ' AND ' );
 	}
 	
 	private function getStrFromBinding( array $valueList /* associative array */, $strGlue = ', ', array $signList = null )
