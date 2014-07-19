@@ -105,7 +105,8 @@ class LangList
 	 */
     public function getLangByNavigator()
     {
-		$acceptedLanguages = filter_input(INPUT_SERVER, 'HTTP_ACCEPT_LANGUAGE', FILTER_SANITIZE_STRING);
+		//$acceptedLanguages = filter_input(INPUT_SERVER, 'HTTP_ACCEPT_LANGUAGE', FILTER_SANITIZE_STRING);
+		$acceptedLanguages = filter_var($_SERVER['HTTP_ACCEPT_LANGUAGE'], FILTER_SANITIZE_STRING);
         $langList = explode( ',', $acceptedLanguages );
         $langLower = strtolower( substr( chop( $langList[0] ), 0, 2 ) );
 		

@@ -421,8 +421,32 @@ class PageList
 			Debug::getInstance()->addError('The URL "'.$relURL.'" don\'t exist');
 		}
 		
-		return $this->getDefaultPage($lang);
+		return $this->getError404Page( $lang );//$this->getDefaultPage($lang);
     }
+	
+	public function getError404Page( $lang )
+	{
+		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
+		$query->setLimit(1);
+		$query->setWhere('_type = \''.Page::$TYPE_ERROR404.'\' AND _lang = \''.$lang.'\'');
+		$pages = $this->getAll( $query );
+		if ( count($pages) > 0 ) return current($pages);
+
+		$query->setWhere('_type = \''.Page::$TYPE_ERROR404.'\'');
+		$pages = $this->getAll( $query );
+		if ( count($pages) > 0 ) return current($pages);
+
+		// CREATE PAGE ERROR 404
+			$page = new Page();
+			$page->setHtmlHeader( '<title>Error 404 - Not found</title>
+					<meta charset="UTF-8" />
+					<meta name="robots" content="noindex,nofollow" />
+					<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />' );
+			$page->setHtmlBody( '<h1>Error 404 - Not found</h1>' );
+			$this->makeError404Page($page);
+			return $page;
+        //
+	}
 	
 	/**
 	 * Default page for the lang
@@ -444,28 +468,7 @@ class PageList
 		$pages = $this->getAll( $query );
 		if ( count($pages) > 0 ) return current($pages);
 		
-		/* IF THE DEFAULT PAGE DON'T EXIST */
-		$query->setWhere('_lang = \''.$lang.'\'');
-		$pages = $this->getAll( $query );
-		if ( count($pages) > 0 ) return current($pages);
-		
-		$query->setWhere('_type = \''.Page::$TYPE_ERROR404.'\' AND _lang = \''.$lang.'\'');
-		$pages = $this->getAll( $query );
-		if ( count($pages) > 0 ) return current($pages);
-
-		$query->setWhere('_type = \''.Page::$TYPE_ERROR404.'\'');
-		$pages = $this->getAll( $query );
-		if ( count($pages) > 0 ) return current($pages);
-
-		// CREATE PAGE ERROR 404
-			$page = new Page();
-			$page->setHtmlHeader( '<title>Error 404 - Not found</title>
-					<meta name="robots" content="noindex,nofollow" />
-					<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />' );
-			$page->setHtmlBody( '<h1>Error 404 - Not found</h1>' );
-			$this->makeError404Page($page);
-			return $page;
-        //
+		return $this->getError404Page( $lang );
     }
     
 	/**

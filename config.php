@@ -20,10 +20,6 @@ define( '_CONTENT_DIRECTORY', 'content/' );
 // Directory name of the template's files
 define( '_TEMPLATE_DIRECTORY', 'template/' );
 
-// Directory name of the cache's files
-// It is better to be outside of the www directory
-define( '_CACHE_DIRECTORY', 'cache/' );
-
 // Directory name of the temporaries files generated
 define( '_TEMP_DIRECTORY', 'temp-files/' );
 
