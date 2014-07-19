@@ -47,7 +47,29 @@ class DataBase
 	{
 		try
 		{
-			$res = $this->_pdo->query( $query->getRequest() );
+			$stmt = $this->_pdo->prepare( $query->getRequest() );
+			
+			if ( $stmt )
+			{
+				$binds = $query->getBinds();
+				if( $binds !== null )
+				{
+					foreach ($binds as $bind)
+					{
+						$stmt->bindValue($bind[0], $bind[1], $bind[2]);
+					}
+				}
+
+				$stmt->execute();
+				$count = $stmt->fetchColumn();
+				$stmt = null;
+				return $count;
+			}
+			
+			$stmt = null;
+			return 0;
+			
+			/*$res = $this->_pdo->query( $query->getRequest() );
 			if ( $res )
 			{
 				$count = $res->fetchColumn();
@@ -56,7 +78,7 @@ class DataBase
 			}
 			
 			$res = null;
-			return 0;
+			return 0;*/
 		}
 		catch (PDOException $e)
 		{

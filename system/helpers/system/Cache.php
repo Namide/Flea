@@ -45,7 +45,7 @@ class Cache
 	 * 
 	 * @param string $rootDir	Root directory
 	 */
-	function __construct( $dbDsnCache/*$rootDir = null*/, $tableName = 'pages-final' )
+	function __construct( $dbDsnCache/*$rootDir = null*/, $tableName = 'pages_cached' )
 	{
 		$this->_db = DataBase::getInstance($dbDsnCache);
 		$this->_tableName = $tableName;
@@ -68,8 +68,8 @@ class Cache
 	 */
 	public function isWrited( $strUrl )
 	{
-		$query = SqlQuery::getTemp();
-		$query->initCount($this->_tableName, array('url'=>$strUrl), array('LIKE') );
+		$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
+		$query->initCount( $this->_tableName, array('url'=>$strUrl), array('LIKE') );
 		return $this->_db->count( $query ) > 0;
 	}
 	

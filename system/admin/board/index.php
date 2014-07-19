@@ -68,7 +68,8 @@ if( _DEBUG )
 					$pagesCachedNum = $cache->getNumFilesSaved();
 					
 					echo '<strong class="' ,
-							( ( $pagesCachedNum / _MAX_PAGE_CACHE > 0.95 )
+							( $pagesCachedNum >= _MAX_PAGE_CACHE ||
+							( $pagesCachedNum / _MAX_PAGE_CACHE > 0.95 )
 							? 'error' : 'passed' ).'">'
 							, $pagesCachedNum .' / '._MAX_PAGE_CACHE
 							, '</strong>';
@@ -123,9 +124,10 @@ if( _DEBUG )
 		
 		<?php
 		
-		$request = null;
+		$request = \Flea\SqlQuery::getTemp( \Flea\SqlQuery::$TYPE_SELECT );
+		$request->setWhere('_visible > -1 OR _visible < 0');
 		\Flea\General::getInstance()->initializesPages();
-		$pages = \Flea\PageList::getInstance()->getAll( $request, \Flea\PageList::$LOAD_INIT | \Flea\PageList::$LOAD_LIST );
+		$pages = \Flea\PageList::getInstance()->getAll( $request );
 		$i = 0;
 		$seoList = '[';
 		
@@ -133,6 +135,7 @@ if( _DEBUG )
 		{
 			if( $i > 0 ) { $seoList .= ', '; }
 			
+			\Flea\General::getInstance()->setCurrentPage($page);
 			
 			$absURL = \Flea\BuildUtil::getInstance()->getAbsUrlByNameLang($page->getName(), $page->getLang() );
 			

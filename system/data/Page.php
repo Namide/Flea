@@ -453,7 +453,7 @@ class Page
 		{
 			header( $this->_phpHeader );
 		}
-		echo '<!doctype html><html><head>';
+		echo '<!doctype html><html><head><meta charset="UTF-8" />';
 		echo BuildUtil::getInstance()->replaceFleaVars( $this->_htmlHeader, $this );
 		if ( $this->_htmlTitle != '' )
 		{
