@@ -39,6 +39,12 @@ class Page
 	public static $_EMPTY = null;
 	
 	private $_id;
+	/**
+	 * ID of the page.
+	 * The ID is unique, it's composed by the name and the language of the page.
+	 * 
+	 * @return string		ID of the page
+	 */
 	public function getId() { return $this->_id; }
 	private function updateId()
 	{
@@ -47,23 +53,23 @@ class Page
 	
 	private $_name;
 	/**
-	 * Name of the Element.
-	 * Like an ID, but an element has the same ID for differents languages
+	 * Name of the Page.
+	 * Like an ID, but an page has the same ID for differents languages
 	 * 
-	 * @param string $name	Name of the Element
+	 * @param string $name	Name of the Page
 	 */
     public function setName( $name ) { $this->_name = $name; $this->updateId(); }
 	/**
-	 * Name of the Element
+	 * Name of the Page
 	 * 
-	 * @return string	Name of the Element
+	 * @return string	Name of the Page
 	 */
     public function getName() { return $this->_name; }
 	
 	private $_lang;
 	/**
-	 * Language of the Element.
-	 * The list of language is in the LangList.php
+	 * Language of the Page (fr, en, ko...)
+	 * The list of languages is in the LangList.php
 	 * 
 	 * @param string $lang	Language
 	 */
@@ -77,8 +83,8 @@ class Page
 		$this->updateId();
 	}
 	/**
-	 * Language of the Element.
-	 * The list of language is in the LangList.php
+	 * Language of the Page (fr, en, ko...)
+	 * The list of languages is in the LangList.php
 	 * 
 	 * @return string	Language
 	 */
@@ -86,7 +92,7 @@ class Page
 	
 	private $_date;
 	/**
-	 * Date of the Element, no set format
+	 * Date of the Page, no set format
 	 * 
 	 * @param string $date	Date
 	 */
@@ -95,7 +101,7 @@ class Page
 		$this->_date = $date;
 	}
 	/**
-	 * Date of the Element
+	 * Date of the Page
 	 * 
 	 * @return string	Date
 	 */
@@ -103,9 +109,13 @@ class Page
 	
 	private $_type;
 	/**
-	 * Type of the element
+	 * Type of the page.
+	 * The page can be :
+	 * - Page::$TYPE_DEFAULT, 
+	 * - Page::$TYPE_ERROR404, 
+	 * - '', 
 	 * 
-	 * @param string $type	Type of the element
+	 * @param string $type	Type of the page
 	 */
     public function setType( $type )
 	{
@@ -119,18 +129,18 @@ class Page
 		$this->_type = $type;
 	}
 	/**
-	 * Type of the element
+	 * Type of the page
 	 * 
-	 * @return string		Type of the element
+	 * @return string		Type of the page
 	 */
     public function getType() { return $this->_type; }
 	
 	private $_tags;
 	/**
 	 * Tags of the page.
-	 * In example you can use tags for search a list of elements.
+	 * You can use tags for search a list of pages.
 	 * 
-	 * @return DataList 
+	 * @return DataList		List of tags
 	 */
 	public function getTags()
 	{
@@ -144,11 +154,11 @@ class Page
 				$table_list = $table_page.'_array';
 
 				$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
-				//$where = 'page_id = \''.$this->getId().'\' AND page_prop = \'_tags\'';
 				$where = array( 'page_id'=>$this->getId(), 'page_prop'=>'_tags' );
 				$query->initSelect( 'value', '`'.$table_list.'`', $where );
 				
-				foreach ( DataBase::getInstance( _DB_DSN_CONTENT )->fetchAll($query) as $row )
+				$rows = DataBase::getInstance( _DB_DSN_CONTENT )->fetchAll($query);
+				foreach ( $rows as $row )
 				{
 					$this->_tags->add( $row['value'] );
 				}
@@ -158,9 +168,6 @@ class Page
 		return $this->_tags;
 	}
 	
-	/**
-	 * @var DataList 
-	 */
 	private $_contents;
 	/**
 	 * A content is a pair with key and value.
@@ -180,10 +187,10 @@ class Page
 				$table_list = $table_page.'_array';
 
 				$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
-				//$where = 'page_id = \''.$this->getId().'\' AND page_prop = \'_contents\'';
 				$where = array( 'page_id'=>$this->getId(), 'page_prop'=>'_contents' );
 				$query->initSelect( 'key, value', '`'.$table_list.'`', $where );
-				foreach ( DataBase::getInstance( _DB_DSN_CONTENT )->fetchAll($query) as $row )
+				$rows = DataBase::getInstance( _DB_DSN_CONTENT )->fetchAll($query);
+				foreach ( $rows as $row )
 				{
 					$content = BuildUtil::getInstance ()->replaceFleaVars ( $row['value'], $this );
 					$this->_contents->add($content, $row['key']);
@@ -303,10 +310,10 @@ class Page
 				$table_list = $table_page.'_array';
 
 				$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
-				//$where = 'page_id = \''.$this->getId().'\' AND page_prop = \'_additionalUrls\'';
 				$where = array( 'page_id'=>$this->getId(), 'page_prop'=>'_additionalUrls' );
 				$query->initSelect( 'value', '`'.$table_list.'`', $where );
-				foreach ( DataBase::getInstance( _DB_DSN_CONTENT )->fetchAll($query) as $row )
+				$rows = DataBase::getInstance( _DB_DSN_CONTENT )->fetchAll($query);
+				foreach ( $rows as $row )
 				{
 					$this->_additionalUrls->add( $row['value'] );
 				}
@@ -447,6 +454,9 @@ class Page
 		}
 	}
 	
+	/**
+	 * Echo the page with Flea variables {{...}} transformed but without template
+	 */
 	public function renderWithoutTemplate()
 	{
 		if ( $this->_phpHeader != '' )
@@ -480,8 +490,8 @@ class Page
 		}
 		$this->setLang( $lang );
 		$this->setName( $name );
-		$this->_contents = null;//new DataList(true);
-		$this->_tags = null;//new DataList(false);
+		$this->_contents = null;
+		$this->_tags = null;
 		
 		$this->_type = '';
 		$this->_date = '';
@@ -490,7 +500,7 @@ class Page
         $this->_getEnabled = false;
 		$this->_getExplicit = true;
 		$this->_cachable = true;
-		$this->_additionalUrls = null;//new DataList(false);
+		$this->_additionalUrls = null;
 		
 		$this->_url = '';
 		
@@ -506,21 +516,30 @@ class Page
     }
 	
 	/**
+	 * Get an empty page to use temporarily.
 	 * 
-	 * @return Page
+	 * @return Page		Empty page
 	 */
 	public static function getEmptyPage()
 	{
-		if ( Page::$_EMPTY === null ) Page::$_EMPTY = new Page ();
+		if ( Page::$_EMPTY === null ) Page::$_EMPTY = new Page();
 		return Page::$_EMPTY;
 	}
 	
+	/**
+	 * Get an associative array with all the unstatic properties of the page
+	 * (public, private and protected).
+	 * The DataList properties are converted in an array.
+	 * 
+	 * @return array		Associative array with all the properties		
+	 */
 	public function getObjectVars()
 	{
 		$obj = get_object_vars($this);
 		foreach ($obj as $key => $value)
 		{
-			if( gettype($value) == 'object' && get_class($value) == get_class( DataList::getEmptyDataList() ) )
+			if( gettype($value) == 'object' &&
+				get_class($value) == get_class( DataList::getEmptyDataList() ) )
 			{
 				$obj[$key] = $value->getArray();
 			}
@@ -529,6 +548,11 @@ class Page
 		return $obj;
 	}
 	
+	/**
+	 * Set all this Page with an object_vars
+	 * 
+	 * @param array $obj	Object_vars (associative array)
+	 */
 	public function setByObjectVars( $obj )
 	{
 		foreach ($obj as $key => $value)
@@ -544,43 +568,4 @@ class Page
 			}
 		}
 	}
-	
-	/*public function addToList( $privateListName, $value, $key = null )
-	{
-		if (	_DEBUG &&
-				get_class($this->$privateListName) != get_class( DataList::getEmptyDataList() ) )
-		{
-				Debug::getInstance()->addError('The propertie "'.$privateListName.'" don\'t exist or isn\'t a DataList object');
-		}
-		$this->$privateListName->add($value, $key);
-	}*/
-	
-	/**
-	 * Get a script for create the same object
-	 * 
-	 * @return string		The save text
-	 */
-	/*public function getSave()
-	{
-		return $this->constructSave( get_object_vars($this) );
-	}*/
-
-	/**
-	 * Update the object with a saved object.
-	 * A saved object can by generate by the method getSave().
-	 * 
-	 * @param array $saveDatas	Datas generated by a save method of this class
-	 * @return self				Page with the news values
-	 */
-	/*public function update( array $saveDatas )
-	{
-		if ( count( $saveDatas ) > 0 )
-		{
-			foreach ( $saveDatas as $varLabel => $varValue )
-			{
-				$this->$varLabel = $varValue;
-			}
-		}
-		return $this;
-	}*/
 }

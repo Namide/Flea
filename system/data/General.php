@@ -92,7 +92,8 @@ class General
 	{
 		if ( _DEBUG && !General::getInstance()->isPagesInitialized() )
 		{
-			Debug::getInstance()->addError( 'You can\'t access to the current page name if the pages isn\'tinitialised' );
+			Debug::getInstance()->addError( 'You can\'t access to the current '
+				. 'page name if the pages isn\'tinitialised' );
 		}
 		return $this->_currentPageName;
 	}
@@ -107,7 +108,8 @@ class General
 	{
 		if ( _DEBUG && !General::getInstance()->isPagesInitialized() )
 		{
-			Debug::getInstance()->addError( 'You can\'t access to the current page if the pages isn\'tinitialised' );
+			Debug::getInstance()->addError( 'You can\'t access to the current '
+				. 'page if the pages isn\'tinitialised' );
 		}
 		return $this->_currentPage;
 	}
@@ -122,7 +124,8 @@ class General
 	{
 		if ( _DEBUG && !General::getInstance()->isPagesInitialized() )
 		{
-			Debug::getInstance()->addError( 'You can\'t access to the current language if the pages isn\'tinitialised' );
+			Debug::getInstance()->addError( 'You can\'t access to the current '
+				. 'language if the pages isn\'tinitialised' );
 		}
 		return $this->_currentLang;
 	}
@@ -137,7 +140,8 @@ class General
 	{
 		if ( _DEBUG && !General::getInstance()->isPagesInitialized() )
 		{
-			Debug::getInstance()->addError( 'You can\'t access to the current global variable GET if the pages isn\'tinitialised' );
+			Debug::getInstance()->addError( 'You can\'t access to the current '
+				. 'global variable GET if the pages isn\'tinitialised' );
 		}
 		return $this->_currentGetUrl;
 	}
@@ -172,7 +176,8 @@ class General
 	{
 		if ( _DEBUG && !General::getInstance()->isPagesInitialized() )
 		{
-			Debug::getInstance()->addError( 'You can\'t access to the current language if the pages isn\'tinitialised' );
+			Debug::getInstance()->addError( 'You can\'t access to the current '
+				. 'language if the pages isn\'tinitialised' );
 		}
 		return $this->_currentPageUrl;
 	}
@@ -197,7 +202,9 @@ class General
 	 * @param array $getUrl		List of the global variables GET
 	 * @param array $postUrl	List of the global variables POST
 	 */
-	public function setCurrentUrl( $pageUrl, array $getUrl = null, array $postUrl = null )
+	public function setCurrentUrl( $pageUrl,
+									array $getUrl = null,
+									array $postUrl = null )
 	{
 		if ( $getUrl === null )
 		{
@@ -212,8 +219,14 @@ class General
 		$this->_currentGetUrl = $getUrl;
 	}
 	
-	
+	/**
+	 * You can't construct a singleton
+	 */
 	protected function __construct() { }
+	
+	/**
+	 * You can't clone a singleton
+	 */
 	protected function __clone() { }
 
 	/**

@@ -27,7 +27,7 @@
 namespace Flea;
 
 /**
- * Description of LangList
+ * List of languages used in the website.
  *
  * @author Namide
  */

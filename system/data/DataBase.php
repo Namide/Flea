@@ -43,6 +43,12 @@ class DataBase
 		return stripslashes(get_class($obj));
 	}
 	
+	/**
+	 * Count the lines in a table
+	 * 
+	 * @param SqlQuery $query	Conditions (where, table...) of the request
+	 * @return int				Number of lines
+	 */
 	public function count( SqlQuery $query )
 	{
 		try
@@ -68,17 +74,6 @@ class DataBase
 			
 			$stmt = null;
 			return 0;
-			
-			/*$res = $this->_pdo->query( $query->getRequest() );
-			if ( $res )
-			{
-				$count = $res->fetchColumn();
-				$res = null;
-				return $count;
-			}
-			
-			$res = null;
-			return 0;*/
 		}
 		catch (PDOException $e)
 		{
@@ -86,6 +81,12 @@ class DataBase
 		}
 	}
 	
+	/**
+	 * Try if the table exist
+	 * 
+	 * @param type $tableName	Name of the table
+	 * @return boolean			It exist?
+	 */
 	public function exist( $tableName )
     {
 		
@@ -106,6 +107,12 @@ class DataBase
 		return ($result !== false);
 	}
 	
+	/**
+	 * Execute a request on the database
+	 * 
+	 * @param SqlQuery $query	Conditions (where, table...) of the request
+	 * @return boolean			method is well executed
+	 */
 	public function execute( SqlQuery $query )
 	{
 		try
@@ -135,7 +142,12 @@ class DataBase
 		return false;
 	}
 	
-	
+	/**
+	 * Get alle the entries of the database
+	 * 
+	 * @param SqlQuery $query	Conditions (where, table...) of the request
+	 * @return array			All the entries
+	 */
 	public function fetchAll( SqlQuery $query )
 	{
 		try
@@ -168,14 +180,19 @@ class DataBase
 				Debug::getInstance()->addError( 'fetch_all() database error: '.$e->getMessage() );
 			}
 		}
-		return false;
+		return array();
 	}
 	
-	private function __construct( $dbDsnCache ) 
+	/**
+	 * Use the static method getInstance() to construct this object
+	 * 
+	 * @param string $dsn		Database source name
+	 */
+	private function __construct( $dsn ) 
     {
 		try
 		{
-			$this->_pdo = new \PDO($dbDsnCache, _DB_USER, _DB_PASS, _DB_OPTIONS );
+			$this->_pdo = new \PDO( $dsn, _DB_USER, _DB_PASS, _DB_OPTIONS );
 			
 			if ( _DEBUG )
 			{
@@ -190,25 +207,31 @@ class DataBase
 		{
 			if ( _DEBUG )
 			{
-				Debug::getInstance()->addError( 'Initialize database error: '.$e->getMessage() );
+				Debug::getInstance()->addError( 'Initialize database error: '
+					.$e->getMessage() );
 			}
 		}
     }
 	
 	/**
+	 * Get the database.
+	 * This multiton avoids to open/close untimely the database.
 	 * 
-	 * @param string $dbDsnCache
-	 * @return DataBase
+	 * @param string $dsn		Database source name
+	 * @return DataBase			The DataBase
 	 */
-	public static function getInstance( $dbDsnCache ) 
+	public static function getInstance( $dsn ) 
     {
-		if(!isset(self::$_INSTANCE[$dbDsnCache]))
+		if(!isset(self::$_INSTANCE[$dsn]))
         {
-            self::$_INSTANCE[$dbDsnCache] = new DataBase($dbDsnCache);
+            self::$_INSTANCE[$dsn] = new DataBase($dsn);
         }
-        return self::$_INSTANCE[$dbDsnCache];
+        return self::$_INSTANCE[$dsn];
     }
 	
+	/**
+	 * Unclonable object
+	 */
 	final public function __clone()
     {
         if ( _DEBUG ) 
