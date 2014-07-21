@@ -50,9 +50,16 @@ class BuildUtil extends InitUtil
 		return PageList::getInstance()->getByName($pageName, $lang);
 	}
 
-	public function getAbsUrlByPage( Page $page, array $getUrl = null )
+	/**
+	 * Get the absolute URL for a page
+	 * 
+	 * @param Page $page			Page
+	 * @param array $getUrl			Additionnal GET of the URL
+	 * @return string				Absolute URL
+	 */
+	public function getAbsUrlByPage( Page $page, array $gets = null )
     {
-		$relUrl = UrlUtil::getInstance()->getRelUrlByIdLang($page, $getUrl);
+		$relUrl = UrlUtil::getInstance()->getRelUrlByIdLang($page, $gets);
 		
         return _ROOT_URL.$relUrl;
     }
@@ -60,8 +67,10 @@ class BuildUtil extends InitUtil
 	/**
 	 * Get the absoulte URL of a page by his page URL
 	 * 
-	 * @param string $url		Page URL
-	 * @return string			Absolute URL of the page
+	 * @param string $url				Page URL
+	 * @param array $gets				Additionnal GET of the URL
+	 * @param boolean $explicitGet		Are this GET datas explicit
+	 * @return string					Absolute URL of the page
 	 */
     public function getAbsUrlByPageUrl( $url, array $gets = null, $explicitGet = true )
     {
@@ -139,13 +148,16 @@ class BuildUtil extends InitUtil
 		return $pageList->getDefaultPage($lang);
 	}
 	
-	public function getContentOfPage(	$contentKey, Page &$page, $replaceFleaVars = false )
+	/**
+	 * Get one of the contents of a Page
+	 * 
+	 * @param type $contentKey			Key of the content
+	 * @param Page $page				Page to get the content
+	 * @param type $replaceFleaVars		Replace or not the FleaVars
+	 * @return string					The corresponding formated content
+	 */
+	public function getContentOfPage( $contentKey, Page &$page, $replaceFleaVars = false )
 	{
-		if ( $page->getContents()->length() < 1 )
-		{
-			PageList::getInstance()->addListToPage($page);
-		}
-		
 		if( !$page->getContents()->hasKey( $contentKey ) ) 
 		{
 			if( _DEBUG )
@@ -191,7 +203,6 @@ class BuildUtil extends InitUtil
 		$replacePage = str_replace('{{body}}', $page->getHtmlBody(), $replacePage);
 		$replacePage = str_replace('{{description}}', $page->getHtmlDescription(), $replacePage);
 		
-		
 		$replacePage = str_replace('{{rootPath}}', _ROOT_URL, $replacePage);
 		$replacePage = str_replace('{{templatePath}}', _ROOT_URL._TEMPLATE_DIRECTORY, $replacePage);
 		$replacePage = str_replace('{{contentPath}}', _ROOT_URL._CONTENT_DIRECTORY, $replacePage);
@@ -214,16 +225,10 @@ class BuildUtil extends InitUtil
 
 		}, $replacePage );
 			
-		if ( /*General::getInstance()->isPagesInitialized() &&*/ $page !== null )
+		if ( $page !== null )
 		{
 			$replacePage = preg_replace_callback( '/\{\{content:(.*?)\}\}/', function ($matches) use($page)
 			{
-				// update the lists if they are empty
-				if ( $page->getContents()->length() < 1 )
-				{
-					PageList::getInstance()->addListToPage($page);
-				}
-				
 				if( !$page->getContents()->hasKey($matches[1]) ) 
 				{
 					if( _DEBUG )

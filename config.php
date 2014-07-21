@@ -28,13 +28,13 @@ define( '_TEMP_DIRECTORY', 'temp-files/' );
  *		PARAMETERS
  */
 
-// URL rewriting activated => TRUE, deactivated => FALSE
+// URL rewriting activated => true, deactivated => false
 define( '_URL_REWRITING', false );
 
-// Debug mode activated => TRUE, deactivated => FALSE
+// Debug mode activated => true, deactivated => false
 define( '_DEBUG', true );
 
-// Cache activated => TRUE, deactivated => FALSE
+// Cache activated => true, deactivated => false
 define( '_CACHE', false );
 
 // Maximum number of files in the cache directory
@@ -48,6 +48,7 @@ define( '_MAX_PAGE_CACHE', 50 );
 
 define( '_DB_DSN_CACHE', 'sqlite:'._CONTENT_DIRECTORY.'cache.sqlite' );
 define( '_DB_DSN_CONTENT', 'sqlite:'._CONTENT_DIRECTORY.'content.sqlite' );
+define( '_DB_DSN_PAGE', 'sqlite:'._CONTENT_DIRECTORY.'page.sqlite' );
 define( '_DB_USER', null );
 define( '_DB_PASS', null );
 define( '_DB_OPTIONS', null );

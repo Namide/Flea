@@ -65,7 +65,7 @@ class PageListCreate
 			$pageVars = $page->getObjectVars();
 			
 			$request = SqlQuery::getTemp( SqlQuery::$TYPE_INSERT );
-			$request->initInsertValues( 'INTO `'.$tableName.'`', $pageVars);
+			$request->initInsertValues( $tableName, $pageVars);
 			$db->execute($request);
 			
 			foreach ($pageVars as $key => $value)
@@ -81,7 +81,7 @@ class PageListCreate
 						$obj['value'] = $val2;
 						
 						$request->clean( SqlQuery::$TYPE_INSERT );
-						$request->initInsertValues( 'INTO `'.$tableName.'_array`', $obj );
+						$request->initInsertValues( $tableName.'_array', $obj );
 						$db->execute($request);
 					}
 				}

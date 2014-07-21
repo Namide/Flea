@@ -92,7 +92,7 @@ class Cache
 		$obj['content'] = &$content;
 		
 		$query = SqlQuery::getTemp(SqlQuery::$TYPE_INSERT);
-		$query->initInsertValues('INTO `'.$this->_tableName.'`', $obj);
+		$query->initInsertValues( $this->_tableName, $obj );
 		$this->_db->execute( $query );
 	}
 	

@@ -56,10 +56,10 @@ class SqlQuery
 	protected $_type;
 	/**
 	 * Type of the request :
-	 * - self::$TYPE_CREATE
-	 * - self::$TYPE_SELECT
-	 * - self::$TYPE_UPDATE
-	 * - self::$TYPE_INSERT
+	 * - self::$TYPE_CREATE 
+	 * - self::$TYPE_SELECT 
+	 * - self::$TYPE_UPDATE 
+	 * - self::$TYPE_INSERT 
 	 * - self::$TYPE_DELETE
 	 * 
 	 * @return int		Type of the request
@@ -203,24 +203,41 @@ class SqlQuery
 		$this->_select = $select;
 		$this->_from = $from;
 		if ( $whereList !== null )
+		{
 			$this->_where = $this->getStrFromBinding($whereList, ' AND ', $whereSigns );
+		}
 		$this->_orderBy = $orderBy;
 		$this->_limit = $limit;
 	}
 	
+	/**
+	 * Initialize you SqlQuery with a self::$TYPE_SELECT request to count lines.
+	 * 
+	 * @param string	$from			tables on which door the order 
+	 * @param array		$whereList		filter in associative array
+	 * @param array		$signList		signs of the $whereList ('=', '<', 'LIKE'...)
+	 */
 	public function initCount( $from, array $whereList = null, array $signList = null )
 	{
 		$this->_type = self::$TYPE_SELECT;
 		$this->_select = 'COUNT(*)';
 		$this->_from = $from;
 		if ( $whereList !== null )
+		{
 			$this->_where = $this->getStrFromBinding( $whereList, ' AND ', $signList );
+		}
 	}
 	
-	public function initInsertValues( $insert, array $values = array() )
+	/**
+	 * Initialize you SqlQuery with a self::$TYPE_INSERT request.
+	 * 
+	 * @param string $tableName		Name of the table		
+	 * @param array $values			Associative array with datas (keys for rows names)
+	 */
+	public function initInsertValues( $tableName, array $values = array() )
 	{
 		$this->_type = self::$TYPE_INSERT;
-		$this->_insert = $insert.' (';
+		$this->_insert = 'INTO `'.$tableName.'` (';
 		
 		$this->_values = '';
 		$first = true;
@@ -258,19 +275,34 @@ class SqlQuery
 		$this->_insert .= ')';
 	}
 	
-	public function initUpdateSet( $update, array $setList, array $whereList = null )
+	/**
+	 * Initialize you SqlQuery with a self::$TYPE_UPDATE request.
+	 * 
+	 * @param string $tableName		Name of the table		
+	 * @param array $setList		Associative array with datas (keys for rows names)
+	 * @param array $whereList		filter in associative array
+	 */
+	public function initUpdateSet( $tableName, array $setList, array $whereList = null )
 	{
 		$this->_type = self::$TYPE_UPDATE;
-		$this->_update = $update;
+		$this->_update = '`'.$tableName.'`';
 		$this->_set = $this->getStrFromBinding( $setList, ', ' );
-		if ( $where !== null )
+		if ( $whereList !== null )
+		{
 			$this->_where = $this->getStrFromBinding( $whereList, ' AND ' );
+		}
 	}
 
-	public function initCreate( $createTable, array $getObjectVars )
+	/**
+	 * Initialize you SqlQuery with a self::$TYPE_UPDATE request.
+	 * 
+	 * @param string $tableName			Name of the table		
+	 * @param array $getObjectVars		List of rows of the table (keys for names, values for example)
+	 */
+	public function initCreate( $tableName, array $getObjectVars )
 	{
 		$this->_type = self::$TYPE_CREATE;
-		$this->_create = 'TABLE `'.$createTable.'` (';
+		$this->_create = 'TABLE `'.$tableName.'` (';
 		
 		$first = true;
 		foreach ( $getObjectVars as $key => $value )
@@ -299,10 +331,16 @@ class SqlQuery
 		$this->_create .= ' );';
 	}
 	
-	public function initDelete( $from, array $whereList )
+	/**
+	 * Initialize you SqlQuery with a self::$TYPE_DELETE request.
+	 * 
+	 * @param string $tableName			Name of the table		
+	 * @param array $whereList			filter in associative array
+	 */
+	public function initDelete( $tableName, array $whereList )
 	{
 		$this->_type = self::$TYPE_DELETE;
-		$this->_delete = 'FROM '.$from;
+		$this->_delete = 'FROM `'.$tableName.'`';
 		
 		if ( $whereList !== null )
 			$this->_where = $this->getStrFromBinding( $whereList, ' AND ' );
@@ -379,6 +417,11 @@ class SqlQuery
 		return $output;
 	}
 	
+	/**
+	 * Generate the string request
+	 * 
+	 * @return string		Request in SQL
+	 */
 	public function getRequest()
 	{
 		switch ($this->_type)
@@ -413,6 +456,11 @@ class SqlQuery
 		return '';
 	}
 	
+	/**
+	 * Generate the string request to create a table
+	 * 
+	 * @return string		Request in SQL to create a table
+	 */
 	protected function getRequestCreate()
 	{
 		if(_DEBUG && $this->_create == '')
@@ -422,6 +470,11 @@ class SqlQuery
 		return 'CREATE '.$this->_create;
 	}
 	
+	/**
+	 * Generate the string request to select rows in a table
+	 * 
+	 * @return string		Request in SQL to select rows in a table
+	 */
 	protected function getRequestRead()
 	{
 		if($this->_select == '')
@@ -442,6 +495,11 @@ class SqlQuery
 		return $request;
 	}
 	
+	/**
+	 * Generate the string request to insert lines in a table
+	 * 
+	 * @return string		Request in SQL to insert lines in a table
+	 */
 	protected function getRequestInsert()
 	{
 		if(_DEBUG)
@@ -458,6 +516,11 @@ class SqlQuery
 		return $request;
 	}
 	
+	/**
+	 * Generate the string request to update line in a table
+	 * 
+	 * @return string		Request in SQL to update line in a table
+	 */
 	protected function getRequestUpdate()
 	{
 		if(_DEBUG)
@@ -479,6 +542,11 @@ class SqlQuery
 		return $request;
 	}
 	
+	/**
+	 * Generate the string request to delete lines
+	 * 
+	 * @return string		Generate the string request to delete lines
+	 */
 	protected function getRequestDelete()
 	{
 		if(_DEBUG)

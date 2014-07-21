@@ -59,7 +59,7 @@ class DataBaseCRUD
 	public function insert( $values )
 	{
 		$request = SqlQuery::getTemp( SqlQuery::$TYPE_INSERT );
-		$request->initInsertValues( 'INTO `'.$this->_table.'`', $values );
+		$request->initInsertValues( $this->_table, $values );
 		return $this->_db->execute( $request );
 	}
 	
@@ -73,19 +73,25 @@ class DataBaseCRUD
 	public function delete( array $whereList )
 	{
 		$request = SqlQuery::getTemp( SqlQuery::$TYPE_DELETE );
-		$request->initUpdateSet( $this->_table, $whereList );
+		$request->initDelete( $this->_table, $whereList );
 		return $this->_db->execute( $request );
 	}
 	
+	/**
+	 * Test if the table exist
+	 * 
+	 * @return boolean		Exist
+	 */
 	public function exist()
 	{
 		return $this->_db->exist($this->_table);
 	}
 	
 	/**
+	 * Get the instance of the object
 	 * 
-	 * @param string $tableName
-	 * @return DataBaseCRUD
+	 * @param string $tableName		Name of the table
+	 * @return DataBaseCRUD			DataBaseCRUD for this table
 	 */
 	public static function getInstance( $tableName ) 
     {
@@ -96,6 +102,9 @@ class DataBaseCRUD
         return self::$_INSTANCE[$tableName];
     }
 	
+	/**
+	 * Can't clone a multiton
+	 */
 	final public function __clone()
     {
         if ( _DEBUG ) 

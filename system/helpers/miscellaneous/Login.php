@@ -26,7 +26,7 @@
 
 namespace Flea;
 
-define( '_DB_LOGIN', 'sqlite:'._CONTENT_DIRECTORY.'login.sqlite' );
+//define( '_DB_LOGIN', 'sqlite:'._CONTENT_DIRECTORY.'login.sqlite' );
 
 class LoginTableName
 {
@@ -76,7 +76,7 @@ class User
 		{
 			$this->_datas = new DataList(true);
 			
-			if ( DataBase::getInstance( _DB_DSN_CONTENT )->exist(LoginTableName::$TABLE_NAME_DATAS) )
+			if ( $this->_db->exist(LoginTableName::$TABLE_NAME_DATAS) )
 			{
 				$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
 				//$where = 'user_email = \''.$this->getEmail().'\'';
@@ -241,7 +241,7 @@ class Login
 		$values['pass'] = $this->passEncrypt($pass, $email);
 		$values['role'] = $role;
 		$values['token'] = $this->generateToken();
-		$insert = 'INTO `'.LoginTableName::$TABLE_NAME_USERS.'`';
+		$insert = LoginTableName::$TABLE_NAME_USERS;
 		$query->initInsertValues($insert, $values);
 		$this->_db->execute($query);
 		
@@ -260,14 +260,14 @@ class Login
 			return false;
 		}
 		
-		if ( DataBase::getInstance( _DB_DSN_CONTENT )->exist(LoginTableName::$TABLE_NAME_DATAS) )
+		if ( $this->_db->exist(LoginTableName::$TABLE_NAME_DATAS) )
 		{
 			$query = SqlQuery::getTemp( SqlQuery::$TYPE_INSERT );
 			$values = array();
 			$values['user_email'] = $userEmail;
 			$values['key'] = $dataKey;
 			$values['value'] = $dataValue;
-			$insert = 'INTO `'.LoginTableName::$TABLE_NAME_DATAS.'`';
+			$insert = LoginTableName::$TABLE_NAME_DATAS;
 			$query->initInsertValues($insert, $values);
 			
 			return $this->_db->execute($query);
@@ -286,7 +286,7 @@ class Login
 			$datas['user_email'] = $email;
 			$datas['time'] = $time;
 			$datas['ip'] = $_SERVER["REMOTE_ADDR"];
-			$query->initInsertValues( 'INTO `'.LoginTableName::$TABLE_NAME_LOGS.'`', $datas );
+			$query->initInsertValues( LoginTableName::$TABLE_NAME_LOGS, $datas );
 			$this->_db->execute($query);
 
 			$query2 = SqlQuery::getTemp();
