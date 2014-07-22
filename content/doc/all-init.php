@@ -6,7 +6,7 @@ $url = 'doc';
 
 $template = '';
 
-$visible = true;	
+$visible = true;
 $cachable = true;
 
 $getEnabled = false;

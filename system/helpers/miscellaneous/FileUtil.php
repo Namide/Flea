@@ -185,7 +185,6 @@ class FileUtil
 	{
 		if ( is_dir($dir2copy) )
 		{
-
 			if ( $dh = opendir($dir2copy) )
 			{     
 				while ( ($file = readdir($dh)) !== false )
