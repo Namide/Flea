@@ -77,6 +77,11 @@ class General
 		{
 			include_once _SYSTEM_DIRECTORY.'data/list/PageListCreate.php';
 			PageListCreate::getInstance()->addPagesByDir(_CONTENT_DIRECTORY);
+			
+			if (file_exists(_CONTENT_DIRECTORY.'initDB.php') )
+			{
+				PageListCreate::getInstance()->commands(_CONTENT_DIRECTORY.'initDB.php');
+			}
 		}
 		
 		$this->_pagesInitialised = true;

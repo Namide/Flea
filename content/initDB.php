@@ -24,4 +24,6 @@
  * THE SOFTWARE.
  */
 
-// Your code before the pages initialisation here
+// Your code before pages data base initialisation
+$redirect301 = array();
+$redirect301['old'] = '{{urlPageToAbsoluteUrl:fr/accueil}}';

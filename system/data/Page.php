@@ -35,6 +35,7 @@ class Page
 {
 	public static $TYPE_DEFAULT = 'default';
 	public static $TYPE_ERROR404 = 'error404';
+	public static $TYPE_REDIRECT301 = 'redirect301';
 	
 	public static $_EMPTY = null;
 	
@@ -122,7 +123,8 @@ class Page
 		if (	_DEBUG &&
 				$type !== '' &&
 				$type !== Page::$TYPE_DEFAULT &&
-				$type !== Page::$TYPE_ERROR404 )
+				$type !== Page::$TYPE_ERROR404 &&
+				$type !== Page::$TYPE_REDIRECT301 )
 		{
 			Debug::getInstance()->addError('The type: '.$type.' don\'t exist');
 		}
@@ -463,6 +465,17 @@ class Page
 		{
 			header( $this->_phpHeader );
 		}
+		
+		if ( $this->_type === Page::$TYPE_REDIRECT301 )
+		{
+			
+			$absNewURL = BuildUtil::getInstance()->replaceFleaVars( $this->_htmlBody, $this );
+			header( 'Status: 301 Moved Permanently' );
+			header( 'Location: '.$absNewURL );
+			exit;
+		}
+		
+		
 		echo '<!doctype html><html><head><meta charset="UTF-8" />';
 		echo BuildUtil::getInstance()->replaceFleaVars( $this->_htmlHeader, $this );
 		if ( $this->_htmlTitle != '' )

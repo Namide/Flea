@@ -46,7 +46,35 @@ class PageListCreate
 		$this->db_insertPages($listOfPages);
 	}
 	
-	protected function db_insertPages( array $list )
+	/**
+	 * Add 301 redirections...
+	 * 
+	 * @param type $file				File with commands
+	 */
+	public function commands( $file )
+	{
+		$listOfPages = array();
+		
+		include $file;
+		if ( isset($redirect301) )
+		{
+			foreach ( $redirect301 as $oldURL => $newURL )
+			{
+				$page = new Page();
+				$page->setType( Page::$TYPE_REDIRECT301 );
+				$page->setPageUrl( $oldURL );
+				$page->setHtmlBody( $newURL );
+				$page->setVisible( false );
+				$page->setCachable( false );
+				
+				array_push( $listOfPages, $page );
+			}
+		}
+		
+		$this->db_insertPages($listOfPages);
+	}
+	
+	protected function db_createPagesDB()
 	{
 		$tableName = DataBase::objectToTableName( Page::getEmptyPage() );
 		
@@ -59,6 +87,18 @@ class PageListCreate
 		$request->clean( SqlQuery::$TYPE_CREATE );
 		$request->initCreate($tableName.'_array', array( 'page_id'=>'TEXT', 'page_prop'=>'TEXT', 'key'=>'TEXT', 'value'=>'TEXT') );
 		$db->execute( $request );
+	}
+
+
+	protected function db_insertPages( array $list )
+	{
+		$tableName = DataBase::objectToTableName( Page::getEmptyPage() );
+		$db = DataBase::getInstance(_DB_DSN_CONTENT);
+		
+		if ( !$db->exist($tableName) )
+		{
+			$this->db_createPagesDB();
+		}
 		
 		foreach ($list as $page) 
 		{

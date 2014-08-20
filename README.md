@@ -132,4 +132,8 @@ or template
 
 {{pageNameToAbsUrl:page-name}}
 // $buildUtil->getAbsUrlByIdLang( ‘page-name', $currentLanguage );
+
+{{urlPageToAbsoluteUrl:page-url}}
+// $buildUtil->getAbsUrlByPageUrl( ‘page-url' );
+
 ```
