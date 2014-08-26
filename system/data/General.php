@@ -51,7 +51,7 @@ class General
 	 */
 	public function isDBInitialized()
 	{
-		return DataBase::getInstance( _DB_DSN_CONTENT )->exist( DataBase::objectToTableName(Page::getEmptyPage() ) );
+		return DataBase::getInstance( _DB_DSN_PAGE )->exist( DataBase::objectToTableName(Page::getEmptyPage() ) );
 	}
 	
 	/**

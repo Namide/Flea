@@ -52,7 +52,7 @@ class DataBaseCRUD
 	public function read( array $whereList, array $whereSign = null, $orderBy = '', $limit = ''  )
 	{
 		$request = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
-		$request->initSelect('*', $this->_table, $whereList, $signList, $orderBy, $limit);
+		$request->initSelect('*', $this->_table, $whereList, null, $orderBy, $limit);
 		return $this->_db->fetchAll( $request );
 	}
 	

@@ -78,7 +78,7 @@ class PageListCreate
 	{
 		$tableName = DataBase::objectToTableName( Page::getEmptyPage() );
 		
-		$db = DataBase::getInstance(_DB_DSN_CONTENT);
+		$db = DataBase::getInstance(_DB_DSN_PAGE);
 		
 		$request = SqlQuery::getTemp( SqlQuery::$TYPE_CREATE );
 		$request->initCreate($tableName, Page::getEmptyPage()->getObjectVars() );
@@ -93,7 +93,7 @@ class PageListCreate
 	protected function db_insertPages( array $list )
 	{
 		$tableName = DataBase::objectToTableName( Page::getEmptyPage() );
-		$db = DataBase::getInstance(_DB_DSN_CONTENT);
+		$db = DataBase::getInstance(_DB_DSN_PAGE);
 		
 		if ( !$db->exist($tableName) )
 		{

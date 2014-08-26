@@ -86,11 +86,11 @@ if( _DEBUG )
 					}
 					echo '</ul>';
 
-					if ( _DB_DSN_CONTENT !== null )
+					if ( _DB_DSN_PAGE !== null )
 					{
 						try
 						{
-							$pdo = new \PDO( _DB_DSN_CONTENT, _DB_USER, _DB_PASS, _DB_OPTIONS );
+							$pdo = new \PDO( _DB_DSN_PAGE, _DB_USER, _DB_PASS, _DB_OPTIONS );
 						}
 						catch( \PDOException $e )
 						{

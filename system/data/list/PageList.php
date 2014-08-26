@@ -70,7 +70,7 @@ class PageList
 			$query->setOrderBy('_date DESC');
 		
 		$pages = array();
-		foreach ( DataBase::getInstance( _DB_DSN_CONTENT )->fetchAll($query) as $row )
+		foreach ( DataBase::getInstance( _DB_DSN_PAGE )->fetchAll($query) as $row )
 		{
 			$page = new Page();
 			$page->setByObjectVars($row);
@@ -107,7 +107,7 @@ class PageList
 		if ( $query->getOrderBy() == '' )
 			$query->setOrderBy('_date DESC');
 		
-		foreach ( DataBase::getInstance( _DB_DSN_CONTENT )->fetchAll($query) as $row )
+		foreach ( DataBase::getInstance( _DB_DSN_PAGE )->fetchAll($query) as $row )
 		{
 			$page = new Page();
 			$page->setByObjectVars($row);
@@ -265,7 +265,7 @@ class PageList
 		if ( $lang !== null ) { $where .= ' AND _lang = \''.$lang.'\''; }
 		$query->setWhere($where);
 		
-		return ( DataBase::getInstance( _DB_DSN_CONTENT )->count( $query ) > 0);
+		return ( DataBase::getInstance( _DB_DSN_PAGE )->count( $query ) > 0);
     }
 	
 	
@@ -425,7 +425,7 @@ class PageList
 		$query->setWhere('SUBSTR( \''.$relURL.'\', 0, LENGTH(_url)+1 ) LIKE _url AND _getEnabled = 1');
 		$query->setOrderBy('LENGTH(_url) DESC');
 		
-		$pages2 = DataBase::getInstance(_DB_DSN_CONTENT)->fetchAll($query);
+		$pages2 = DataBase::getInstance(_DB_DSN_PAGE)->fetchAll($query);
 		if ( count($pages2) > 0 )
 		{
 			foreach ($pages2 as $pageTemp)

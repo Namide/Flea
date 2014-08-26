@@ -26,8 +26,6 @@
 
 namespace Flea;
 
-//define( '_DB_LOGIN', 'sqlite:'._CONTENT_DIRECTORY.'login.sqlite' );
-
 class LoginTableName
 {
 	public static $TABLE_NAME_DATAS = 'login_datas';
@@ -72,22 +70,20 @@ class User
 	 */
 	public function getDatas()
 	{
+		
 		if ( $this->_datas === null )
 		{
 			$this->_datas = new DataList(true);
 			
-			if ( $this->_db->exist(LoginTableName::$TABLE_NAME_DATAS) )
+			$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
+			$where = array( 'user_email'=>$this->getEmail() );
+			$query->initSelect('key, value', '`'.LoginTableName::$TABLE_NAME_DATAS.'`', $where);
+			
+			foreach ( $this->_db->fetchAll($query) as $row )
 			{
-				$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
-				//$where = 'user_email = \''.$this->getEmail().'\'';
-				$where = array( 'user_email'=>$this->getEmail() );
-				$query->initSelect('key, value', '`'.LoginTableName::$TABLE_NAME_DATAS.'`', $where);
-				foreach ( $this->_db->fetchAll($query) as $row )
-				{
-					$content = BuildUtil::getInstance ()->replaceFleaVars ($row['value'], $this);
-					$this->_datas->add($content, $row['key']);
-				}
+				$this->_datas->add($row['value'], $row['key']);
 			}
+			
 		}
 		return $this->_datas;
 	}
@@ -118,16 +114,8 @@ class Login
 	{
 		if( isset( $_SESSION['login_token'] ) )
 		{
-			//throw new \Exception('todo optimise binds DataBase and add user in DB test');
 			if ( $this->_user === null )
 			{
-				/*$keys = array( 'token' );
-				$signs = array( '=' );
-				$values = array( $_SESSION['login_token'] );
-
-				$query = SqlQuery::getTemp();
-				$query->initSelectValues('*', LoginTableName::$TABLE_NAME_USERS, $keys, $signs, $values );*/
-				
 				$where = array( 'token'=>$_SESSION['login_token'] );
 				$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
 				$query->initSelect('*', LoginTableName::$TABLE_NAME_USERS, $where );
@@ -156,10 +144,6 @@ class Login
 		
 		if ( $this->_user == null )
 		{
-			/*$keys = array( 'token' );
-			$signs = array( '=' );
-			$values = array( $_SESSION['login_token'] );*/
-
 			$query = SqlQuery::getTemp();
 			$where = array( 'token'=>$_SESSION['login_token'] );
 			$query->initSelect('*', LoginTableName::$TABLE_NAME_USERS, $where );
@@ -181,7 +165,7 @@ class Login
 		return hash( self::$_HASH_ALGO, $realPass.$email );
 	}
 	
-	public function getUserList( $dataKey = null, $dataValue = null )
+	public function getUserByEMail( $email )
 	{
 		if (	!$this->isConnected() ||
 				$this->getUserConnected()->getRole() != User::$ROLE_ADMIN )
@@ -189,7 +173,31 @@ class Login
 			return false;
 		}
 		
+		$tnu = LoginTableName::$TABLE_NAME_USERS;
+		//$tnd = LoginTableName::$TABLE_NAME_DATAS;
+		
+		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
+		$query->initSelect( 'email, role', $tnu, array('email'=>$email) );
+		$rows = $this->_db->fetchAll($query);
+		if ( count( $rows ) < 1 )
+		{
+			return false;
+		}
+		
+		$user = new User( $this->_db );
+		$user->initUser( $rows[0]['email'], 'null', $rows[0]['role'] );
+		
+		return $user;
+	}
+	
+	public function getUserList( $dataKey = null, $dataValue = null )
+	{
 		$list = array();
+		if (	!$this->isConnected() ||
+				$this->getUserConnected()->getRole() != User::$ROLE_ADMIN )
+		{
+			return $list;
+		}
 		
 		$tnu = LoginTableName::$TABLE_NAME_USERS;
 		$tnd = LoginTableName::$TABLE_NAME_DATAS;
@@ -206,27 +214,13 @@ class Login
 		$where = '';
 		foreach ($this->_db->fetchAll($query) as $user)
 		{
-			$list[$user['email']] = array();
-			$list[$user['email']]['role'] = $user['role'];
-			$list[$user['email']]['datas'] = array();
-			$where .= ($where == '') ? 'user_email = \''.$user['email'].'\'' : ' OR user_email = \''.$user['email'].'\'';
-		}
-		
-		$query2 = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
-		$query2->initSelect( 'user_email, key, value', $tnd);
-		$query2->setWhere($where);
-		foreach ($this->_db->fetchAll($query2) as $value)
-		{
-			$email = $value['user_email'];
-			if ( isset($list[$email]) )
-			{
-				$list[$email]['datas'][$value['key']] = $value['value'];
-			}
+			$list[$user['email']] = new User( $this->_db );
+			$list[$user['email']]->initUser( $user['email'], 'null', $user['role'] );
 		}
 		
 		return $list;
 	}
-
+	
 	public function addUser( $email, $pass, $role = 1 )
 	{
 		if (	!$this->isConnected() ||

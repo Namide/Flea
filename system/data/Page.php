@@ -151,7 +151,7 @@ class Page
 			$this->_tags = new DataList(false);
 			
 			$table_page = DataBase::objectToTableName( $this );
-			if ( DataBase::getInstance( _DB_DSN_CONTENT )->exist($table_page) )
+			if ( DataBase::getInstance( _DB_DSN_PAGE )->exist($table_page) )
 			{
 				$table_list = $table_page.'_array';
 
@@ -159,7 +159,7 @@ class Page
 				$where = array( 'page_id'=>$this->getId(), 'page_prop'=>'_tags' );
 				$query->initSelect( 'value', '`'.$table_list.'`', $where );
 				
-				$rows = DataBase::getInstance( _DB_DSN_CONTENT )->fetchAll($query);
+				$rows = DataBase::getInstance( _DB_DSN_PAGE )->fetchAll($query);
 				foreach ( $rows as $row )
 				{
 					$this->_tags->add( $row['value'] );
@@ -184,14 +184,14 @@ class Page
 			$this->_contents = new DataList(true);
 			
 			$table_page = DataBase::objectToTableName( $this );
-			if ( DataBase::getInstance( _DB_DSN_CONTENT )->exist($table_page) )
+			if ( DataBase::getInstance( _DB_DSN_PAGE )->exist($table_page) )
 			{
 				$table_list = $table_page.'_array';
 
 				$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
 				$where = array( 'page_id'=>$this->getId(), 'page_prop'=>'_contents' );
 				$query->initSelect( 'key, value', '`'.$table_list.'`', $where );
-				$rows = DataBase::getInstance( _DB_DSN_CONTENT )->fetchAll($query);
+				$rows = DataBase::getInstance( _DB_DSN_PAGE )->fetchAll($query);
 				foreach ( $rows as $row )
 				{
 					$content = BuildUtil::getInstance ()->replaceFleaVars ( $row['value'], $this );
@@ -307,14 +307,14 @@ class Page
 			$this->_additionalUrls = new DataList(false);
 			
 			$table_page = DataBase::objectToTableName( $this );
-			if ( DataBase::getInstance( _DB_DSN_CONTENT )->exist($table_page) )
+			if ( DataBase::getInstance( _DB_DSN_PAGE )->exist($table_page) )
 			{
 				$table_list = $table_page.'_array';
 
 				$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
 				$where = array( 'page_id'=>$this->getId(), 'page_prop'=>'_additionalUrls' );
 				$query->initSelect( 'value', '`'.$table_list.'`', $where );
-				$rows = DataBase::getInstance( _DB_DSN_CONTENT )->fetchAll($query);
+				$rows = DataBase::getInstance( _DB_DSN_PAGE )->fetchAll($query);
 				foreach ( $rows as $row )
 				{
 					$this->_additionalUrls->add( $row['value'] );
