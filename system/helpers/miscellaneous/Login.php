@@ -211,7 +211,7 @@ class Login
 						. 'ON '.$tnu.'.email = '.$tnd.'.user_email');
 			$query->setWhere( $tnd.'.key = \''.$dataKey.'\' AND '.$tnd.'.value = \''.$dataValue.'\'' );
 		}
-		$where = '';
+		
 		foreach ($this->_db->fetchAll($query) as $user)
 		{
 			$list[$user['email']] = new User( $this->_db );
@@ -385,7 +385,7 @@ class Login
 	/**
 	 * 
 	 * @param string $dbDsn
-	 * @return DataBase
+	 * @return Login
 	 */
 	public static function getInstance( $dbDsn ) 
     {
