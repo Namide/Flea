@@ -27,6 +27,9 @@
 namespace Flea;
 
 /**
+ * An object DataBaseCRUD corresponds to a table,
+ * with this method it is simple to interact with the table
+ * 
  * @author Namide
  */
 class DataBaseCRUD
@@ -42,6 +45,12 @@ class DataBaseCRUD
 		$this->_db = DataBase::getInstance( _DB_DSN_CONTENT );
     }
 	
+	/**
+	 * Create the table from rows.
+	 * 
+	 * @param array $rows	List of rows of the table (keys for names, values for example)
+	 * @return bool			true if successful, else without
+	 */
 	public function create( array $rows )
 	{
 		$request = SqlQuery::getTemp( SqlQuery::$TYPE_CREATE );
@@ -49,6 +58,15 @@ class DataBaseCRUD
 		return $this->_db->execute( $request );
 	}
 
+	/**
+	 * Get lines from the database
+	 * 
+	 * @param array $whereList		filter in associative array
+	 * @param array $whereSign		signs of the $whereList ('=', '<', 'LIKE'...)
+	 * @param string $orderBy		sorting of the result data
+	 * @param string $limit			count of results
+	 * @return array				List of results
+	 */
 	public function read( array $whereList, array $whereSign = null, $orderBy = '', $limit = ''  )
 	{
 		$request = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
@@ -56,6 +74,12 @@ class DataBaseCRUD
 		return $this->_db->fetchAll( $request );
 	}
 	
+	/**
+	 * Insert a line in the table
+	 * 
+	 * @param array $values		Associative array with datas (keys for rows names)
+	 * @return bool				true if successful, else without
+	 */
 	public function insert( $values )
 	{
 		$request = SqlQuery::getTemp( SqlQuery::$TYPE_INSERT );
@@ -63,6 +87,13 @@ class DataBaseCRUD
 		return $this->_db->execute( $request );
 	}
 	
+	/**
+	 * Update a line in the table
+	 * 
+	 * @param array $setList		Associative array with datas (keys for rows names)
+	 * @param array $whereList		Filter in associative array
+	 * @return type					true if successful, else without
+	 */
 	public function update( array $setList, array $whereList = null )
 	{
 		$request = SqlQuery::getTemp( SqlQuery::$TYPE_UPDATE );
@@ -70,6 +101,12 @@ class DataBaseCRUD
 		return $this->_db->execute( $request );
 	}
 	
+	/**
+	 * Delete line(s) in the table
+	 * 
+	 * @param array $whereList		Filter in associative array
+	 * @return type					true if successful, else without
+	 */
 	public function delete( array $whereList )
 	{
 		$request = SqlQuery::getTemp( SqlQuery::$TYPE_DELETE );
