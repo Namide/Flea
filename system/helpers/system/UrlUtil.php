@@ -117,10 +117,10 @@ class UrlUtil
 	{
 		$pageUrl = $page->getPageUrl();
 		
-		if( strlen(substr($relUrl, 0, strlen($pageUrl))) > 1 &&
+		if( strlen($relUrl) - strlen($pageUrl) > 1 &&
 			$page->getGetEnabled() )
 		{
-			$restUrl = substr($relUrl, strlen($pageUrl)+1);
+			$restUrl = substr($relUrl, strlen($pageUrl) );
 			$this->explodeDynamicUrlToGet( $restUrl, $pageGet, $page->getGetExplicit() );
 		}
 		
