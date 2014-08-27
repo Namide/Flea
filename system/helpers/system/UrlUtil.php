@@ -116,11 +116,14 @@ class UrlUtil
 	private function dynamicPageUrlToPageUrl(Page &$page, $relUrl, array &$pageGet)
 	{
 		$pageUrl = $page->getPageUrl();
-		
 		if( strlen($relUrl) - strlen($pageUrl) > 1 &&
 			$page->getGetEnabled() )
 		{
 			$restUrl = substr($relUrl, strlen($pageUrl) );
+			if ( $restUrl{0} == '/' )
+			{
+				$restUrl = substr($restUrl, 1);
+			}
 			$this->explodeDynamicUrlToGet( $restUrl, $pageGet, $page->getGetExplicit() );
 		}
 		
