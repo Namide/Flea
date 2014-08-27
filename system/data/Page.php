@@ -438,7 +438,7 @@ class Page
 	 */
 	public function render()
 	{
-		if ( $this->_template != '' )
+		if ( $this->_template != '' && file_exists(_TEMPLATE_DIRECTORY.$this->_template.'.php') )
 		{
 			if ( $this->_phpHeader != '' )
 			{
