@@ -85,7 +85,13 @@ class UrlUtil
 		foreach ($_GET as $key => $value)
 		{
 			$navigatorGets[$key] = filter_input( INPUT_GET, $key, FILTER_SANITIZE_STRING );
+			// hack for integer $key
+			if ( $navigatorGets[$key] == null )
+			{
+				$navigatorGets[$key] = filter_var( $value, FILTER_SANITIZE_STRING );
+			}
 		}
+		
 		
 		return $navigatorGets;
 	}
@@ -179,7 +185,6 @@ class UrlUtil
 	 */
 	public function getRelUrlByIdLang( Page &$page/*, $lang*/, array $getUrl = null )
     {
-		//$page = PageList::getInstance()->getByName( $page->getName(), $lang );
 		$url = $this->getRelUrlByPageUrl( $page->getPageUrl(), $getUrl, $page->getGetExplicit() );
 		
 		return $url;

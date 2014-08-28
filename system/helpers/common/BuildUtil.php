@@ -54,7 +54,7 @@ class BuildUtil extends InitUtil
 	 * Get the absolute URL for a page
 	 * 
 	 * @param Page $page			Page
-	 * @param array $getUrl			Additionnal GET of the URL
+	 * @param array $gets			Additionnal GET of the URL
 	 * @return string				Absolute URL
 	 */
 	public function getAbsUrlByPage( Page $page, array $gets = null )
@@ -116,13 +116,14 @@ class BuildUtil extends InitUtil
 	 * Absolute URL for a page
 	 * 
 	 * @param string $pageName	Name of the page
+	 * @param array $gets		Additionnal GET of the URL
 	 * @return string			Absolute URL of the page		
 	 */
-    public function getAbsUrl( $pageName )
+    public function getAbsUrl( $pageName, array $gets = null )
     {
 		$lang = General::getInstance()->getCurrentLang();
 		
-		return $this->getAbsUrlByNameLang($pageName, $lang);
+		return $this->getAbsUrlByNameLang($pageName, $lang, $gets);
     }
 	
 	/**

@@ -143,7 +143,48 @@ class DataBase
 	}
 	
 	/**
-	 * Get alle the entries of the database
+	 * Get the first entry of the request
+	 * 
+	 * @param SqlQuery $query	Conditions (where, table...) of the request
+	 * @return array			The entriy
+	 */
+	public function fetch( SqlQuery $query )
+	{
+		try
+		{
+			$stmt = $this->_pdo->prepare( $query->getRequest() );
+			
+			if ( $stmt === false )
+			{
+				return array();
+			}
+			
+			$binds = $query->getBinds();
+			if ( $binds !== null )
+			{
+				foreach ($binds as $bind)
+				{
+					$stmt->bindValue($bind[0], $bind[1], $bind[2]);
+				}
+			}
+			$stmt->execute();
+			$arrValues = $stmt->fetch(\PDO::FETCH_ASSOC);
+			$stmt = null;
+			
+			return $arrValues;
+		}
+		catch(PDOException $e)
+		{
+			if ( _DEBUG )
+			{
+				Debug::getInstance()->addError( 'fetch_all() database error: '.$e->getMessage() );
+			}
+		}
+		return array();
+	}
+	
+	/**
+	 * Get all the entries of the request
 	 * 
 	 * @param SqlQuery $query	Conditions (where, table...) of the request
 	 * @return array			All the entries
