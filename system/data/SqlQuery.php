@@ -378,7 +378,7 @@ class SqlQuery
 			
 			if ( gettype($value) == 'boolean' )
 			{
-				$output .= ( ($first)?' ':$strGlue ).$key.' '.$sign.' :'.$key;
+				$output .= ( ($first)?'':$strGlue ).$key.' '.$sign.' :'.$key;
 				if ( !array_key_exists(':'.$key, $this->_binds) )
 				{
 					$this->_binds[] = array( ':'.$key, (($value)?'1':'0'), \PDO::PARAM_BOOL );
@@ -387,7 +387,7 @@ class SqlQuery
 			}
 			elseif ( gettype($value) == 'integer' )
 			{
-				$output .= ( ($first)?' ':$strGlue ).$key.' '.$sign.' :'.$key;
+				$output .= ( ($first)?'':$strGlue ).$key.' '.$sign.' :'.$key;
 				if ( !array_key_exists(':'.$key, $this->_binds) )
 				{
 					$this->_binds[] = array( ':'.$key, $value, \PDO::PARAM_INT );
@@ -396,7 +396,7 @@ class SqlQuery
 			}
 			elseif ( gettype($value) == 'double' )
 			{
-				$output .= ( ($first)?' ':$strGlue ).$key.' '.$sign.' :'.$key;
+				$output .= ( ($first)?'':$strGlue ).$key.' '.$sign.' :'.$key;
 				if ( !array_key_exists(':'.$key, $this->_binds) )
 				{
 					$this->_binds[] = array( ':'.$key, $value, \PDO::PARAM_STR );
@@ -405,7 +405,7 @@ class SqlQuery
 			}
 			elseif ( gettype($value) == 'string' )
 			{
-				$output .= ( ($first)?' ':$strGlue ).$key.' '.$sign.' :'.$key;
+				$output .= ( ($first)?'':$strGlue ).$key.' '.$sign.' :'.$key;
 				if ( !array_key_exists(':'.$key, $this->_binds) )
 				{
 					$this->_binds[] = array( ':'.$key, $value, \PDO::PARAM_STR );
@@ -565,6 +565,6 @@ class SqlQuery
 		if($this->_where != '') { $request .= ' WHERE ' . $this->_where; }
 		if($this->_orderBy != '') { $request .= ' ORDER BY ' . $this->_orderBy; }
 		if($this->_limit != '') { $request .= ' LIMIT ' . $this->_limit; }
-		return $request;
+		return $request.';';
 	}
 }
