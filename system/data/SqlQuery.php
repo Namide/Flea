@@ -334,13 +334,14 @@ class SqlQuery
 	/**
 	 * Initialize you SqlQuery with a self::$TYPE_DELETE request.
 	 * 
-	 * @param string $tableName			Name of the table		
-	 * @param array $whereList			filter in associative array
+	 * @param string $from			Name of the table		
+	 * @param array $whereList		filter in associative array
 	 */
-	public function initDelete( $tableName, array $whereList )
+	public function initDelete( $from, array $whereList )
 	{
 		$this->_type = self::$TYPE_DELETE;
-		$this->_delete = 'FROM `'.$tableName.'`';
+		//$this->_delete = ($tableName == '') ? '' : 'FROM `'.$tableName.'`';
+		$this->_from = $from;
 		
 		if ( $whereList !== null )
 			$this->_where = $this->getStrFromBinding( $whereList, ' AND ' );
@@ -551,10 +552,10 @@ class SqlQuery
 	{
 		if(_DEBUG)
 		{
-			if($this->_delete == '')
+			/*if($this->_delete == '')
 			{
 				Debug::getInstance()->addError('For a TYPE_DELETE SQL query You must init the var "delete"');
-			}
+			}*/
 			if($this->_from == '')
 			{
 				Debug::getInstance()->addError('For a TYPE_DELETE SQL query You must init the var "from"');

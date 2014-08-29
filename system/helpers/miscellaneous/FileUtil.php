@@ -142,6 +142,50 @@ class FileUtil
 	}
 	
 	/**
+	 * Delete file
+	 * 
+	 * @param type $file				Path of file to delete
+	 * @param type $recursEmptyDir		Delete containers directories empty
+	 * @return boolean					File successfull deleted
+	 */
+	public static function delFile( $file, $recursEmptyDir = false )
+	{
+		if ( !file_exists($file) ) { return false; }
+		unlink($file);
+		
+		if ( $recursEmptyDir )
+		{
+			$dir = $file;
+			do
+			{
+				$dir = explode('/', $dir);
+				if ( count($dir) < 1 ) return true;
+				array_pop($dir);
+				$dir = implode('/', $dir);
+				self::delEmptyDirRecursively( $dir );
+			}
+			while ( self::isEmpty($dir) );
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Is the directory empty
+	 * 
+	 * @param type $dir			Directtory to test
+	 * @return int				Is deleted	
+	 */
+	public static function isEmpty( $dir )
+	{
+		if ( !file_exists($dir) )	{ return false; }
+		if ( is_file($dir) )		{ return true; }
+
+		$files = array_diff( scandir($dir), array( '.', '..', '.DS_Store', 'Thumbs.db' ) );
+		return count($files) < 1;
+	}
+	
+	/**
 	 * Delete all files and directories and return the number of file deleted
 	 * 
 	 * @param string $dirName		Directory to delete
