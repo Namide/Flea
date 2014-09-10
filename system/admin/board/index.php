@@ -61,21 +61,6 @@ if( _DEBUG )
 					: '<strong class="error">false</strong>' ?></td>
 		</tr>
 		<tr>
-			<th>Pages cached</th>
-			<td>
-				<?php
-					$cache = new \Flea\Cache(_DB_DSN_CACHE);
-					$pagesCachedNum = $cache->getNumFilesSaved();
-					
-					echo '<strong class="' ,
-							( $pagesCachedNum >= _MAX_PAGE_CACHE ||
-							( $pagesCachedNum / _MAX_PAGE_CACHE > 0.95 )
-							? 'error' : 'passed' ).'">'
-							, $pagesCachedNum .' / '._MAX_PAGE_CACHE
-							, '</strong>';
-				?></td>
-		</tr>
-		<tr>
 			<th>SQL</th>
 			<td>
 				<?php
@@ -99,6 +84,21 @@ if( _DEBUG )
 					}
 				?>
 			</td>
+		</tr>
+		<tr>
+			<th>Pages cached</th>
+			<td>
+				<?php
+					$cache = new \Flea\Cache(_DB_DSN_CACHE);
+					$pagesCachedNum = $cache->getNumFilesSaved();
+					
+					echo '<strong class="' ,
+							( $pagesCachedNum >= _MAX_PAGE_CACHE ||
+							( $pagesCachedNum / _MAX_PAGE_CACHE > 0.95 )
+							? 'error' : 'passed' ).'">'
+							, $pagesCachedNum .' / '._MAX_PAGE_CACHE
+							, '</strong>';
+				?></td>
 		</tr>
 		
 	</tbody>
