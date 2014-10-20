@@ -67,6 +67,20 @@ class Page
 	 */
     public function getName() { return $this->_name; }
 	
+	private $_cover;
+	/**
+	 * Cover URL of the Page.
+	 * 
+	 * @param string $src	URL of the cover
+	 */
+    public function setCover( $src ) { $this->_cover = $src; }
+	/**
+	 * Cover URL of the Page
+	 * 
+	 * @return string	URL of the cover
+	 */
+    public function getCover() { return $this->_cover; }
+	
 	private $_lang;
 	/**
 	 * Language of the Page (fr, en, ko...)
@@ -528,6 +542,7 @@ class Page
 		$this->_htmlHeader = '';
 		$this->_htmlBody = '';
 		
+		$this->_cover = '';
         $this->_template = '';
 		
 		$this->_phpHeader = '';

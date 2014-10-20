@@ -238,6 +238,7 @@ class PageListCreate
 		if ( isset($htmlDescription) )	{ $page->setHtmlDescription($htmlDescription) ; }
 		if ( isset($htmlHeader) )		{ $page->setHtmlHeader($htmlHeader) ; }
 		if ( isset($htmlTitle) )		{ $page->setHtmlTitle($htmlTitle) ; }
+		if ( isset($cover) )			{ $page->setCover($cover) ; }
 				
 		if ( isset($phpHeader) )		{ $page->setPhpHeader($phpHeader) ; }
 		

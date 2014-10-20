@@ -203,6 +203,7 @@ class BuildUtil extends InitUtil
 		$replacePage = str_replace('{{header}}', $page->getHtmlHeader(), $replacePage);
 		$replacePage = str_replace('{{body}}', $page->getHtmlBody(), $replacePage);
 		$replacePage = str_replace('{{description}}', $page->getHtmlDescription(), $replacePage);
+		$replacePage = str_replace('{{cover}}', $page->getCover(), $replacePage);
 		
 		$replacePage = str_replace('{{rootPath}}', _ROOT_URL, $replacePage);
 		$replacePage = str_replace('{{templatePath}}', _ROOT_URL._TEMPLATE_DIRECTORY, $replacePage);

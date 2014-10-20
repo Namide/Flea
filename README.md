@@ -59,6 +59,8 @@ $htmlDescription = 'FWK is a really fun framework!';
 $htmlHeader = '<meta name="robots" content="all" />';
 // title of the page
 $htmlTitle = 'accueil';
+// add cover for the page
+$cover = '{{pageContentPath}}img/cover-photo.jpg';
 
 // Type of the page: 
 // - ''
