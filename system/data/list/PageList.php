@@ -101,7 +101,7 @@ class PageList
 		$query->setType( SqlQuery::$TYPE_SELECT );
 		$query->setSelect('*');
 		$query->setFrom('`'.$table_page.'` '
-						. 'LEFT JOIN '.$table_list.' '
+						. 'LEFT JOIN `'.$table_list.'` '
 						. 'ON '.$table_page.'._id = '.$table_list.'.page_id');
 		
 		if ( $query->getOrderBy() == '' )
@@ -220,19 +220,26 @@ class PageList
 	 */
 	public function getWithAllTags( array $tags, $lang )
     {
-		$where = ' _lang = \''.$lang.'\' AND AND _visible = 1 ';
+		$allPages = $this->getWithOneOfTags( $tags, $lang );
+		$goodPages = array();
 		
-		$first = true;
-		foreach ($tags as $tag)
+		foreach ( $allPages as $page )
 		{
-			if ( !$first ) $where .= ' AND';
-			$where .= ' _tags = \''.$tag.'\'';
-			$first = false;
+			$ok = true;
+			foreach( $tags as $tag )
+			{
+				if ( !$page->getTags()->hasValue($tag) )
+				{
+					$ok = false;
+				}
+			}
+			if( $ok )
+			{
+				$goodPages[] = $page;
+			}
 		}
 		
-		$query = SqlQuery::getTemp();
-		$query->setWhere($where);
-		return $this->getByList ( $query );
+		return $goodPages;
     }
 	
 	/**
