@@ -156,6 +156,10 @@ class DataList
 		{
 			Debug::getInstance()->addError('The key:'.$key.' don\'t exist');
 		}
+		if ( !$this->hasKey($key) )
+		{
+			return "";
+		}
 		return $this->_datas[$key];
 	}
 	
