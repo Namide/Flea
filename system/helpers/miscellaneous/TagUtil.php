@@ -82,4 +82,51 @@ class TagUtil
 		$img .= '/>';
 		return  $img;
 	}
+	
+	/**
+	 * 
+	 * Simple method to get breadcrump of the current page.
+	 * It have microdatas.
+	 * 
+	 * @param Page $currentPage		Current page (optional if the pages are initialized)
+	 * @param string $delimiter		String between the links
+	 * @return string				Tag of the breadcrump
+	 */
+	public static function getBreadcrump( Page $currentPage = null, $delimiter = ' > ' )
+	{
+		if ( $currentPage === null )
+		{
+			if ( _DEBUG && !General::getInstance()->isPagesInitialized() )
+			{
+				Debug::getInstance()->addError( 'All pages must be initialised after use TagUtil::getBreadcrump( $argument ) method without argument' );
+			}
+			$currentPage = General::getInstance()->getCurrentPage();
+		}
+		
+		$path = explode('/', $currentPage->getPageUrl() ) ;
+		$numParentsPages = count($path);
+		$output = '';
+		
+		if ( $numParentsPages > 1 )
+		{
+			$output = '<nav class="breadcrumb"><ul>';
+			foreach ($path as $l => $url)
+			{
+				$url = $path[0];
+				for( $i = 1; $i <= $l ; $i++ )
+				{
+					$url .= '/'.$path[$i];
+				}
+				$temp = '<li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">';
+				$temp .= '<a href="'.BuildUtil::getInstance()->getAbsUrlByPageUrl($url).'" itemprop="url">';
+				$temp .= '<span itemprop="title">'.PageList::getInstance()->getByUrl($url)->getHtmlTitle().'</span>';
+				$temp .= '</a></li>';
+				$output .= ( $l > 0 ) ? $delimiter : '';
+				$output .= $temp;
+			}
+			$output .= '</ul></nav>';
+		}
+		return $output;
+	}
+	
 }
