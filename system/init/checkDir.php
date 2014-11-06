@@ -26,15 +26,8 @@
 
 namespace Flea;
 
-if ( file_exists(_CONTENT_DIRECTORY.'initBuild.php') )
+if ( !file_exists(_CACHE_DIRECTORY.'.htaccess') )
 {
-	include _CONTENT_DIRECTORY.'initBuild.php';
-}
-
-$page = General::getInstance()->getCurrentPage();
-PageList::getInstance()->buildPage( $page );
-
-if ( _DEBUG )
-{
-	Debug::getInstance()->addTimeMark('build page');
+	include _SYSTEM_DIRECTORY.'helpers/miscellaneous/FileUtil.php';
+	FileUtil::writeProtectedDir(_CACHE_DIRECTORY);
 }

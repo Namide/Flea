@@ -1,72 +1,12 @@
-system
-	data
-		list
-			ElementList.php
-			LanguageList.php
-			PageList.php
-		Element.php
-		Page.php
-		//DynamicPage.php	=> remplacé par GET dans PAGES
-		//RequestPage.php	=> remplacé par GET dans PAGES
-		Saver.php
+TODO LIST
+
+	SearchEngine.php
+	? TradUtil.php
+	ImgUtil.php
+	DateUtil.php
+
+	unit-testing
 		
-		General.php => currentLang, currentPage, currentUrl, state
-		
-	helpers
-		
-		common
-			InitUtil.php
-			BuildUtil.php
-			_TemplateUtil.php [ mustache( $content, &$page ) => render( $content, $page = -1 ) ]
-			
-		miscellaneous
-			SearchEngine.php // indexes...
-			? TradUtil.php
-			ImgUtil.php
-			DateUtil.php
-		
-		system
-			Router.php
-			Cache.php
-			FileUtil.php
-			DataUtil.php
-				_construct( dir, name )
-				add( key, content, type = file /* json */ );
-				update( key, content );
-				get( key )
-				getType( key )
-				has( key )
-				render( key )
-
-			//SaveUtil.php
-			UrlUtil.php
-			
-	init
-		start.php
-		imports.php
-		load.php
-		build.php
-		
-	admin
-		admin
-		SEO-utils
-		content-utils
-		unit-testing
-		
-	
-content
-	initBegin.php
-	initLang.php
-	initPages.php
-	
-template
-
-
-
-
-
-TO-DO
-
 	get the abs URL with pageName and global GET
 
 	

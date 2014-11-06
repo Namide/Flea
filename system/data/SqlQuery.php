@@ -27,7 +27,8 @@
 namespace Flea;
 
 /**
- * Requests data helper
+ * Requests data helper.
+ * Use this class to create SQL requests.
  * 
  * @author Namide
  */
@@ -40,6 +41,7 @@ class SqlQuery
 	public static $TYPE_DELETE = 5;
 	
 	protected static $_TEMP = null;
+	
 	/**
 	 * Create a temporary request object.
 	 * Used to reduce memory (avoid to create other request objects)
@@ -48,8 +50,14 @@ class SqlQuery
 	 */
 	public static function getTemp( $type = 0 )
 	{
-		if ( self::$_TEMP === null ) { self::$_TEMP = new SqlQuery(); }
-		else self::$_TEMP->clean( $type );
+		if ( self::$_TEMP === null )
+		{
+			self::$_TEMP = new SqlQuery();
+		}
+		else
+		{
+			self::$_TEMP->clean( $type );
+		}
 		return self::$_TEMP;
 	}
 	
@@ -71,7 +79,7 @@ class SqlQuery
 	/**
 	 * Used in PDO to securise datas injected in the data base
 	 * 
-	 * @return array	Binds like binds in PDO object
+	 * @return array	Binds (like binds in PDO object)
 	 */
 	public function getBinds() { return $this->_binds; }
 	public function setBinds( array $binds ) { $this->_binds = $this->_binds + $binds; }
@@ -164,7 +172,7 @@ class SqlQuery
 	}
 	
 	/**
-	 * Clean the datas in your object
+	 * Clean datas in your object
 	 * 
 	 * @param int		Type of the next SqlQuery
 	 */

@@ -46,8 +46,6 @@ include_once _SYSTEM_DIRECTORY.'helpers/common/BuildUtil.php';
 
 if ( _CACHE )
 {
-	//include_once _SYSTEM_DIRECTORY.'helpers/miscellaneous/FileUtil.php';
-	//include_once _SYSTEM_DIRECTORY.'helpers/system/DataUtil.php';
 	include_once _SYSTEM_DIRECTORY.'helpers/system/Cache.php';
 }
 

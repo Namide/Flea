@@ -82,6 +82,25 @@ class FileUtil
 	}
 	
 	/**
+	 * Writes a directory with .htaccess (deny from all) if it doesn't exist.
+	 * It works recursively.
+	 * 
+	 * @param string $dirName		Directory of the .htaccess
+	 */
+	public static function writeProtectedDir( $dirName )
+	{
+		FileUtil::writeDir( $dirName );
+		
+		if( !file_exists( $dirName.'.htaccess' ) )
+		{
+			$htaccess = fopen( $dirName.'.htaccess' , "w" );
+			$htaccessContent = 'deny from all';
+			fwrite($htaccess, $htaccessContent);
+			fclose($htaccess);
+		}
+	}
+	
+	/**
 	 * Size of the directory in octets
 	 * 
 	 * @param string $dir		Directory to mesure

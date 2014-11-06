@@ -34,6 +34,8 @@ if ( _DEBUG )
 	error_reporting(E_ALL);
 }
 
+include _SYSTEM_DIRECTORY.'init/checkDir.php';
+
 if ( _CACHE )
 {
 	
