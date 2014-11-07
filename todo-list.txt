@@ -18,12 +18,6 @@ TODO LIST
 		rootURL + pageURL + getURL = absURL
 		pageURL + getURL = relURL
 		
-	Router
-		composé avec UrlUtil
-		(gestion URL en premier lieu sans init pour décomposer et sécuriser actuelle)
-		phase avant init
-		phase cache
-		
 	singletons -> utilisable sans méthode getInstance() pour InitUtil, BuildUtil et TemplateUtil
 	
 	Flea.variables (old mustache) !
