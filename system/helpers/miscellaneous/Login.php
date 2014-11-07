@@ -26,35 +26,97 @@
 
 namespace Flea;
 
+/**
+ * Flags for the names of the table used by the Login class.
+ */
 class LoginTableName
 {
+	/**
+	 * Name of the table of the datas of users.
+	 * Datas are optionnal and unlimited.
+	 * @var string 
+	 */
 	public static $TABLE_NAME_DATAS = 'login_datas';
+	
+	/**
+	 * Name of the table of users (email, password...).
+	 * @var string
+	 */
 	public static $TABLE_NAME_USERS = 'login_users';
+	
+	/**
+	 * Name of the table of logs of users.
+	 * @var string 
+	 */
 	public static $TABLE_NAME_LOGS = 'login_logs';
 }
 
-class User
+/**
+ * User's variables used by the Login class.
+ */
+class LoginUser
 {
+	/**
+	 * Role of the user. Basic user is authorized to less informations.
+	 * 
+	 * @var int
+	 */
 	public static $ROLE_BASIC = 1;
+	
+	/**
+	 * Role of the user. Admin is authorized to more informations.
+	 * 
+	 * @var int
+	 */
 	public static $ROLE_ADMIN = 2;
 	
 	private $_db;
 	
-	protected $_email;
+	private $_email;
+	
+	/**
+	 * Email of the user
+	 * 
+	 * @return string
+	 */
 	public function getEmail() { return $this->_email; }
 	
-	protected $_token;
+	private $_token;
+	
+	/**
+	 * Token is used for security
+	 * 
+	 * @return string
+	 */
 	public function getToken() { return $this->_token; }
 	
-	protected $_role;
+	private $_role;
+	
+	/**
+	 * Role of the user: LoginUser::$ROLE_BASIC or LoginUser::$ROLE_ADMIN
+	 * 
+	 * @return int
+	 */
 	public function getRole() { return $this->_role; }
 	
+	/**
+	 * Init the user.
+	 * 
+	 * @param DataBase $db		DataBase used to this user
+	 */
 	public function __construct( $db )
 	{
 		$this->_db = $db;
 	}
 	
-	public function initUser( $email, $token, $role = 1 )
+	/**
+	 * Initialize user's datas
+	 * 
+	 * @param type $email	Email of the user	
+	 * @param type $token	Token of the current conection of the user
+	 * @param type $role	Role of the user
+	 */
+	public function init( $email, $token, $role = 1 )
 	{
 		$this->_email = $email;
 		$this->_token = $token;
@@ -62,15 +124,14 @@ class User
 	}
 	
 	private $_datas;
+	
 	/**
 	 * A data is a pair with key and value.
-	 * You can't add 2 datas with same label.
 	 * 
-	 * @return DataList 
+	 * @return DataList		Data of the user
 	 */
 	public function getDatas()
 	{
-		
 		if ( $this->_datas === null )
 		{
 			$this->_datas = new DataList(true);
@@ -107,9 +168,13 @@ class Login
 	 */
 	private $_db;
 	
-	
 	private $_user = null;
 	
+	/**
+	 * Test if this user is connected (with Session).
+	 * 
+	 * @return boolean		Is connected
+	 */
 	public function isConnected()
 	{
 		if( isset( $_SESSION['login_token'] ) )
@@ -131,8 +196,9 @@ class Login
 	}
 	
 	/**
+	 * User connected (false if no user connected).
 	 * 
-	 * @return User
+	 * @return boolean|LoginUser
 	 */
 	public function getUserConnected()
 	{
@@ -153,22 +219,37 @@ class Login
 				return false;
 			}
 
-			$this->_user = new User( $this->_db );
-			$this->_user->initUser( $rows[0]['email'], $rows[0]['token'], $rows[0]['role'] );
+			$this->_user = new LoginUser( $this->_db );
+			$this->_user->init( $rows[0]['email'], $rows[0]['token'], $rows[0]['role'] );
 		}
 		
 		return $this->_user;
 	}
 	
+	/**
+	 * Crypt the password.
+	 * 
+	 * @param string $realPass		Password not crypted
+	 * @param string $email			Email of the user (for the saltz)
+	 * @return string				Password crypted
+	 */
 	public function passEncrypt( $realPass, $email )
 	{
 		return hash( self::$_HASH_ALGO, $realPass.$email );
 	}
 	
+	/**
+	 * Found and return a user (false if no user connected or email not found or
+	 * if the user don't have authorizations).
+	 * Only if your are admin and connected
+	 * 
+	 * @param string $email		Mail of the user
+	 * @return boolean|\Flea\LoginUser
+	 */
 	public function getUserByEMail( $email )
 	{
 		if (	!$this->isConnected() ||
-				$this->getUserConnected()->getRole() != User::$ROLE_ADMIN )
+				$this->getUserConnected()->getRole() != LoginUser::$ROLE_ADMIN )
 		{
 			return false;
 		}
@@ -184,17 +265,25 @@ class Login
 			return false;
 		}
 		
-		$user = new User( $this->_db );
-		$user->initUser( $rows[0]['email'], 'null', $rows[0]['role'] );
+		$user = new LoginUser( $this->_db );
+		$user->init( $rows[0]['email'], 'null', $rows[0]['role'] );
 		
 		return $user;
 	}
 	
+	/**
+	 * List of the users.
+	 * Only if your are admin and connected
+	 * 
+	 * @param string $dataKey				Key for the filter (example: group)
+	 * @param string $dataValue				Value for the filter (example: gamer)
+	 * @return array of \Flea\LoginUser		List of the users with $dataKey = $dataValue
+	 */
 	public function getUserList( $dataKey = null, $dataValue = null )
 	{
 		$list = array();
 		if (	!$this->isConnected() ||
-				$this->getUserConnected()->getRole() != User::$ROLE_ADMIN )
+				$this->getUserConnected()->getRole() != LoginUser::$ROLE_ADMIN )
 		{
 			return $list;
 		}
@@ -214,17 +303,26 @@ class Login
 		
 		foreach ($this->_db->fetchAll($query) as $user)
 		{
-			$list[$user['email']] = new User( $this->_db );
-			$list[$user['email']]->initUser( $user['email'], 'null', $user['role'] );
+			$list[$user['email']] = new LoginUser( $this->_db );
+			$list[$user['email']]->init( $user['email'], 'null', $user['role'] );
 		}
 		
 		return $list;
 	}
 	
-	public function addUser( $email, $pass, $role = 1 )
+	/**
+	 * Add a new user.
+	 * Only if your are admin and connected
+	 * 
+	 * @param type $email		Email of the new user
+	 * @param type $realPass	Password of the new user
+	 * @param type $role		Role of the new user
+	 * @return boolean			True if the user is added
+	 */
+	public function addUser( $email, $realPass, $role = 1 )
 	{
 		if (	!$this->isConnected() ||
-				$this->getUserConnected()->getRole() != User::$ROLE_ADMIN )
+				$this->getUserConnected()->getRole() != LoginUser::$ROLE_ADMIN )
 		{
 			return false;
 		}
@@ -232,7 +330,7 @@ class Login
 		$query = SqlQuery::getTemp( SqlQuery::$TYPE_INSERT );
 		$values = array();
 		$values['email'] = $email;
-		$values['pass'] = $this->passEncrypt($pass, $email);
+		$values['pass'] = $this->passEncrypt($realPass, $email);
 		$values['role'] = $role;
 		$values['token'] = $this->generateToken();
 		$insert = LoginTableName::$TABLE_NAME_USERS;
@@ -242,11 +340,20 @@ class Login
 		return true;
 	}
 	
+	/**
+	 * Add informations to a user.
+	 * Only if your are admin and connected
+	 * 
+	 * @param type $userEmail		Email of the user
+	 * @param type $dataKey			Label of the data (example: group)
+	 * @param type $dataValue		Value of the data (example: gamer)
+	 * @return boolean				True if the data is added
+	 */
 	public function addDataToUser( $userEmail, $dataKey, $dataValue )
 	{
 		if (	!$this->isConnected() ||
 				!(
-					$this->getUserConnected()->getRole() == User::$ROLE_ADMIN ||
+					$this->getUserConnected()->getRole() == LoginUser::$ROLE_ADMIN ||
 					$this->getUserConnected()->getEmail() == $userEmail
 				)
 			)
@@ -265,10 +372,17 @@ class Login
 			$query->initInsertValues($insert, $values);
 			
 			return $this->_db->execute($query);
-		}
-		
+		}	
 	}
 	
+	/**
+	 * Connect the user.
+	 * After this state a token will be storage in the session
+	 * 
+	 * @param string $email			Email of the user
+	 * @param string $realPass		Password of the user
+	 * @return boolean				It is connected
+	 */
 	public function connect( $email, $realPass )
 	{
 		$time = time();
@@ -307,6 +421,9 @@ class Login
 		}
 	}
 	
+	/**
+	 * Disconnect the current connected user.
+	 */
 	public function disconnect()
 	{
 		if ( $this->isConnected() )
@@ -332,6 +449,9 @@ class Login
 		return md5( rand(0, 9999).microtime() );
 	}
 	
+	/**
+	 * Create the table of the users.
+	 */
 	private function create()
 	{
 		$req1 = SqlQuery::getTemp( SqlQuery::$TYPE_CREATE );
@@ -361,6 +481,11 @@ class Login
 		$this->_db->execute( $req3 );
 	}
 	
+	/**
+	 * Test if the table of the user exist.
+	 * 
+	 * @return Bool			True if the table exist 
+	 */
 	private function isDBInitialized()
 	{
 		return $this->_db->exist( LoginTableName::$TABLE_NAME_USERS );
@@ -383,9 +508,10 @@ class Login
 	}
 	
 	/**
+	 * Get the Login object
 	 * 
-	 * @param string $dbDsn
-	 * @return Login
+	 * @param string $dbDsn		Data Source Name of the data base
+	 * @return Login			Login corresponding at the data base
 	 */
 	public static function getInstance( $dbDsn ) 
     {
@@ -396,7 +522,7 @@ class Login
         return self::$_INSTANCE[$dbDsn];
     }
 	
-	final public function __clone()
+	final private function __clone()
     {
         if ( _DEBUG ) 
 		{

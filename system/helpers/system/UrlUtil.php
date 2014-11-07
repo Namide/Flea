@@ -268,7 +268,7 @@ class UrlUtil
 		return $urlStr;
 	}
 	
-	final public function __clone()
+	final private function __clone()
     {
         if ( _DEBUG )
 		{

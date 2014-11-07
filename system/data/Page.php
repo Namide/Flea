@@ -33,11 +33,25 @@ namespace Flea;
  */
 class Page
 {
+	/**
+	 * Default page (homepage)
+	 * @var string
+	 */
 	public static $TYPE_DEFAULT = 'default';
+	
+	/**
+	 * Page not found
+	 * @var string 
+	 */
 	public static $TYPE_ERROR404 = 'error404';
+	
+	/**
+	 * Redirection of this page
+	 * @var string 
+	 */
 	public static $TYPE_REDIRECT301 = 'redirect301';
 	
-	public static $_EMPTY = null;
+	private static $_EMPTY = null;
 	
 	private $_id;
 	/**
@@ -128,7 +142,7 @@ class Page
 	 * The page can be :
 	 * - Page::$TYPE_DEFAULT, 
 	 * - Page::$TYPE_ERROR404, 
-	 * - '', 
+	 * - Page::$TYPE_REDIRECT301
 	 * 
 	 * @param string $type	Type of the page
 	 */
@@ -218,7 +232,7 @@ class Page
 		return $this->_contents;
 	}
 	
-	protected $_phpHeader;
+	private $_phpHeader;
 	/**
 	 * Set phpHeader (for header() function)
 	 * 
@@ -232,7 +246,7 @@ class Page
 	 */
     public function getPhpHeader() { return $this->_phpHeader; }
 	
-    protected $_visible;
+    private $_visible;
 	/**
 	 * Set the visibility of the page
 	 * 
@@ -246,7 +260,7 @@ class Page
 	 */
     public function getVisible() { return $this->_visible; }
 
-    protected $_getEnabled;
+    private $_getEnabled;
 	/**
 	 * Active or unactive the GET method
 	 * 
@@ -260,7 +274,7 @@ class Page
 	 */
     public function getGetEnabled() { return $this->_getEnabled; }
 
-	protected $_getExplicit;
+	private $_getExplicit;
 	/**
 	 * Active or unactive the explicit GET
 	 * 
@@ -269,17 +283,17 @@ class Page
     public function setGetExplicit( $explicit ) { $this->_getExplicit = $explicit; }
 	/**
 	 * If the GET is explicit the URL contains the labels of values.
-	 * URL: www.flea.namide.com/games
-	 * GET: array( 'page'=>2, 'tag'=>'RTS' );
-	 * ( explicit ) www.flea.namide.com/games/page/2/tag/RTS
-	 * ( !explicit ) www.flea.namide.com/games/2/RTS
+	 * - URL: www.flea.namide.com/games
+	 * - GET: array( 'page'=>2, 'tag'=>'RTS' );
+	 * - explicit: www.flea.namide.com/games/page/2/tag/RTS
+	 * - !explicit: www.flea.namide.com/games/2/RTS
 	 * 
 	 * @return boolean		Global variables GET explicit or not
 	 */
     public function getGetExplicit() { return $this->_getExplicit; }
 
 	
-    protected $_cachable;
+    private $_cachable;
 	/**
 	 * set the cachability of the page
 	 * 
@@ -294,7 +308,7 @@ class Page
 	 */
     public function getCachable() { return $this->_cachable; }
 
-    protected $_url;
+    private $_url;
 	/**
 	 * Set the URL of the page (without Root and GET)
 	 * 
@@ -308,7 +322,7 @@ class Page
 	 */
     public function getPageUrl() { return $this->_url; }
 	
-	protected $_additionalUrls;
+	private $_additionalUrls;
 	/**
 	 * Additionnal(s) URL for this page (without Root and GET)
 	 * 
@@ -361,7 +375,7 @@ class Page
 		return 0;
 	}
 	
-    protected $_htmlHeader;
+    private $_htmlHeader;
 	/**
 	 * Add to the content header HTML (links CSS, links JS...)
 	 * 
@@ -376,7 +390,7 @@ class Page
 	 */
 	public function getHtmlHeader() { return $this->_htmlHeader; }
 	
-    protected $_htmlBody;
+    private $_htmlBody;
 	/**
 	 * Set the body of the page
 	 * 
@@ -391,7 +405,7 @@ class Page
 	 */
 	public function getHtmlBody() { return $this->_htmlBody; }
 
-    protected $_htmlTitle;
+    private $_htmlTitle;
 	/**
 	 * Set the title of the page
 	 * 
@@ -405,7 +419,7 @@ class Page
 	 */
     public function getHtmlTitle() { return $this->_htmlTitle; }
 
-	protected $_htmlDescription;
+	private $_htmlDescription;
 	/**
 	 * Set the description of the page
 	 * 
@@ -419,7 +433,7 @@ class Page
 	 */
     public function getHtmlDescription() { return $this->_htmlDescription; }
 	
-    protected $_template;
+    private $_template;
 	/**
 	 * Change the template of the page
 	 * 
@@ -433,7 +447,7 @@ class Page
 	 */
     public function getTemplate() { return $this->_template; }
 
-	protected $_buildFile;
+	private $_buildFile;
 	/**
 	 * Change the build file of the page
 	 * 
@@ -448,7 +462,7 @@ class Page
     public function getBuildFile() { return $this->_buildFile; }
 	
 	/**
-	 * Echo the page (with template and Flea variables {{...}} transformed
+	 * Echo the page (with template and Flea variables {{...}} transformed)
 	 */
 	public function render()
 	{

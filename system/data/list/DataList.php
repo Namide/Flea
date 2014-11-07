@@ -33,10 +33,10 @@ namespace Flea;
  */
 class DataList
 {
-	public static $_EMPTY = null;
+	private static $_EMPTY = null;
 	
-	protected $_datas;
-	protected $_isAssoc;
+	private $_datas;
+	private $_isAssoc;
 	
 	/**
 	 * Construct the DataList in associative array or not

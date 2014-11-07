@@ -33,14 +33,6 @@ namespace Flea;
  */
 class DataUtil
 {
-	protected $_dir = '';
-	/**
-	 * Directory to save the files
-	 * 
-	 * @return string		Directory to save the files
-	 */
-	public function getDir() { return $this->_dir; }
-	
 	/**
 	 * Initialise the "connection" with the directory of data files
 	 * 
@@ -50,6 +42,14 @@ class DataUtil
 	{
 		$this->_dir = $dir;
 	}
+	
+	private $_dir = '';
+	/**
+	 * Directory to save the files
+	 * 
+	 * @return string		Directory to save the files
+	 */
+	public function getDir() { return $this->_dir; }
 	
 	/**
 	 * Add a file in the datas

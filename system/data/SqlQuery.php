@@ -34,13 +34,42 @@ namespace Flea;
  */
 class SqlQuery
 {
+	/**
+	 * Flag for a create request
+	 * 
+	 * @var int 
+	 */
 	public static $TYPE_CREATE = 1;
+	
+	/**
+	 * Flag for a select request
+	 * 
+	 * @var int 
+	 */
 	public static $TYPE_SELECT = 2;
+	
+	/**
+	 * Flag for an update request
+	 * 
+	 * @var int 
+	 */
 	public static $TYPE_UPDATE = 3;
+	
+	/**
+	 * Flag for a insert request
+	 * 
+	 * @var int 
+	 */
 	public static $TYPE_INSERT = 4;
+	
+	/**
+	 * Flag for a delete request
+	 * 
+	 * @var int 
+	 */
 	public static $TYPE_DELETE = 5;
 	
-	protected static $_TEMP = null;
+	private static $_TEMP = null;
 	
 	/**
 	 * Create a temporary request object.
@@ -61,7 +90,14 @@ class SqlQuery
 		return self::$_TEMP;
 	}
 	
-	protected $_type;
+	/////////////////////////////
+	//
+	//			TYPE
+	//
+	/////////////////////////////
+	
+	private $_type;
+	
 	/**
 	 * Type of the request :
 	 * - self::$TYPE_CREATE 
@@ -70,102 +106,350 @@ class SqlQuery
 	 * - self::$TYPE_INSERT 
 	 * - self::$TYPE_DELETE
 	 * 
-	 * @return int		Type of the request
+	 * @return int				Type of the request
 	 */
 	public function getType() { return $this->_type; }
+	
+	/**
+	 * Type of the request :
+	 * - self::$TYPE_CREATE 
+	 * - self::$TYPE_SELECT 
+	 * - self::$TYPE_UPDATE 
+	 * - self::$TYPE_INSERT 
+	 * - self::$TYPE_DELETE
+	 * 
+	 * @param string $type		Type of the request
+	 */
 	public function setType( $type ) { $this->_type = $type; }
 	
-	protected $_binds;
+	/////////////////////////////
+	//
+	//			BINDS
+	//
+	/////////////////////////////
+	
+	private $_binds;
+	
 	/**
 	 * Used in PDO to securise datas injected in the data base
 	 * 
 	 * @return array	Binds (like binds in PDO object)
 	 */
 	public function getBinds() { return $this->_binds; }
+	
+	/**
+	 * Used in PDO to securise datas injected in the data base
+	 * 
+	 * @param array $binds		List of binds in associative array
+	 */
 	public function setBinds( array $binds ) { $this->_binds = $this->_binds + $binds; }
+	
+	/**
+	 * Add a data in the binging list.
+	 * 
+	 * @param string $key				Label of the data
+	 * @param string $value			value of the data
+	 * @param string $pdoParamType	Type of the data (in PDO format)
+	 */
 	public function addBind( $key, $value, $pdoParamType )
 	{
 		$this->_binds[] = array($key, $value, $pdoParamType);
 	}
 	
+	/////////////////////////////
+	//
+	//			CREATE
+	//
+	/////////////////////////////
 	
-	// CREATE
-	protected $_create;
+	private $_create;
+	
+	/**
+	 * SQL CREATE.
+	 * like 'TABLE table_name ( row1 datas_type, row2 datas_type )'
+	 * 
+	 * @return string
+	 */
 	public function getCreate() { return $this->_create; }
+	
+	/**
+	 * SQL CREATE.
+	 * example: $create = 'TABLE table_name ( row1 datas_type, row2 datas_type )'
+	 * 
+	 * @param string $create
+	 */
 	public function setCreate( $create )
 	{
 		$this->_type = self::$TYPE_CREATE;
 		$this->_create = $create;
 	}
 	
-	// READ
-	protected $_select;
+	/////////////////////////////
+	//
+	//			READ
+	//
+	/////////////////////////////
+	
+	private $_select;
+	
+	/**
+	 * SQL SELECT.
+	 * like 'row_name FROM table_name'
+	 * 
+	 * @return string
+	 */
 	public function getSelect() { return $this->_select; }
+	
+	/**
+	 * SQL SELECT.
+	 * example: $select = 'row_name FROM table_name'
+	 * 
+	 * @param string $select
+	 */
 	public function setSelect( $select )
 	{
 		$this->_type = self::$TYPE_SELECT;
 		$this->_select = $select;
 	}
 	
-	protected $_where;
+	private $_where;
+	
+	/**
+	 * SQL WHERE.
+	 * like 'row_name = row_value'
+	 * 
+	 * @return string
+	 */
 	public function getWhere() { return $this->_where; }
+	
+	/**
+	 * SQL WHERE.
+	 * example $where = 'row_name = row_value'
+	 * 
+	 * @param string $where
+	 */
 	public function setWhere( $where ) { $this->_where = $where; }
 	
-	protected $_from;
+	private $_from;
+	
+	/**
+	 * SQL FROM.
+	 * like 'table_name'
+	 * 
+	 * @return string
+	 */
 	public function getFrom() { return $this->_from; }
+	
+	/**
+	 * SQL FROM.
+	 * example $from = 'table_name'
+	 * 
+	 * @param string $from
+	 */
 	public function setFrom( $from ) { $this->_from = $from; }
 	
-	protected $_groupBy;
+	private $_groupBy;
+	
+	/**
+	 * SQL GROUP BY.
+	 * like 'column_name'
+	 * 
+	 * @return string
+	 */
 	public function getGroupBy() { return $this->_groupBy; }
+	
+	/**
+	 * SQL GROUP BY.
+	 * example $groupBy = 'column_name'
+	 * 
+	 * @param string $groupBy
+	 */
 	public function setGroupBy( $groupBy ) { $this->_groupBy = $groupBy; }
 	
-	protected $_having;
+	private $_having;
+	
+	/**
+	 * SQL HAVING.
+	 * like 'SUM(cost) > 40'
+	 * 
+	 * @return string
+	 */
 	public function getHaving() { return $this->_having; }
+	
+	/**
+	 * SQL HAVING.
+	 * example: $having = 'SUM(cost) > 40'
+	 * 
+	 * @param string $having
+	 */
 	public function setHaving( $having ) { $this->_having = $having; }
 	
-	protected $_orderBy;
+	private $_orderBy;
+	
+	/**
+	 * SQL ORDER BY.
+	 * Like 'column1'
+	 * 
+	 * @return string
+	 */
 	public function getOrderBy() { return $this->_orderBy; }
+	
+	/**
+	 * SQL ORDER BY.
+	 * Example: $orderBy = 'column1'
+	 * 
+	 * @param string $orderBy
+	 */
 	public function setOrderBy( $orderBy ) { $this->_orderBy = $orderBy; }
 	
-	protected $_limit;
+	private $_limit;
+	
+	/**
+	 * SQL LIMIT.
+	 * Like '10'
+	 * 
+	 * @return string
+	 */
 	public function getLimit() { return $this->_limit; }
+	
+	/**
+	 * SQL LIMIT.
+	 * Example: $limit = '10'
+	 * 
+	 * @param string $limit
+	 */
 	public function setLimit( $limit ) { $this->_limit = $limit; }
 	
-	// INSERT
-	protected $_insert;
+	/////////////////////////////
+	//
+	//			INSERT
+	//
+	/////////////////////////////
+	
+	private $_insert;
+	
+	/**
+	 * SQL INSERT.
+	 * Like 'table_name'
+	 * 
+	 * @return string
+	 */
 	public function getInsert() { return $this->_insert; }
+	
+	/**
+	 * SQL INSERT.
+	 * Example: $insert = 'table_name'
+	 * 
+	 * @param string $insert
+	 */
 	public function setInsert( $insert )
 	{
 		$this->_type = self::$TYPE_INSERT;
 		$this->_insert = $insert;
 	}
 	
-	protected $_values;
+	private $_values;
+	
+	/**
+	 * SQL VALUES.
+	 * Like '("val1", "val2")'
+	 * 
+	 * @return type
+	 */
 	public function getValues() { return $this->_values; }
+	
+	/**
+	 * SQL VALUES.
+	 * Example: $values = '("val1", "val2")'
+	 * 
+	 * @param string $values
+	 */
 	public function setValues( $values ) { $this->_values = $values; }
 
-	// UPDATE
-	protected $_update;
+	/////////////////////////////
+	//
+	//			UPDATE
+	//
+	/////////////////////////////
+	
+	private $_update;
+	
+	/**
+	 * SQL UPDATE.
+	 * Like 'table_name'
+	 * 
+	 * @return string
+	 */
 	public function getUpdate() { return $this->_update; }
+	
+	/**
+	 * SQL UPDATE.
+	 * example: $update = 'table_name'
+	 * 
+	 * @param string $update
+	 */
 	public function setUpdate( $update )
 	{
 		$this->_type = self::$TYPE_UPDATE;
 		$this->_update = $update;
 	}
 	
-	protected $_set;
+	private $_set;
+	
+	/**
+	 * SQL SET.
+	 * Like 'name_column_1 = "value"'
+	 * 
+	 * @return string
+	 */
 	public function getSet() { return $this->_set; }
+	
+	/**
+	 * SQL SET.
+	 * example: $set = 'name_column_1 = "value"'
+	 * 
+	 * @param string $set
+	 */
 	public function setSet( $set ) { $this->_set = $set; }
 	
-	// DELETE
-	protected $_delete;
+	/////////////////////////////
+	//
+	//			DELETE
+	//
+	/////////////////////////////
+	
+	private $_delete;
+	
+	/**
+	 * SQL DELETE.
+	 * Like '*'
+	 * 
+	 * @return string
+	 */
 	public function getDelete() { return $this->_delete; }
+	
+	/**
+	 * SQL DELETE.
+	 * Example: $delete = '*'
+	 * 
+	 * @param string $delete
+	 */
 	public function setDelete( $delete )
 	{
-		$this->_type = self::$TYPE_UPDATE;
+		$this->_type = self::$TYPE_DELETE;
 		$this->_delete = $delete;
 	}
 	
+	/**
+	 * Initialize the query with the type :
+	 * - SqlQuery::$TYPE_CREATE 
+	 * - SqlQuery::$TYPE_SELECT 
+	 * - SqlQuery::$TYPE_UPDATE 
+	 * - SqlQuery::$TYPE_INSERT 
+	 * - SqlQuery::$TYPE_DELETE
+	 * 
+	 * @param int $type		Type of the query
+	 */
 	public function __construct( $type = 0 )
 	{
 		$this->clean( $type );
@@ -470,7 +754,7 @@ class SqlQuery
 	 * 
 	 * @return string		Request in SQL to create a table
 	 */
-	protected function getRequestCreate()
+	private function getRequestCreate()
 	{
 		if(_DEBUG && $this->_create == '')
 		{
@@ -484,7 +768,7 @@ class SqlQuery
 	 * 
 	 * @return string		Request in SQL to select rows in a table
 	 */
-	protected function getRequestRead()
+	private function getRequestRead()
 	{
 		if($this->_select == '')
 		{
@@ -509,7 +793,7 @@ class SqlQuery
 	 * 
 	 * @return string		Request in SQL to insert lines in a table
 	 */
-	protected function getRequestInsert()
+	private function getRequestInsert()
 	{
 		if(_DEBUG)
 		{
@@ -530,7 +814,7 @@ class SqlQuery
 	 * 
 	 * @return string		Request in SQL to update line in a table
 	 */
-	protected function getRequestUpdate()
+	private function getRequestUpdate()
 	{
 		if(_DEBUG)
 		{
@@ -556,7 +840,7 @@ class SqlQuery
 	 * 
 	 * @return string		Generate the string request to delete lines
 	 */
-	protected function getRequestDelete()
+	private function getRequestDelete()
 	{
 		if(_DEBUG)
 		{

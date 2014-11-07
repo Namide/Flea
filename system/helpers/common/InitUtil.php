@@ -36,11 +36,14 @@ class InitUtil
 {
 	private static $_INSTANCES = array();
     
-    final protected function __construct()
+    final private function __construct()
     {
         $this->reset();
     }
 	
+	/**
+	 * Reset the object
+	 */
     protected function reset() { }
 	
 	/**
@@ -76,10 +79,7 @@ class InitUtil
        return _ROOT_URL._CONTENT_DIRECTORY.$file;
     }
 	
-	/**
-	 * Unclonable (singleton)
-	 */
-	final public function __clone()
+	final private function __clone()
     {
         if ( _DEBUG )
 		{

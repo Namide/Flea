@@ -43,6 +43,7 @@ include_once _SYSTEM_DIRECTORY.'data/General.php';
 include_once _SYSTEM_DIRECTORY.'helpers/system/UrlUtil.php';
 include_once _SYSTEM_DIRECTORY.'helpers/common/InitUtil.php';
 include_once _SYSTEM_DIRECTORY.'helpers/common/BuildUtil.php';
+include_once _SYSTEM_DIRECTORY.'helpers/Helper.php';
 
 if ( _CACHE )
 {

@@ -42,19 +42,68 @@ class Debug
 	private $_timerList;
 	
 	private $_errorBackNum = 10;
+	
+	/**
+	 * Number of functions called before the error.
+	 * Default is 10.
+	 * 
+	 * @param int $num		Maximum of caller saved
+	 */
 	public function setErrorBackNum( $num ) { $this->_errorBackNum = $num; }
+	
+	/**
+	 * Number of functions called before the error.
+	 * 
+	 * @return int			Maximum of caller saved
+	 */
 	public function getErrorBackNum() { return $this->_errorBackNum; }
 
 	private $_errorJsAlert = false;
+	
+	/**
+	 * Force the JavaScript alert() to trace errors.
+	 * 
+	 * @param bool $errorJsAlert		Force it
+	 */
+	
 	public function setErrorJsAlert( $errorJsAlert ) { $this->_errorJsAlert = $errorJsAlert; }
+	/**
+	 * Errors traced with the JavaScript function: alert()
+	 * 
+	 * @return type						Is it
+	 */
 	public function getErrorJsAlert() { return $this->_errorJsAlert; }
 
 	private $_errorEcho = true;
+	
+	/**
+	 * Force the php echo to trace errors in the page.
+	 * 
+	 * @param bool $errorEcho		Force it
+	 */
 	public function setErrorEcho( $errorEcho ) { $this->_errorEcho = $errorEcho; }
+	
+	/**
+	 * Errors traced with the php function: echo
+	 * 
+	 * @return type						Is it
+	 */
 	public function getErrorEcho() { return $this->_errorEcho; }
 
 	private $_errorJsLog = true;
+	
+	/**
+	 * Force the JavaScript console.log() to output errors.
+	 * 
+	 * @param bool $errorEcho		Force it
+	 */
 	public function setErrorJsLog( $errorJsLog ) { $this->_errorJsLog = $errorJsLog; }
+	
+	/**
+	 * Errors traced with the JavaScript function: console.log()
+	 * 
+	 * @return type						Is it
+	 */
 	public function getErrorJsLog() { return $this->_errorJsLog; }
 
 	/**
@@ -70,7 +119,7 @@ class Debug
 	
 	/**
 	 * Dispatch all errors messages.
-	 * Echo in the HTML and in alert(); JavaScript
+	 * Echo in the HTML (PHP), in alert() (JavaScript) or console.log() (JavaScript)
 	 */
 	public function dispatchErrors()
 	{
@@ -110,6 +159,9 @@ class Debug
 	
 	/**
 	 * Get all the markers and the total time
+	 * 
+	 * @param string $msg		Message for the total time
+	 * @return string			All datas
 	 */
 	public function getTimes( $msg )
 	{
@@ -145,7 +197,7 @@ class Debug
 	/**
 	 * Unclonable
 	 */
-    final public function __clone()
+    final private function __clone()
     {
 		if ( _DEBUG )
 		{

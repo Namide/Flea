@@ -27,7 +27,8 @@
 namespace Flea;
 
 /**
- * Description of TagUtil
+ * Helper for tags.
+ * You can use this class for create tags ( a, img, breadcrump )
  *
  * @author damien
  */
@@ -84,7 +85,6 @@ class TagUtil
 	}
 	
 	/**
-	 * 
 	 * Simple method to get breadcrump of the current page.
 	 * It have microdatas.
 	 * 

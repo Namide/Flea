@@ -35,17 +35,19 @@ class PageList
 {
 	private static $_INSTANCE = null;
 	
-	public static $LOAD_INIT = 0;
-	public static $LOAD_LIST = 1;
+	//public static $LOAD_INIT = 0;
+	//public static $LOAD_LIST = 1;
 	
     /**
 	 * List of pages.
 	 * By default this query return all the pages without the non-visible pages.
 	 * To change this you must use a SqlQuery with an other where defined.
 	 * Exemple :
+	 * <pre>
 	 * $query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
 	 * $query->setWhere('_visible = 1 AND _visible = 0');
 	 * $pages = PageList::getInstance()->getAll( $query );
+	 * </pre>
 	 * 
 	 * @param SqlQuery $query		Query for the request
 	 * @return array				All the Pages
@@ -84,9 +86,11 @@ class PageList
 	 * Get the page and use the list of the page.
 	 * You can use the values used in the DataList of the Page (tags, contents...)
 	 * Example :
+	 * <pre>
 	 * $query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
 	 * $query->setWhere('_lang = \'en\' AND page_prop = \'_tags\' AND value = \'post\' AND _visible = 1');
 	 * $pages = PageList::getInstance()->getByList ( $query );
+	 * </pre>
 	 * 
 	 * @param SqlQuery $query		Query for the request
 	 * @return Page					List the Pages corresponding of the request
@@ -155,7 +159,7 @@ class PageList
 	/**
 	 * You must use the static method PageList::getInstance();
 	 */
-	final protected function __construct() { }
+	final private function __construct() { }
 	
 	/**
 	 * Return all the pages with the name $name (all langues)
@@ -277,7 +281,7 @@ class PageList
 	
 	
 	
-	protected $_default;
+	private $_default;
 	/**
 	 * The name of the default page
 	 * 
@@ -285,7 +289,7 @@ class PageList
 	 */
 	public function getDefaultPageName() { return $this->_default; }
 	
-	protected $_error404;
+	private $_error404;
 	/**
 	 * The name of the error 404 page
 	 * 
@@ -388,8 +392,6 @@ class PageList
         return $page;
     }
 	
-	
-
 	/**
 	 * Get the page by relative URL
 	 * 
@@ -566,7 +568,7 @@ class PageList
 		return LangList::getInstance()->getLangByNavigator();
     }
 	
-	final public function __clone()
+	final private function __clone()
     {
 		if ( _DEBUG )
 		{

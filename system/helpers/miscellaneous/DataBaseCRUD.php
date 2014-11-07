@@ -139,14 +139,5 @@ class DataBaseCRUD
         return self::$_INSTANCE[$tableName];
     }
 	
-	/**
-	 * Can't clone a multiton
-	 */
-	final public function __clone()
-    {
-        if ( _DEBUG ) 
-		{
-			Debug::getInstance()->addError('You can\'t clone a multiton');
-		}
-    }
+	private function __clone() { }
 }

@@ -37,7 +37,13 @@ class DataBase
     private static $_INSTANCE = array();
 	
 	private $_pdo;
-	 
+	
+	/**
+	 * Analyzes the object and obtains his table 's name for the data base.
+	 * 
+	 * @param object $obj		Object to analyze
+	 * @return string			Name of the table for this object
+	 */
 	public static function objectToTableName( $obj )
 	{
 		return stripslashes(get_class($obj));
@@ -270,15 +276,6 @@ class DataBase
         return self::$_INSTANCE[$dsn];
     }
 	
-	/**
-	 * Unclonable object
-	 */
-	final public function __clone()
-    {
-        if ( _DEBUG ) 
-		{
-			Debug::getInstance()->addError('You can\'t clone a multiton');
-		}
-    }
+	private function __clone() { }
 	
 }

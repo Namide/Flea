@@ -3,7 +3,7 @@
 
 <?php
 
-var_dump( Flea\General::getInstance()->getCurrentGetUrl() );
+var_dump( Flea\Helper::getGeneral()->getCurrentGetUrl() );//Flea\General::getInstance()->getCurrentGetUrl() );
 
  //if ( Flea\BuildUtil::getInstance()-> )
 	 

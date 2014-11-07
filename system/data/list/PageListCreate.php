@@ -47,9 +47,9 @@ class PageListCreate
 	}
 	
 	/**
-	 * Add 301 redirections...
+	 * Add 301 redirections and other commands
 	 * 
-	 * @param type $file				File with commands
+	 * @param string $file				File with commands
 	 */
 	public function commands( $file )
 	{
@@ -74,7 +74,7 @@ class PageListCreate
 		$this->db_insertPages($listOfPages);
 	}
 	
-	protected function db_createPagesDB()
+	private function db_createPagesDB()
 	{
 		$tableName = DataBase::objectToTableName( Page::getEmptyPage() );
 		
@@ -90,7 +90,7 @@ class PageListCreate
 	}
 
 
-	protected function db_insertPages( array $list )
+	private function db_insertPages( array $list )
 	{
 		$tableName = DataBase::objectToTableName( Page::getEmptyPage() );
 		$db = DataBase::getInstance(_DB_DSN_PAGE);
@@ -136,7 +136,7 @@ class PageListCreate
 	 * @param type $fileDirRel		Relative directory (for the recursivity)	
 	 * @return array				List of the pages added
 	 */
-	protected function addPageByDirRecurs( $dir, $fileDirRel = '' )
+	private function addPageByDirRecurs( $dir, $fileDirRel = '' )
 	{
 		$list = array();
 		
@@ -167,7 +167,7 @@ class PageListCreate
 	 * @param string $folderName	Name of the folder thats contain the page
 	 * @return array				List of the pages generated (differents languages)
 	 */
-	protected function createPage( $folderName )
+	private function createPage( $folderName )
     {
         $pages = array();
         
@@ -249,12 +249,9 @@ class PageListCreate
         return $page;
     }
 	
-	/**
-	 * Can't construct a singleton
-	 */
-	final protected function __construct() { }
+	final private function __construct() { }
 	
-	final public function __clone()
+	final private function __clone()
     {
 		if ( _DEBUG )
 		{

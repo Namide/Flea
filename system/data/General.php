@@ -33,9 +33,9 @@ namespace Flea;
  */
 class General
 {
-	protected static $_INSTANCE;
+	private static $_INSTANCE;
 
-	protected $_pagesInitialised = false;
+	private $_pagesInitialised = false;
 	
 	/**
 	 * All page initialised
@@ -87,7 +87,8 @@ class General
 		$this->_pagesInitialised = true;
 	}
 	
-	protected $_currentPageName;
+	private $_currentPageName;
+	
 	/**
 	 * Name of the current page
 	 * 
@@ -103,7 +104,8 @@ class General
 		return $this->_currentPageName;
 	}
 	
-	protected $_currentPage;
+	private $_currentPage;
+	
 	/**
 	 * Current page
 	 * 
@@ -119,7 +121,8 @@ class General
 		return $this->_currentPage;
 	}
 	
-	protected $_currentLang;
+	private $_currentLang;
+	
 	/**
 	 * Current language
 	 * 
@@ -135,7 +138,8 @@ class General
 		return $this->_currentLang;
 	}
 	
-	protected $_currentGetUrl;
+	private $_currentGetUrl;
+	
 	/**
 	 * Current $_GET
 	 * 
@@ -151,7 +155,8 @@ class General
 		return $this->_currentGetUrl;
 	}
 	
-	protected $_currentPostUrl = null;
+	private $_currentPostUrl = null;
+	
 	/**
 	 * Current $_POST
 	 * 
@@ -171,7 +176,8 @@ class General
 		return $this->_currentPostUrl;
 	}
 	
-	protected $_currentPageUrl;
+	private $_currentPageUrl;
+	
 	/**
 	 * Current page URL
 	 * 
@@ -224,15 +230,9 @@ class General
 		$this->_currentGetUrl = $getUrl;
 	}
 	
-	/**
-	 * You can't construct a singleton
-	 */
-	protected function __construct() { }
+	private function __construct() { }
 	
-	/**
-	 * You can't clone a singleton
-	 */
-	protected function __clone() { }
+	private function __clone() { }
 
 	/**
 	 * Get the instance of General
