@@ -42,7 +42,7 @@ class PageList
 	 * List of pages.
 	 * By default this query return all the pages without the non-visible pages.
 	 * To change this you must use a SqlQuery with an other where defined.
-	 * Exemple :
+	 * Example:
 	 * <pre>
 	 * $query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
 	 * $query->setWhere('_visible = 1 AND _visible = 0');
@@ -85,7 +85,7 @@ class PageList
 	/**
 	 * Get the page and use the list of the page.
 	 * You can use the values used in the DataList of the Page (tags, contents...)
-	 * Example :
+	 * <br>Example:
 	 * <pre>
 	 * $query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
 	 * $query->setWhere('_lang = \'en\' AND page_prop = \'_tags\' AND value = \'post\' AND _visible = 1');

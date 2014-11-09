@@ -41,8 +41,8 @@ Contenu !
 
 function addUser( \Flea\Login $login )
 {
-	$urlUtil = Flea\UrlUtil::getInstance();
-	$gen = \Flea\General::getInstance();
+	$build = \Flea\Helper::getBuildUtil();
+	$gen = \Flea\Helper::getGeneral();
 	$post = $gen->getCurrentPostUrl();
 	if (	isset($post['addUserEmail']) &&
 			isset($post['addUserPass']) )
@@ -50,7 +50,7 @@ function addUser( \Flea\Login $login )
 		$login->addUser( $post['addUserEmail'], $post['addUserPass'] );
 	}
 	
-	$currentUrl = Flea\BuildUtil::getInstance()->getAbsUrl( $gen->getCurrentPage()->getName() );
+	$currentUrl = $build->getAbsUrl( $gen->getCurrentPage()->getName() );
 	
 	$form = '<form method="post" action="'.$currentUrl.'">
 				<input class="field" type="text" name="addUserEmail" placeholder="E-mail" value="" required="required" pattern="^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"/>
@@ -62,7 +62,7 @@ function addUser( \Flea\Login $login )
 
 function connectUser( \Flea\Login $login )
 {
-	$urlUtil = Flea\UrlUtil::getInstance();
+	$build = \Flea\Helper::getBuildUtil();
 	$gen = \Flea\General::getInstance();
 	$post = $gen->getCurrentPostUrl();
 	if (	isset($post['connectUserEmail']) &&
@@ -71,7 +71,7 @@ function connectUser( \Flea\Login $login )
 		$login->connect( $post['connectUserEmail'], $post['connectUserPass'] );
 	}
 	
-	$currentUrl = Flea\BuildUtil::getInstance()->getAbsUrl( $gen->getCurrentPage()->getName() );
+	$currentUrl = $build->getAbsUrl( $gen->getCurrentPage()->getName() );
 	
 	$form = '<form method="post" action="'.$currentUrl.'">
 				<input class="field" type="text" name="connectUserEmail" placeholder="E-mail" value="" required="required"/>
@@ -102,7 +102,7 @@ function getUserList( \Flea\Login $login )
 	
 function disconnectUser( \Flea\Login $login )
 {
-	$urlUtil = Flea\UrlUtil::getInstance();
+	$buil = \Flea\Helper::getBuildUtil();
 	$gen = \Flea\General::getInstance();
 	$post = $gen->getCurrentPostUrl();
 	if ( isset($post['disconnectUser']) )
@@ -110,7 +110,7 @@ function disconnectUser( \Flea\Login $login )
 		$login->disconnect();
 	}
 	
-	$currentUrl = Flea\BuildUtil::getInstance()->getAbsUrl( $gen->getCurrentPage()->getName() );
+	$currentUrl = $buil->getAbsUrl( $gen->getCurrentPage()->getName() );
 	
 	$form = '<form method="post" action="'.$currentUrl.'">
 				<input type="hidden" name="disconnectUser" value="1">
@@ -118,5 +118,3 @@ function disconnectUser( \Flea\Login $login )
 			</form>';
 	return $form;
 }
-
-?>

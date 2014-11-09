@@ -28,6 +28,8 @@ namespace Flea;
 
 /**
  * Flags for the names of the table used by the Login class.
+ * 
+ * @author Namide
  */
 class LoginTableName
 {
@@ -53,6 +55,8 @@ class LoginTableName
 
 /**
  * User's variables used by the Login class.
+ * 
+ * @author Namide
  */
 class LoginUser
 {
@@ -104,7 +108,7 @@ class LoginUser
 	 * 
 	 * @param DataBase $db		DataBase used to this user
 	 */
-	public function __construct( $db )
+	private function __construct( $db )
 	{
 		$this->_db = $db;
 	}
@@ -152,6 +156,7 @@ class LoginUser
 }
 
 /**
+ * Class to manipulate Users (connect, disconnect, add...)
  * 
  * @author Namide
  */
@@ -274,6 +279,23 @@ class Login
 	/**
 	 * List of the users.
 	 * Only if your are admin and connected
+	 * <br>Example of getUserList() in <code>en-build.php</code>
+	 * <pre>
+	 * $list = $login->getUserList('group', 'admin');
+	 * $output = '';
+	 * if ( is_array($list) )
+	 * {
+	 *   foreach ($list as $userMail => $userDatas)
+	 *   {
+	 *     $output .= $userMail.'<br>-role: '.$userDatas['role'].'<br>';
+	 *     foreach ($userDatas['datas'] as $dataKey => $dataValue )
+	 *     {
+	 *       $output .= '-'.$dataKey.': '.$dataValue.'<br>';
+	 *     }
+	 *   }
+	 * }
+	 * echo $output;
+	 * </pre>
 	 * 
 	 * @param string $dataKey				Key for the filter (example: group)
 	 * @param string $dataValue				Value for the filter (example: gamer)
@@ -312,7 +334,39 @@ class Login
 	
 	/**
 	 * Add a new user.
-	 * Only if your are admin and connected
+	 * Only if your are admin and connected.<br>
+	 * <br>Example of addUser() in <code>en-build.php</code>
+	 * <pre>
+	 * $build = \Flea\Helper::getBuildUtil();
+	 * $gen = \Flea\Helper::getGeneral();
+	 * $post = $gen->getCurrentPostUrl();
+	 * if (	isset($post['addUserEmail']) &&
+	 *		isset($post['addUserPass']) )
+	 * {
+	 * 	$login->addUser( $post['addUserEmail'],
+	 *				$post['addUserPass'] );
+	 * }
+	 * $currentUrl = $build->getAbsUrl( $gen->getCurrentPage()->getName() );
+	 * $form = '<form method="post" action="'.$currentUrl.'">
+	 * 		<input class="field" 
+	 *				type="text"
+	 *				name="addUserEmail"
+	 *				placeholder="E-mail"
+	 *				value=""
+	 *				required="required"
+	 *				pattern="^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"/>
+	 * 		<input class="field"
+	 *				type="password"
+	 *				name="addUserPass"
+	 *				placeholder="Password"
+	 *				value=""
+	 *				required="required"/>
+	 * 		<input type="submit"
+	 *				name="add"
+	 *				value="add">
+	 * 	</form>';
+	 * echo $form;
+	 * </pre>
 	 * 
 	 * @param type $email		Email of the new user
 	 * @param type $realPass	Password of the new user
@@ -378,6 +432,36 @@ class Login
 	/**
 	 * Connect the user.
 	 * After this state a token will be storage in the session
+	 * <br>Example of connect() in <code>en-build.php</code>
+	 * <pre>
+	 * $build = \Flea\Helper::getBuildUtil();
+	 * $gen = \Flea\General::getInstance();
+	 * $post = $gen->getCurrentPostUrl();
+	 * if (	isset($post['connectUserEmail']) &&
+	 * 		isset($post['connectUserPass']) )
+	 * {
+	 * 	$login->connect( $post['connectUserEmail'], 
+	 * 			$post['connectUserPass'] );
+	 * }
+	 * $currentUrl = $build->getAbsUrl( $gen->getCurrentPage()->getName() );
+	 * $form = '<form method="post" action="'.$currentUrl.'">
+	 * 		<input class="field"
+	 * 			type="text" 
+	 * 			name="connectUserEmail" 
+	 * 			placeholder="E-mail" 
+	 * 			value="" 
+	 * 			required="required"/>
+	 * 		<input class="field" 
+	 * 			type="password" 
+	 * 			name="connectUserPass" 
+	 * 			placeholder="Password" 
+	 * 			value="" required="required"/>
+	 * 		<input type="submit" 
+	 * 			name="connect" 
+	 * 			value="connect">
+	 * 		</form>';
+	 * echo $form;
+	 * </pre>
 	 * 
 	 * @param string $email			Email of the user
 	 * @param string $realPass		Password of the user
@@ -423,6 +507,22 @@ class Login
 	
 	/**
 	 * Disconnect the current connected user.
+	 * <br>Example of connect() in <code>en-build.php</code>
+	 * <pre>
+	 * $buil = \Flea\Helper::getBuildUtil();
+	 * $gen = \Flea\General::getInstance();
+	 * $post = $gen->getCurrentPostUrl();
+	 * if ( isset($post['disconnectUser']) )
+	 * {
+	 *   $login->disconnect();
+	 * }
+	 * $currentUrl = $buil->getAbsUrl( $gen->getCurrentPage()->getName() );
+	 * $form = '<form method="post" action="'.$currentUrl.'">
+	 *			<input type="hidden" name="disconnectUser" value="1">
+	 *			<input type="submit" name="disconnect" value="disconnect">
+	 *		</form>';
+	 * echo $form;
+	 * </pre>
 	 */
 	public function disconnect()
 	{
@@ -508,7 +608,7 @@ class Login
 	}
 	
 	/**
-	 * Get the Login object
+	 * Get the Login manager
 	 * 
 	 * @param string $dbDsn		Data Source Name of the data base
 	 * @return Login			Login corresponding at the data base

@@ -40,16 +40,19 @@ class TagUtil
 	/**
 	 * Simple method to create a link.
 	 * Ex:
-	 * - $pageName = 'home';
-	 * - $tagBefore = '<em>';
-	 * - $tagAfter = '</em>';
-	 * - $attInA = ' class="link-home blue"';
-	 * =>  <a href="http://flea.namide.com/en/home" class="link-home blue">Home page<em></em></a>
+	 * <pre>
+	 * $pageName = 'home';
+	 * $tagBefore = '<em>';
+	 * $tagAfter = '</em>';
+	 * $attInA = 'class="link-home blue"';
+	 * getLink( $pageName, $tagBefore, $tagAfter, $attInA );
+	 * //output => <a href="http://flea.namide.com/en/home" class="link-home blue">Home page<em></em></a>
+	 * </pre>
 	 * 
 	 * @param string $pageName		Name of the page to linked
-	 * @param string $tagBefore		Tag before the title of the page (in the tag <a></a>)
-	 * @param string $tagAfter		Tag after the title of the page (in the tag <a></a>)
-	 * @param string $attInA		Additionnal attribute to the tag <a></a>
+	 * @param string $tagBefore		Tag before the title of the page (in the tag '<a></a>')
+	 * @param string $tagAfter		Tag after the title of the page (in the tag '<a></a>')
+	 * @param string $attInA		Additionnal attribute to the tag '<a></a>'
 	 * @return string				HTML link generated	
 	 */
 	public static function getLink( $pageName, $tagBefore = '', $tagAfter = '', $attInA = '' )

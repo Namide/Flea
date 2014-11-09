@@ -36,7 +36,8 @@ class Helper
 	
 	private function __construct() { }
 	
-	private static $_PAGE_LIST;
+	private static $_PAGE_LIST = false;
+	
 	/**
 	 * List of pages in the website
 	 * 
@@ -44,15 +45,16 @@ class Helper
 	 */
 	public static function getPageList()
 	{
-		if ( Helper::$_PAGE_LIST === null )
+		if ( !Helper::$_PAGE_LIST )
 		{
 			include_once _SYSTEM_DIRECTORY.'data/list/PageList.php';
-			Helper::$_PAGE_LIST = PageList::getInstance();
+			Helper::$_PAGE_LIST = true;
 		}
-		return Helper::$_PAGE_LIST;
+		return PageList::getInstance();
 	}
 	
-	private static $_BUILD_UTIL;
+	private static $_BUILD_UTIL = false;
+	
 	/**
 	 * Utils to write pages and template.
 	 * This class cannot be used before the building page time.
@@ -61,15 +63,16 @@ class Helper
 	 */
 	public static function getBuildUtil()
 	{
-		if ( Helper::$_BUILD_UTIL === null )
+		if ( !Helper::$_BUILD_UTIL )
 		{
 			include_once _SYSTEM_DIRECTORY.'helpers/common/BuildUtil.php';
-			Helper::$_BUILD_UTIL = BuildUtil::getInstance();
+			Helper::$_BUILD_UTIL = true;
 		}
-		return Helper::$_BUILD_UTIL;
+		return BuildUtil::getInstance();
 	}
 	
-	private static $_INIT_UTIL;
+	private static $_INIT_UTIL = false;
+	
 	/**
 	 * All simple methods usable after pages building.
 	 * You can use it during the initialization state.
@@ -78,15 +81,16 @@ class Helper
 	 */
 	public static function getInitUtil()
 	{
-		if ( Helper::$_INIT_UTIL === null )
+		if ( !Helper::$_INIT_UTIL )
 		{
 			include_once _SYSTEM_DIRECTORY.'helpers/common/InitUtil.php';
-			Helper::$_INIT_UTIL = InitUtil::getInstance();
+			Helper::$_INIT_UTIL = true;
 		}
-		return Helper::$_INIT_UTIL;
+		return InitUtil::getInstance();
 	}
 	
-	private static $_URL_UTIL;
+	private static $_URL_UTIL = false;
+	
 	/**
 	 * URL managment
 	 * 
@@ -94,15 +98,16 @@ class Helper
 	 */
 	public static function getUrlUtil()
 	{
-		if ( Helper::$_URL_UTIL === null )
+		if ( !Helper::$_URL_UTIL )
 		{
 			include_once _SYSTEM_DIRECTORY.'helpers/system/UrlUtil.php';
-			Helper::$_URL_UTIL = UrlUtil::getInstance();
+			Helper::$_URL_UTIL = true;
 		}
-		return Helper::$_URL_UTIL;
+		return UrlUtil::getInstance();
 	}
 	
-	private static $_TAG_UTIL;
+	private static $_TAG_UTIL = false;
+	
 	/**
 	 * Helper for tags.
 	 * You can use this class for create tags ( a, img, breadcrump )
@@ -111,27 +116,46 @@ class Helper
 	 */
 	public static function getTagUtil()
 	{
-		if ( Helper::$_TAG_UTIL === null )
+		if ( !Helper::$_TAG_UTIL )
 		{
 			include_once _SYSTEM_DIRECTORY.'helpers/miscellaneous/TagUtil.php';
-			Helper::$_TAG_UTIL = TagUtil::getInstance();
+			Helper::$_TAG_UTIL = true;
 		}
-		return Helper::$_TAG_UTIL;
+		return TagUtil::getInstance();
 	}
 	
-	private static $_GENERAL;
+	private static $_GENERAL = false;
+	
 	/**
-	 *  All the general data changeable (current page, state...)
+	 * All the general data changeable (current page, state...)
 	 * 
 	 * @return General
 	 */
 	public static function getGeneral()
 	{
-		if ( Helper::$_GENERAL === null )
+		if ( !Helper::$_GENERAL )
 		{
 			include_once _SYSTEM_DIRECTORY.'data/General.php';
-			Helper::$_GENERAL = General::getInstance();
+			Helper::$_GENERAL = true;
 		}
-		return Helper::$_GENERAL;
+		return General::getInstance();
+	}
+	
+	private static $_LOGIN = false;
+	
+	/**
+	 * Login manager
+	 * 
+	 * @param type $dbDsn		Data Source Name of the data base used for this Login
+	 * @return Login
+	 */
+	public static function getLogin( $dbDsn )
+	{
+		if ( !Helper::$_LOGIN )
+		{
+			include_once _SYSTEM_DIRECTORY.'helpers/miscellaneous/Login.php';
+			Helper::$_LOGIN = true;
+		}
+		return Login::getInstance($dbDsn);
 	}
 }
