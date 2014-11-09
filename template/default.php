@@ -9,7 +9,7 @@
 <head>
 
     <meta charset="utf-8">
-	<title>{{title}} - FWK</title>
+	<title>{{title}} - Flea</title>
     <meta name="description" content="{{description}}" />
 	
 	
