@@ -1,38 +1,18 @@
 <?php
-
-/* 
- * The MIT License
- *
- * Copyright 2014 Damien Doussaud (namide.com).
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
-namespace Flea\admin;
-
-include_once _SYSTEM_DIRECTORY.'data/DataBase.php';
-include_once _SYSTEM_DIRECTORY.'helpers/system/Cache.php';
-include_once _SYSTEM_DIRECTORY.'init/import.php';
-
 if( _DEBUG )
 {
-	\Flea\Debug::getInstance()->setErrorBackNum(0);
+	\Flea\Debug::getInstance()->setErrorBackNum(10);	// 0
+}
+
+function echoLine( $num, $url, $dir, $lang, $errors, $links )
+{
+	echo '<tr><td>', $num, '</td>'
+	, '<td>', $url, '</td>'
+	, '<td>', $dir, '</td>'
+	, '<td>', $lang, '</td>'
+	, '<td>', $errors, '</td>'
+	, '<td>', $links, '</td>'
+	, '<td id="seo'.$num.'"></td></tr>';
 }
 
 ?>
@@ -126,56 +106,62 @@ if( _DEBUG )
 		
 		$request = \Flea\SqlQuery::getTemp( \Flea\SqlQuery::$TYPE_SELECT );
 		$request->setWhere('_visible > -1 OR _visible < 0');
-		\Flea\General::getInstance()->initializesPages();
+		//\Flea\General::getInstance()->initializesPages();
 		$pages = \Flea\PageList::getInstance()->getAll( $request );
 		$i = 0;
 		$seoList = '[';
 		
-		foreach ($pages as $id => $page)
+		foreach ($pages as $id => $pageTemp)
 		{
-			if( $i > 0 ) { $seoList .= ', '; }
-			
-			\Flea\General::getInstance()->setCurrentPage($page);
-			
-			$absURL = \Flea\BuildUtil::getInstance()->getAbsUrlByNameLang($page->getName(), $page->getLang() );
-			
-			//$page = new Page();
-			echo '<tr><td>' , ++$i , '</td>';
-			echo '<td><a href="' , $absURL , '">' 
-				, $page->getPageUrl() , '</a></td>';
-			echo '<td>' , $page->getName() , '</td>';
-			echo '<td>' , $page->getLang() , '</td>';
-			if(_DEBUG)
+			if ( $pageTemp->getType() != \Flea\Page::$TYPE_REDIRECT301 &&
+				!$pageTemp->getTags()->hasValue('flea-admin') )
 			{
-				echo '<td>' , \Flea\Debug::getInstance()->dispatchErrors() , '</td>';
-			}
-			else
-			{
-				echo '<td><strong class="error">debug mode disable</strong></td>';
-			}
-			echo '<td>';
-			
-			$links = array();
-			\Flea\PageList::getInstance()->buildPage($page);
-			$body = $page->getHtmlBody();
-			foreach ( $page->getContents()->getArray() as $content )
-			{
-				$body .= $content;
-			}
-			$body = \Flea\BuildUtil::getInstance()->replaceFleaVars( $body, $page );
-			$regex = "\b(([\w-]+://?|www[.])[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|/)))";
-			preg_match_all("%$regex%s", $body, $links);
-			$links = $links[0];
-			foreach ($links as $link)
-			{
-				echo '<a href="' , $link, '" class="checkURL">', $link, '</a><br>';
-			}
-			
-			echo '</td>';
-			echo '<td id="seo'.$i.'">' , '</td></tr>';
-			
+				
+				if( $i > 0 ) { $seoList .= ', '; }
+
+				$i++;
+				//\Flea\Helper::getGeneral()->setCurrentPage($pageTemp);
+				
+				$absURL = \Flea\Helper::getBuildUtil()->getAbsUrlByNameLang($pageTemp->getName(), $pageTemp->getLang() );
+				$url = '<a href="' . $absURL . '">' . $pageTemp->getPageUrl() . '</a>';
+				if(_DEBUG)
+				{
+					$errors = \Flea\Debug::getInstance()->dispatchErrors();
+				}
+				else
+				{
+					$errors = '<td><strong class="error">debug mode disable</strong></td>';
+				}
+				
+				$linksString = '';
+				$links = array();
+				\Flea\Helper::getPageList()->buildPage($pageTemp);
+				$body = $pageTemp->getHtmlBody();
+				foreach ( $pageTemp->getContents()->getArray() as $content )
+				{
+					$body .= $content;
+				}
+				$body = \Flea\BuildUtil::getInstance()->replaceFleaVars( $body, $pageTemp );
+				$regex = "\b(([\w-]+://?|www[.])[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|/)))";
+				preg_match_all("%$regex%s", $body, $links);
+				$links = $links[0];
+				foreach ($links as $link)
+				{
+					$linksString .= '<a href="' . $link. '" class="checkURL">'. $link. '</a><br>';
+				}
+				
+				echoLine(	$i,
+							$url,
+							$pageTemp->getName(),
+							$pageTemp->getLang(),
+							$errors,
+							$linksString );
+				
 				$seoList .= '{ url:"' . $absURL;
 				$seoList .= '", id:"seo'.$i.'" }';
+				
+				
+			}
 			
 		}
 		
@@ -192,10 +178,11 @@ if( _DEBUG )
 <!-- SCRIPTS JS -->
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>
-<script type="text/javascript"><?php include _SYSTEM_DIRECTORY.'admin/board/js/linkChecker.js'; ?></script>
+
+<script type="text/javascript" src="{{pageContentPath}}js/linkChecker.js"></script>
+<script type="text/javascript" src="{{pageContentPath}}js/seoTest.js"></script>
 
 <script type="text/javascript" >
-	<?php include _SYSTEM_DIRECTORY.'admin/board/js/seoTest.js'; ?>
 	var seoTest = new SeoTest( <?php echo $seoList; ?> );
 </script>
 
@@ -244,3 +231,14 @@ if( _DEBUG )
 	//processor.go();				
 
 </script>
+
+<?php
+
+include_once _SYSTEM_DIRECTORY.'init/import.php';
+if ( _DEBUG )
+{
+	echo '<strong>'.\Flea\Debug::getInstance()->getTimes('').'</strong><br><br>';
+	\Flea\Debug::getInstance()->dispatchErrors();
+}
+?>
+

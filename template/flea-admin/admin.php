@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="{{lang}}">
+
+<head>
+
+    <meta charset="utf-8">
+	<title>{{title}} - admin</title>
+    <meta name="description" content="{{description}}" />
+	
+	
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <meta name="viewport" content="width=device-width; height=device-height; maximum-scale=1.4; initial-scale=1.0; user-scalable=yes" />
+	
+	<meta name="author" content="Namide" />
+
+	<link rel="stylesheet" type="text/css" href="{{templatePath}}flea-admin/css/admin.css" />
+	
+    <link rel="icon" type="image/png" href={{templatePath}}img/favicon.png" /> 
+    
+    {{header}}
+    
+</head>
+
+<body>
+    
+    <header>
+        <h1><a href="<?= Flea\Helper::getBuildUtil()->getAbsUrl( 'home' ) ?>">Flea</a></h1>
+        <nav>
+			
+			<ul>
+				<?php
+					foreach( \Flea\Helper::getPageList()->getByTag('flea-admin', 'en' ) as $pageTemp )
+					{
+						echo \Flea\Helper::getTagUtil()->getLink($pageTemp->getName());
+					}
+				?>
+			</ul>
+				
+        </nav>
+    </header>
+    
+    <section>
+    
+        {{body}}
+		
+    </section>
+    
+    <footer>
+        
+    </footer>
+	
+</body>
+
+</html>

@@ -34,7 +34,8 @@ namespace Flea;
  */
 class TagUtil
 {
-	
+	private static $_INSTANCE;
+
 	private function __construct() { }
 	
 	/**
@@ -55,7 +56,7 @@ class TagUtil
 	 * @param string $attInA		Additionnal attribute to the tag '<a></a>'
 	 * @return string				HTML link generated	
 	 */
-	public static function getLink( $pageName, $tagBefore = '', $tagAfter = '', $attInA = '' )
+	public function getLink( $pageName, $tagBefore = '', $tagAfter = '', $attInA = '' )
 	{
 		$lang = General::getInstance()->getCurrentLang();
 		$pageList = PageList::getInstance();
@@ -72,7 +73,7 @@ class TagUtil
 	 * @param type $attInImg	Additionnal attribute to the tag <img/>
 	 * @return type				Tag img with : alt, width, height and $attInImg
 	 */
-	public static function getImg( $fileName, $alt = '', $attInImg = '' )
+	public function getImg( $fileName, $alt = '', $attInImg = '' )
 	{
 		if ( !is_file($fileName) )
 		{
@@ -95,7 +96,7 @@ class TagUtil
 	 * @param string $delimiter		String between the links
 	 * @return string				Tag of the breadcrump
 	 */
-	public static function getBreadcrump( Page $currentPage = null, $delimiter = ' > ' )
+	public function getBreadcrump( Page $currentPage = null, $delimiter = ' > ' )
 	{
 		if ( $currentPage === null )
 		{
@@ -130,6 +131,23 @@ class TagUtil
 			$output .= '</ul></nav>';
 		}
 		return $output;
+	}
+	
+	private function __clone() { }
+	
+	/**
+	 * Get the instance of TagUtil
+	 * 
+	 * @return TagUtil		TagUtil instancied
+	 */
+	public static function getInstance()
+	{
+		if ( !isset(self::$_INSTANCE) )
+		{
+			self::$_INSTANCE = new self();
+		}
+
+		return self::$_INSTANCE;
 	}
 	
 }

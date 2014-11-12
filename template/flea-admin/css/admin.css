@@ -1,0 +1,55 @@
+.error { color: red; }
+.passed { color: green; }
+strong { font-weight: bold; }
+
+body
+{
+	font-family: Arial, sans-serif;
+	font-size: 12px;
+	color: #444;
+	font-weight: lighter;
+}
+body>header
+{
+	position:fixed;
+	top:0;
+	left:0;
+	right:0;
+	padding: 16px 16px 0 16px;
+	background-color: rgba( 127, 0, 255, 0.8 );
+	box-shadow: 0 4px 8px rgba(0, 0, 50, 0.25); 
+}
+body>header h1 { text-transform: uppercase; font-weight: lighter; }
+body>header h1, body>header nav, body>header ul, body>header li, body>header a, body>header p
+{
+	display:inline-block;
+	color: #FFF;
+	margin-left: 8px;
+	text-decoration: none;
+}
+body>header nav { float: right; }
+body>section
+{
+	margin-top:64px;
+	padding:16px;
+}
+
+p { text-align: left; }
+
+table h1, table h2, table h3, table h4, table h5, table h6 {  margin: 0; }
+
+h1 { font-size: 30px; color:#000; margin: 0; text-transform: uppercase; font-weight: lighter; }
+h2 { font-size: 20px; color:#000; margin: 30px 0 10px 0; text-transform: uppercase; font-weight: lighter; }
+h3 { font-size: 18px; color:#000; margin: 18px 0 10px 0; text-transform: uppercase; font-weight: lighter; }
+h4 { font-size: 16px; color:#000; margin: 15px 0 10px 0; text-transform: uppercase; font-weight: lighter; }
+h5 { font-size: 14px; color:#000; margin: 12px 0 10px 0; text-transform: uppercase; font-weight: lighter; }
+h6 { font-size: 12px; color:#000; margin: 10px 0 10px 0; text-transform: uppercase; font-weight: lighter; }
+
+table tr:nth-child(odd) { background-color:#EEE; 	}
+table tr:nth-child(even) { background-color:#FFF; 	}
+table td { padding:8px; }
+table th { padding:16px 8px; }
+table { border-spacing: 0; float:left; margin: 0 32px 32px 0; }
+
+ul, li { margin:0; padding:0; }
+ul { padding-left:10px; }
