@@ -108,7 +108,7 @@ class LoginUser
 	 * 
 	 * @param DataBase $db		DataBase used to this user
 	 */
-	private function __construct( $db )
+	public function __construct( $db )
 	{
 		$this->_db = $db;
 	}
@@ -594,6 +594,7 @@ class Login
 
 		session_unset();
 		session_destroy();
+		return true;
 	}
 	
 	private function generateToken()

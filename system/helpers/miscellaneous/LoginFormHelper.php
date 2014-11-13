@@ -49,7 +49,7 @@ class LoginFormHelper
 	 * 
 	 * @return string
 	 */
-	public function getFormRegisterUser()
+	public function getFormRegisterUser( $role = 1 )
 	{
 		$build = \Flea\Helper::getBuildUtil();
 		$gen = \Flea\Helper::getGeneral();
@@ -57,7 +57,10 @@ class LoginFormHelper
 		if (	isset($post['addUserEmail']) &&
 				isset($post['addUserPass']) )
 		{
-			$this->_login->registerUser( $post['addUserEmail'], $post['addUserPass'] );
+			if( $this->_login->registerUser( $post['addUserEmail'], $post['addUserPass'], $role ) )
+			{
+				return '<script>location.reload();</script>';
+			}
 		}
 
 		$currentUrl = $build->getAbsUrl( $gen->getCurrentPage()->getName() );
@@ -83,7 +86,10 @@ class LoginFormHelper
 		if (	isset($post['addUserEmail']) &&
 				isset($post['addUserPass']) )
 		{
-			$this->_login->addUser( $post['addUserEmail'], $post['addUserPass'] );
+			if( $this->_login->addUser( $post['addUserEmail'], $post['addUserPass'] ) )
+			{
+				return '<script>location.reload();</script>';
+			}
 		}
 
 		$currentUrl = $build->getAbsUrl( $gen->getCurrentPage()->getName() );
@@ -109,7 +115,10 @@ class LoginFormHelper
 		if (	isset($post['connectUserEmail']) &&
 				isset($post['connectUserPass']) )
 		{
-			$this->_login->connect( $post['connectUserEmail'], $post['connectUserPass'] );
+			if( $this->_login->connect( $post['connectUserEmail'], $post['connectUserPass'] ) )
+			{
+				return '<script>location.reload();</script>';
+			}
 		}
 
 		$currentUrl = $build->getAbsUrl( $gen->getCurrentPage()->getName() );
@@ -134,7 +143,10 @@ class LoginFormHelper
 		$post = $gen->getCurrentPostUrl();
 		if ( isset($post['disconnectUser']) )
 		{
-			$this->_login->disconnect();
+			if( $this->_login->disconnect() )
+			{
+				return '<script>location.reload();</script>';
+			}
 		}
 
 		$currentUrl = $buil->getAbsUrl( $gen->getCurrentPage()->getName() );
@@ -162,8 +174,8 @@ class LoginFormHelper
 			foreach ($list as $userMail => $userDatas)
 			{
 				$output .= '<li>'.$userMail;
-				$output .= '<ul>role: '.$userDatas['role'];
-				foreach ($userDatas['datas'] as $dataKey => $dataValue )
+				$output .= '<ul>role: '.$userDatas->getRole();
+				foreach ($userDatas->getDatas() as $dataKey => $dataValue )
 				{
 					$output .= '<li>'.$dataKey.': '.$dataValue.'</li>';
 				}
