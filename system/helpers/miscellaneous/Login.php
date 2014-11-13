@@ -173,6 +173,8 @@ class Login
 	 */
 	private $_db;
 	
+	private $_loginFormHelper = null;
+	
 	private $_user = null;
 	
 	/**
@@ -232,6 +234,21 @@ class Login
 	}
 	
 	/**
+	 * An helper to make formularies of the login page.
+	 * 
+	 * @return LoginFormHelper
+	 */
+	public function getLoginFormHelper()
+	{
+		if ( $this->_loginFormHelper === null )
+		{
+			include_once _SYSTEM_DIRECTORY.'helpers/miscellaneous/LoginFormHelper.php';
+			$this->_loginFormHelper = new LoginFormHelper($this);
+		}
+		return $this->_loginFormHelper;
+	}
+	
+	/**
 	 * Crypt the password.
 	 * 
 	 * @param string $realPass		Password not crypted
@@ -241,6 +258,18 @@ class Login
 	public function passEncrypt( $realPass, $email )
 	{
 		return hash( self::$_HASH_ALGO, $realPass.$email );
+	}
+	
+	/**
+	 * Test if the data base has 1 or more users.
+	 * 
+	 * @return bool		True is it has 1 or more users in the data base
+	 */
+	public function hasUsersInList()
+	{
+		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
+		$query->initSelect( 'COUNT(*)', LoginTableName::$TABLE_NAME_USERS );
+		return $this->_db->count($query) > 0;
 	}
 	
 	/**
@@ -381,6 +410,29 @@ class Login
 			return false;
 		}
 		
+		$query = SqlQuery::getTemp( SqlQuery::$TYPE_INSERT );
+		$values = array();
+		$values['email'] = $email;
+		$values['pass'] = $this->passEncrypt($realPass, $email);
+		$values['role'] = $role;
+		$values['token'] = $this->generateToken();
+		$insert = LoginTableName::$TABLE_NAME_USERS;
+		$query->initInsertValues($insert, $values);
+		$this->_db->execute($query);
+		
+		return true;
+	}
+	
+	/**
+	 * Register a new user
+	 * 
+	 * @param type $email		Email of the new user
+	 * @param type $realPass	Password of the new user
+	 * @param type $role		Role of the new user
+	 * @return boolean			True if the user is added
+	 */
+	public function registerUser( $email, $realPass, $role = 1 )
+	{
 		$query = SqlQuery::getTemp( SqlQuery::$TYPE_INSERT );
 		$values = array();
 		$values['email'] = $email;
@@ -586,7 +638,7 @@ class Login
 	 * 
 	 * @return Bool			True if the table exist 
 	 */
-	private function isDBInitialized()
+	private function isDbInitialized()
 	{
 		return $this->_db->exist( LoginTableName::$TABLE_NAME_USERS );
 	}
@@ -601,7 +653,7 @@ class Login
 		
 		$this->_db = DataBase::getInstance($dbDsn);
 		
-		if ( !$this->isDBInitialized() )
+		if ( !$this->isDbInitialized() )
 		{
 			$this->create();
 		}
