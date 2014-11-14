@@ -113,18 +113,12 @@ function getLine( $num, $url, $dir, $lang, $errors, $links )
 		$i = 0;
 		$seoList = '[';
 		
-		
-		//$contentCatched = ob_get_clean();
-		
-		//var_dump(ob_get_clean());
-		
 		foreach ($pages as $id => $pageTemp)
 		{
-			//var_dump($pageTemp->getName());
-			//var_dump($pageTemp->getType());
 			
 			if ( $pageTemp->getType() != \Flea\Page::$TYPE_REDIRECT301 &&
-				!$pageTemp->getTags()->hasValue('flea-admin') )
+				 $pageTemp->getType() != \Flea\Page::$TYPE_XML &&
+				 !$pageTemp->getTags()->hasValue('flea-admin') )
 			{
 				
 				if( $i > 0 ) { $seoList .= ', '; }
@@ -135,12 +129,7 @@ function getLine( $num, $url, $dir, $lang, $errors, $links )
 				}
 				
 				$i++;
-				//\Flea\Helper::getGeneral()->setCurrentPage($pageTemp);
-				//PageListCreate::getInstance()->commands(_CONTENT_DIRECTORY.'initDB.php');
-
-				$pageTemp->render(false);
-				//ob_get_clean();
-				
+				$body = $pageTemp->render(false);
 				$absURL = \Flea\Helper::getBuildUtil()->getAbsUrlByNameLang($pageTemp->getName(), $pageTemp->getLang() );
 				
 				$url = '<a href="' . $absURL . '">' . $pageTemp->getPageUrl() . '</a>';
@@ -158,13 +147,6 @@ function getLine( $num, $url, $dir, $lang, $errors, $links )
 				
 				$linksString = '';
 				$links = array();
-				\Flea\Helper::getPageList()->buildPage($pageTemp);
-				$body = $pageTemp->getHtmlBody();
-				foreach ( $pageTemp->getContents()->getArray() as $content )
-				{
-					$body .= $content;
-				}
-				$body = \Flea\BuildUtil::getInstance()->replaceFleaVars( $body, $pageTemp );
 				$regex = "\b(([\w-]+://?|www[.])[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|/)))";
 				preg_match_all("%$regex%s", $body, $links);
 				$links = $links[0];
@@ -193,10 +175,6 @@ function getLine( $num, $url, $dir, $lang, $errors, $links )
 		}
 		
 		$seoList .= ']';
-		
-		
-		//ob_end_clean();
-		//echo $contentCatched;
 		
 		?>
 		

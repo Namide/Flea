@@ -13,7 +13,7 @@
 	
 	<meta name="author" content="Namide" />
 
-	<link rel="stylesheet" type="text/css" href="{{templatePath}}flea-admin/css/admin.css" />
+	<!-- <link rel="stylesheet" type="text/css" href="{{templatePath}}flea-admin/css/admin.css" /> -->
 	
     <link rel="icon" type="image/png" href={{templatePath}}img/favicon.png" /> 
     
@@ -24,7 +24,7 @@
 <body>
     
     <header>
-        <h1><a href="<?= Flea\Helper::getBuildUtil()->getAbsUrl( 'home' ) ?>">Flea</a></h1>
+        <h1>Backoffice</h1>
         <nav>
 			
 			<ul>

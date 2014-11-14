@@ -51,6 +51,12 @@ class Page
 	 */
 	public static $TYPE_REDIRECT301 = 'redirect301';
 	
+	/**
+	 * XML
+	 * @var string 
+	 */
+	public static $TYPE_XML = 'xml';
+	
 	private static $_EMPTY = null;
 	
 	private $_id;
