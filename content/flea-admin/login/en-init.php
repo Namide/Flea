@@ -5,7 +5,7 @@ $url = 'admin/login';
 
 $template = 'flea-admin/admin';
 
-$visible = true;	
+$visible = false;	
 $cachable = false;
 
 $getEnabled = false;
@@ -16,6 +16,6 @@ $htmlDescription = 'Connection page of the Flea framework admin.';
 $htmlHeader = '';
 $htmlTitle = 'Login';
 
-$type = 'default';
+$type = '';
 
 $tags = array( 'flea-admin' );

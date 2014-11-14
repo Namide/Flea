@@ -13,8 +13,8 @@ $getEnabled = false;
 $getExplicit = true;
 $date = '2014-05-01';
 
-$htmlBody = '<h1>Error 404</h1>';
-$htmlDescription = 'description';
+$htmlBody = '<h1>Error 404</h1><p>Page not found</p>';
+$htmlDescription = 'Page not found';
 $htmlHeader = '';
 $htmlTitle = 'Error';
 

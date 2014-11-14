@@ -5,7 +5,7 @@ $url = 'admin/class-test';
 
 $template = 'flea-admin/admin';
 
-$visible = true;	
+$visible = false;	
 $cachable = false;
 
 $getEnabled = false;
@@ -16,6 +16,6 @@ $htmlDescription = 'Tools to tests class of Flea.';
 $htmlHeader = '';
 $htmlTitle = 'Class test';
 
-$type = 'default';
+$type = '';
 
 $tags = array( 'flea-admin' );

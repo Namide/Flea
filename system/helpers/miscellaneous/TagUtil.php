@@ -56,13 +56,52 @@ class TagUtil
 	 * @param string $attInA		Additionnal attribute to the tag '<a></a>'
 	 * @return string				HTML link generated	
 	 */
-	public function getLink( $pageName, $tagBefore = '', $tagAfter = '', $attInA = '' )
+	public function getLink( $pageName, $lang = null, $tagBefore = '', $tagAfter = '', $attInA = '' )
 	{
-		$lang = General::getInstance()->getCurrentLang();
+		if( $lang === null )
+		{
+			$lang = General::getInstance()->getCurrentLang();
+		}
 		$pageList = PageList::getInstance();
 		$page = $pageList->getByName( $pageName, $lang );
 		$buildUtil = BuildUtil::getInstance();
 		return '<a href="'.$buildUtil->getAbsUrlByPageUrl( $page->getPageUrl() ).'" '.$attInA.' hreflang="'.$page->getLang().'">'.$tagBefore.$page->getHtmlTitle().$tagAfter.'</a>';
+	}
+	
+	public function getOtherLanguages( Page $page = null )
+	{
+		if ( $page === null )
+		{
+			$page = General::getInstance()->getCurrentPage();
+		}
+		$langList = LangList::getInstance()->getList();
+		$currentLang = General::getInstance()->getCurrentLang();
+		
+		$output = '<ul>';
+		foreach ($langList as $langTemp)
+		{
+			if ( $langTemp != 'all' && $langTemp != $currentLang )
+			{
+				if ( PageList::getInstance()->exist($page->getName(), $langTemp) )
+				{
+					$output .= '<li><a href="'
+						. BuildUtil::getInstance()->getAbsUrlByNameLang( $page->getName(), $langTemp )
+						. '" hreflang="' . $langTemp . '">'
+						. $langTemp . '</a></li>';
+				}
+				else
+				{
+					$output .= '<li><a href="'
+						. BuildUtil::getInstance()->getAbsUrlByNameLang( PageList::getInstance()->getDefaultPage( $langTemp )->getName(), $langTemp )
+						. '" hreflang="' . $langTemp . '">'
+						. $langTemp . '</a></li>';
+				}
+				//$page = PageList::getInstance()->getByName($output, $lang);
+			}
+		}
+		$output .= '</ul>';
+		
+		return $output;
 	}
 	
 	/**

@@ -1,18 +1,18 @@
 <?php
 if( _DEBUG )
 {
-	\Flea\Debug::getInstance()->setErrorBackNum(10);	// 0
+	\Flea\Debug::getInstance()->setErrorBackNum(0);
 }
 
-function echoLine( $num, $url, $dir, $lang, $errors, $links )
+function getLine( $num, $url, $dir, $lang, $errors, $links )
 {
-	echo '<tr><td>', $num, '</td>'
-	, '<td>', $url, '</td>'
-	, '<td>', $dir, '</td>'
-	, '<td>', $lang, '</td>'
-	, '<td>', $errors, '</td>'
-	, '<td>', $links, '</td>'
-	, '<td id="seo'.$num.'"></td></tr>';
+	return '<tr><td>' . $num. '</td>'
+	. '<td>'. $url. '</td>'
+	. '<td>'. $dir. '</td>'
+	. '<td>'. $lang. '</td>'
+	. '<td class="error">'. $errors. '</td>'
+	. '<td>'. $links. '</td>'
+	. '<td id="seo'.$num.'"></td></tr>';
 }
 
 ?>
@@ -69,6 +69,8 @@ function echoLine( $num, $url, $dir, $lang, $errors, $links )
 			<th>Pages cached</th>
 			<td>
 				<?php
+					include_once _SYSTEM_DIRECTORY.'helpers/system/Cache.php';
+				
 					$cache = new \Flea\Cache(_DB_DSN_CACHE);
 					$pagesCachedNum = $cache->getNumFilesSaved();
 					
@@ -111,26 +113,47 @@ function echoLine( $num, $url, $dir, $lang, $errors, $links )
 		$i = 0;
 		$seoList = '[';
 		
+		
+		//$contentCatched = ob_get_clean();
+		
+		//var_dump(ob_get_clean());
+		
 		foreach ($pages as $id => $pageTemp)
 		{
+			//var_dump($pageTemp->getName());
+			//var_dump($pageTemp->getType());
+			
 			if ( $pageTemp->getType() != \Flea\Page::$TYPE_REDIRECT301 &&
 				!$pageTemp->getTags()->hasValue('flea-admin') )
 			{
 				
 				if( $i > 0 ) { $seoList .= ', '; }
 
+				if( _DEBUG )
+				{
+					\Flea\Debug::getInstance()->clear();
+				}
+				
 				$i++;
 				//\Flea\Helper::getGeneral()->setCurrentPage($pageTemp);
+				//PageListCreate::getInstance()->commands(_CONTENT_DIRECTORY.'initDB.php');
+
+				$pageTemp->render(false);
+				//ob_get_clean();
 				
 				$absURL = \Flea\Helper::getBuildUtil()->getAbsUrlByNameLang($pageTemp->getName(), $pageTemp->getLang() );
+				
 				$url = '<a href="' . $absURL . '">' . $pageTemp->getPageUrl() . '</a>';
+				
+				$errors = 'debug mode disable';
 				if(_DEBUG)
 				{
-					$errors = \Flea\Debug::getInstance()->dispatchErrors();
+					$errors = \Flea\Debug::getInstance()->getErrorsHtml();
 				}
-				else
+				if ( $errors == '' )
 				{
-					$errors = '<td><strong class="error">debug mode disable</strong></td>';
+					$errors = '<strong class="passed">Passed</strong>';
+					
 				}
 				
 				$linksString = '';
@@ -150,22 +173,30 @@ function echoLine( $num, $url, $dir, $lang, $errors, $links )
 					$linksString .= '<a href="' . $link. '" class="checkURL">'. $link. '</a><br>';
 				}
 				
-				echoLine(	$i,
-							$url,
-							$pageTemp->getName(),
-							$pageTemp->getLang(),
-							$errors,
-							$linksString );
+				echo getLine(	$i,
+								$url,
+								$pageTemp->getName(),
+								$pageTemp->getLang(),
+								$errors,
+								$linksString );
 				
 				$seoList .= '{ url:"' . $absURL;
 				$seoList .= '", id:"seo'.$i.'" }';
-				
 				
 			}
 			
 		}
 		
+		if( _DEBUG )
+		{
+			\Flea\Debug::getInstance()->clear();
+		}
+		
 		$seoList .= ']';
+		
+		
+		//ob_end_clean();
+		//echo $contentCatched;
 		
 		?>
 		
@@ -234,7 +265,6 @@ function echoLine( $num, $url, $dir, $lang, $errors, $links )
 
 <?php
 
-include_once _SYSTEM_DIRECTORY.'init/import.php';
 if ( _DEBUG )
 {
 	echo '<strong>'.\Flea\Debug::getInstance()->getTimes('').'</strong><br><br>';

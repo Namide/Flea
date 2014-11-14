@@ -463,8 +463,10 @@ class Page
 	
 	/**
 	 * Echo the page (with template and Flea variables {{...}} transformed)
+	 * 
+	 * @param bool $activeHeader		Active the header datas (redirect301, error404...)
 	 */
-	public function render()
+	public function render( $activeHeader = true )
 	{
 		if ( _DEBUG && $this->_template != '' &&
 			!file_exists(_TEMPLATE_DIRECTORY.$this->_template.'.php') )
@@ -474,7 +476,7 @@ class Page
 		
 		if ( $this->_template != '' && file_exists(_TEMPLATE_DIRECTORY.$this->_template.'.php') )
 		{
-			if ( $this->_phpHeader != '' )
+			if ( $this->_phpHeader != '' && $activeHeader )
 			{
 				header( $this->_phpHeader );
 			}
@@ -482,27 +484,28 @@ class Page
 			ob_start();
 			include _TEMPLATE_DIRECTORY.$this->_template.'.php';
 			$content = ob_get_clean();
-			echo BuildUtil::getInstance()->replaceFleaVars( $content, $this );
+			return BuildUtil::getInstance()->replaceFleaVars( $content, $this );
 		}
 		else
 		{
-			$this->renderWithoutTemplate();
+			return $this->renderWithoutTemplate($activeHeader);
 		}
 	}
 	
 	/**
 	 * Echo the page with Flea variables {{...}} transformed but without template
+	 * 
+	 * @param bool $activeHeader		Active the header datas (redirect301, error404...)
 	 */
-	public function renderWithoutTemplate()
+	public function renderWithoutTemplate( $activeHeader = true )
 	{
-		if ( $this->_phpHeader != '' )
+		if ( $this->_phpHeader != '' && $activeHeader )
 		{
 			header( $this->_phpHeader );
 		}
 		
-		if ( $this->_type === Page::$TYPE_REDIRECT301 )
+		if ( $this->_type === Page::$TYPE_REDIRECT301 && $activeHeader )
 		{
-			
 			$absNewURL = BuildUtil::getInstance()->replaceFleaVars( $this->_htmlBody, $this );
 			header( 'Status: 301 Moved Permanently' );
 			header( 'Location: '.$absNewURL );
@@ -510,17 +513,18 @@ class Page
 		}
 		
 		
-		echo '<!doctype html><html><head><meta charset="UTF-8" />';
-		echo BuildUtil::getInstance()->replaceFleaVars( $this->_htmlHeader, $this );
+		$output = '<!doctype html><html><head><meta charset="UTF-8" />';
+		$output .= BuildUtil::getInstance()->replaceFleaVars( $this->_htmlHeader, $this );
 		if ( $this->_htmlTitle != '' )
 		{
-			echo '<title>', BuildUtil::getInstance()->replaceFleaVars( $this->_htmlTitle, $this ), '</title>';
+			$output .= '<title>'. BuildUtil::getInstance()->replaceFleaVars( $this->_htmlTitle, $this ). '</title>';
 		}
 		if ( $this->_htmlDescription != '' )
 		{
-			echo '<meta name="description" content="', BuildUtil::getInstance()->replaceFleaVars( $this->_htmlDescription, $this ), '"/>';
+			$output .= '<meta name="description" content="'. BuildUtil::getInstance()->replaceFleaVars( $this->_htmlDescription, $this ). '"/>';
 		}
-		echo '</head><body>' , BuildUtil::getInstance()->replaceFleaVars( $this->_htmlBody, $this ), '</body></html>';
+		$output .= '</head><body>' . BuildUtil::getInstance()->replaceFleaVars( $this->_htmlBody, $this ). '</body></html>';
+		return $output;
 	}
 
 	/**

@@ -203,16 +203,16 @@ class Login
 	}
 	
 	/**
-	 * User connected (false if no user connected).
+	 * User connected.
 	 * 
-	 * @return boolean|LoginUser
+	 * @return ValueObject
 	 */
 	public function getUserConnected()
 	{
 		if ( !$this->isConnected() )
 		{
-			if ( _DEBUG ) Debug::getInstance()->addError ('User is\'n connected');
-			return false;
+			//if ( _DEBUG ) Debug::getInstance()->addError ('User is\'n connected');
+			return new ValueObject(null, true, array('You are don\'t connected') );
 		}
 		
 		if ( $this->_user == null )
@@ -223,14 +223,14 @@ class Login
 			$rows = $this->_db->fetchAll($query);
 			if ( count( $rows ) < 1 )
 			{
-				return false;
+				return new ValueObject(null, true, array('Connection data corrupted') );
 			}
 
 			$this->_user = new LoginUser( $this->_db );
 			$this->_user->init( $rows[0]['email'], $rows[0]['token'], $rows[0]['role'] );
 		}
 		
-		return $this->_user;
+		return new ValueObject($this->_user);;
 	}
 	
 	/**
@@ -273,36 +273,39 @@ class Login
 	}
 	
 	/**
-	 * Found and return a user (false if no user connected or email not found or
+	 * Found and return a ValueObject with the user
+	 * (error if no user connected or email not found or
 	 * if the user don't have authorizations).
-	 * Only if your are admin and connected
+	 * Work only if your are admin and connected
 	 * 
 	 * @param string $email		Mail of the user
-	 * @return boolean|\Flea\LoginUser
+	 * @return ValueObject		<code>getUserByEMail( $email )->content</code>;
 	 */
 	public function getUserByEMail( $email )
 	{
-		if (	!$this->isConnected() ||
-				$this->getUserConnected()->getRole() != LoginUser::$ROLE_ADMIN )
+		$userConnectedVO = $this->getUserConnected();
+		if ( $userConnectedVO->error )
 		{
-			return false;
+			return new ValueObject( null, true, $userConnectedVO->errorList );
+		}
+		else if ( $userConnectedVO->content->getRole() != LoginUser::$ROLE_ADMIN )
+		{
+			return new ValueObject( null, true, array('Only admin can see others user with her email') );
 		}
 		
 		$tnu = LoginTableName::$TABLE_NAME_USERS;
-		//$tnd = LoginTableName::$TABLE_NAME_DATAS;
 		
 		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
 		$query->initSelect( 'email, role', $tnu, array('email'=>$email) );
 		$rows = $this->_db->fetchAll($query);
 		if ( count( $rows ) < 1 )
 		{
-			return false;
+			return new ValueObject( null, true, array('No users have this email') );
 		}
 		
 		$user = new LoginUser( $this->_db );
 		$user->init( $rows[0]['email'], 'null', $rows[0]['role'] );
-		
-		return $user;
+		return new ValueObject($user);
 	}
 	
 	/**
@@ -310,9 +313,10 @@ class Login
 	 * Only if your are admin and connected
 	 * <br>Example of getUserList() in <code>en-build.php</code>
 	 * <pre>
-	 * $list = $login->getUserList('group', 'admin');
+	 * $vo = $login->getUserList('group', 'admin');
+	 * $list = $vo->content;
 	 * $output = '';
-	 * if ( is_array($list) )
+	 * if ( !$vo->error )
 	 * {
 	 *   foreach ($list as $userMail => $userDatas)
 	 *   {
@@ -323,20 +327,32 @@ class Login
 	 *     }
 	 *   }
 	 * }
+	 * else if ( count($vo->errorList)>0 )
+	 * {
+	 *   foreach ($vo->errorList as $errorInfo)
+	 *   {
+	 *     $output .= $errorInfo;
+	 *   }
+	 * }
 	 * echo $output;
 	 * </pre>
 	 * 
 	 * @param string $dataKey				Key for the filter (example: group)
 	 * @param string $dataValue				Value for the filter (example: gamer)
-	 * @return array of \Flea\LoginUser		List of the users with $dataKey = $dataValue
+	 * @return ValueObject					List of the users with $dataKey = $dataValue
 	 */
 	public function getUserList( $dataKey = null, $dataValue = null )
 	{
 		$list = array();
-		if (	!$this->isConnected() ||
-				$this->getUserConnected()->getRole() != LoginUser::$ROLE_ADMIN )
+		
+		$userConnectedVO = $this->getUserConnected();
+		if ( $userConnectedVO->error )
 		{
-			return $list;
+			return new ValueObject( $list, true, $userConnectedVO->errorList );
+		}
+		else if ( $userConnectedVO->content->getRole() != LoginUser::$ROLE_ADMIN )
+		{
+			return new ValueObject( $list, true, array('Only admin can see others user with her email') );
 		}
 		
 		$tnu = LoginTableName::$TABLE_NAME_USERS;
@@ -358,7 +374,7 @@ class Login
 			$list[$user['email']]->init( $user['email'], 'null', $user['role'] );
 		}
 		
-		return $list;
+		return new ValueObject($list);
 	}
 	
 	/**
@@ -400,14 +416,37 @@ class Login
 	 * @param type $email		Email of the new user
 	 * @param type $realPass	Password of the new user
 	 * @param type $role		Role of the new user
-	 * @return boolean			True if the user is added
+	 * @return ValueObject		Content is true if the user is added
 	 */
 	public function addUser( $email, $realPass, $role = 1 )
 	{
-		if (	!$this->isConnected() ||
-				$this->getUserConnected()->getRole() != LoginUser::$ROLE_ADMIN )
+		$userConnectedVO = $this->getUserConnected();
+		if ( $userConnectedVO->error )
 		{
-			return false;
+			return new ValueObject( false, true, $userConnectedVO->errorList );
+		}
+		else if ( $userConnectedVO->content->getRole() != LoginUser::$ROLE_ADMIN )
+		{
+			return new ValueObject( false, true, array('Only admin can add a user.') );
+		}
+		
+		return registerUser( $email, $realPass, $role );
+	}
+	
+	/**
+	 * Register a new user
+	 * 
+	 * @param type $email		Email of the new user
+	 * @param type $realPass	Password of the new user
+	 * @param type $role		Role of the new user
+	 * @return ValueObject		ValueObject with datas : content = true if the user is added
+	 */
+	public function registerUser( $email, $realPass, $role = 1 )
+	{
+		$sameEmail = $this->getUserByEMail($email);
+		if ( !$sameEmail->error && $sameEmail->content !== null )
+		{
+			return new ValueObject( false, true, array('An user with the same email already exist.') );
 		}
 		
 		$query = SqlQuery::getTemp( SqlQuery::$TYPE_INSERT );
@@ -420,30 +459,7 @@ class Login
 		$query->initInsertValues($insert, $values);
 		$this->_db->execute($query);
 		
-		return true;
-	}
-	
-	/**
-	 * Register a new user
-	 * 
-	 * @param type $email		Email of the new user
-	 * @param type $realPass	Password of the new user
-	 * @param type $role		Role of the new user
-	 * @return boolean			True if the user is added
-	 */
-	public function registerUser( $email, $realPass, $role = 1 )
-	{
-		$query = SqlQuery::getTemp( SqlQuery::$TYPE_INSERT );
-		$values = array();
-		$values['email'] = $email;
-		$values['pass'] = $this->passEncrypt($realPass, $email);
-		$values['role'] = $role;
-		$values['token'] = $this->generateToken();
-		$insert = LoginTableName::$TABLE_NAME_USERS;
-		$query->initInsertValues($insert, $values);
-		$this->_db->execute($query);
-		
-		return true;
+		return new ValueObject( true );
 	}
 	
 	/**
@@ -453,20 +469,21 @@ class Login
 	 * @param type $userEmail		Email of the user
 	 * @param type $dataKey			Label of the data (example: group)
 	 * @param type $dataValue		Value of the data (example: gamer)
-	 * @return boolean				True if the data is added
+	 * @return ValueObject			ValueObject, $vo->content = true if the data is added
 	 */
 	public function addDataToUser( $userEmail, $dataKey, $dataValue )
 	{
-		if (	!$this->isConnected() ||
-				!(
-					$this->getUserConnected()->getRole() == LoginUser::$ROLE_ADMIN ||
-					$this->getUserConnected()->getEmail() == $userEmail
-				)
-			)
+		$userConnectedVO = $this->getUserConnected();
+		if ( $userConnectedVO->error )
 		{
-			return false;
+			return new ValueObject( false, true, $userConnectedVO->errorList );
 		}
-		
+		else if (	$userConnectedVO->content->getRole() != LoginUser::$ROLE_ADMIN ||
+					$userConnectedVO->content->getEmail() == $userEmail	)
+		{
+			return new ValueObject( false, true, array('Only admin or the user can add data.') );
+		}
+				
 		if ( $this->_db->exist(LoginTableName::$TABLE_NAME_DATAS) )
 		{
 			$query = SqlQuery::getTemp( SqlQuery::$TYPE_INSERT );
@@ -477,8 +494,18 @@ class Login
 			$insert = LoginTableName::$TABLE_NAME_DATAS;
 			$query->initInsertValues($insert, $values);
 			
-			return $this->_db->execute($query);
-		}	
+			$added = $this->_db->execute($query);
+			if ( $added )
+			{
+				return new ValueObject( true );
+			}
+			else				
+			{
+				return new ValueObject( false, true, array('An error as occured in the data base.') );
+			}
+		}
+		
+		return new ValueObject( false, true, array('This table does not exist in the database') );
 	}
 	
 	/**
@@ -517,7 +544,7 @@ class Login
 	 * 
 	 * @param string $email			Email of the user
 	 * @param string $realPass		Password of the user
-	 * @return boolean				It is connected
+	 * @return ValueObject			It is connected
 	 */
 	public function connect( $email, $realPass )
 	{
@@ -535,7 +562,10 @@ class Login
 
 			$query2 = SqlQuery::getTemp();
 			$query2->initCount( LoginTableName::$TABLE_NAME_LOGS, array('user_email'=>$email, 'time'=>($time-2) ), array('=', '>') );
-			if ( $this->_db->count($query2) > 1 ) return false;
+			if ( $this->_db->count($query2) > 1 )
+			{
+				return new ValueObject( false, true, array('The server has detected an attack by brute forcing.') );
+			}
 		// <-- anti-brute-force
 		
 		$cryptedPass = $this->passEncrypt($realPass, $email);
@@ -543,7 +573,10 @@ class Login
 		$query3 = SqlQuery::getTemp();
 		$query3->initSelect('*', LoginTableName::$TABLE_NAME_USERS, $where3 );
 		$rows = $this->_db->fetchAll($query3);
-		if ( count( $rows ) < 1 ) return false;
+		if ( count( $rows ) < 1 ) 
+		{
+			return new ValueObject( false, true, array('No password matches this email.') );
+		}
 		
 		$token = $this->generateToken();
 		$query4 = SqlQuery::getTemp( SqlQuery::$TYPE_UPDATE );
@@ -554,6 +587,11 @@ class Login
 		if( $this->_db->execute($query4) )
 		{
 			$_SESSION['login_token'] = $token;
+			return new ValueObject( true );
+		}
+		else
+		{
+			return new ValueObject( false, true, array('An error in the data base has occurred.') );
 		}
 	}
 	
@@ -575,12 +613,15 @@ class Login
 	 *		</form>';
 	 * echo $form;
 	 * </pre>
+	 * 
+	 * @return boolean
 	 */
 	public function disconnect()
 	{
-		if ( $this->isConnected() )
+		$vo = $this->getUserConnected();
+		if ( !$vo->error )
 		{
-			$user = $this->getUserConnected();
+			$user = $vo->content;
 			
 			$token = $this->generateToken();
 			$query = SqlQuery::getTemp( SqlQuery::$TYPE_UPDATE );

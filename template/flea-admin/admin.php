@@ -29,7 +29,10 @@
 			
 			<ul>
 				<?php
-					foreach( \Flea\Helper::getPageList()->getByTag('flea-admin', 'en' ) as $pageTemp )
+				
+					$query = Flea\SqlQuery::getTemp();
+					$query->setWhere(' _lang = \'en\' AND page_prop = \'_tags\' AND value = \'flea-admin\' ');
+					foreach( \Flea\Helper::getPageList()->getByList( $query ) as $pageTemp )
 					{
 						echo \Flea\Helper::getTagUtil()->getLink($pageTemp->getName());
 					}

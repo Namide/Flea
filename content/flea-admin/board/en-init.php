@@ -5,7 +5,7 @@ $addUrls = array('admin');
 
 $template = 'flea-admin/admin';
 
-$visible = true;	
+$visible = false;	
 $cachable = false;
 
 $getEnabled = false;
@@ -16,6 +16,6 @@ $htmlDescription = 'Tools to tests links and SEO of pages.';
 $htmlHeader = '';
 $htmlTitle = 'Board';
 
-$type = 'default';
+$type = '';
 
 $tags = array( 'flea-admin' );

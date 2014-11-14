@@ -1,7 +1,6 @@
 <?php
 
 	include_once _TEMPLATE_DIRECTORY.'includes/menu.php';
-	include_once _TEMPLATE_DIRECTORY.'includes/footer.php';
 	
 ?><!DOCTYPE html>
 <html lang="{{lang}}">
@@ -30,7 +29,7 @@
 <body>
     
     <header>
-        <h1><a href="<?= Flea\Helper::getBuildUtil()->getAbsUrl( 'home' ) ?>">FWK</a></h1>
+        <h1><a href="<?= Flea\Helper::getBuildUtil()->getAbsUrl( 'home' ) ?>">Flea</a></h1>
         <nav>
             <?php echo getMenu(); ?>
         </nav>
@@ -43,7 +42,7 @@
     </div>
     
     <footer>
-        <?php echo getFooter(); ?>
+        <?= \Flea\Helper::getTagUtil()->getOtherLanguages(); ?>
     </footer>
 	
 </body>

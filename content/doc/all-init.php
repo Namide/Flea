@@ -18,7 +18,7 @@ $htmlDescription = 'description';
 $htmlHeader = '';
 $htmlTitle = 'Documentation';
 
-$type = ''; // error404
+$type = 'redirect301'; // error404
 $phpHeader = 'Location: '._ROOT_URL.'doc/index.html';
 
 // $tags				

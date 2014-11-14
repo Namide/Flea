@@ -281,13 +281,13 @@ class PageList
 	
 	
 	
-	private $_default;
+	//private $_default;
 	/**
 	 * The name of the default page
 	 * 
 	 * @return string	Default page
 	 */
-	public function getDefaultPageName() { return $this->_default; }
+	//public function getDefaultPageName() { return $this->_default; }
 	
 	private $_error404;
 	/**
@@ -494,9 +494,9 @@ class PageList
 	 * @param string $lang		Language of the default page
 	 * @return Page				Default page
 	 */
-    public function getDefaultPage( $lang )
+    public function getDefaultPage( $lang = null )
     {
-        $query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
+		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
 		$query->setLimit(1);
 		
 		$query->setWhere('_type = \''.Page::$TYPE_DEFAULT.'\' AND _lang = \''.$lang.'\'');
@@ -512,6 +512,23 @@ class PageList
 		return $this->getError404Page( $lang );
     }
     
+	/**
+	 * Test if the page exist.
+	 * 
+	 * @param string $name	Name of the page
+	 * @param string $lang	Language
+	 * @return bool			True if the page exist
+	 */
+	public function exist( $name, $lang )
+	{
+		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
+		$query->setWhere('_name = \''.$name.'\' AND _lang = \''.$lang.'\'');
+		$query->setLimit(1);
+		$pages = $this->getAll( $query );
+		
+		return ( count($pages) > 0 );
+	}
+	
 	/**
 	 * Return the page or, if it doesn't exist, the default page
 	 * 

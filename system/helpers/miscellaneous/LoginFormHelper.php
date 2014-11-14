@@ -54,18 +54,30 @@ class LoginFormHelper
 		$build = \Flea\Helper::getBuildUtil();
 		$gen = \Flea\Helper::getGeneral();
 		$post = $gen->getCurrentPostUrl();
+		$error = '';
 		if (	isset($post['addUserEmail']) &&
 				isset($post['addUserPass']) )
 		{
-			if( $this->_login->registerUser( $post['addUserEmail'], $post['addUserPass'], $role ) )
+			$vo = $this->_login->registerUser( $post['addUserEmail'], $post['addUserPass'], $role );
+			if( $vo->content )
 			{
-				return '<script>location.reload();</script>';
+				$currentUrl = $build->getAbsUrl( $gen->getCurrentPage()->getName() );
+				header('Location: '.$currentUrl);
+			}
+			else if ( count($vo->errorList) > 0 )
+			{
+				$error .= '<strong class="error">';
+				foreach ($vo->errorList as $e)
+				{
+					$error .= $e . ' ';
+				}
+				$error .= '</strong>';
 			}
 		}
 
 		$currentUrl = $build->getAbsUrl( $gen->getCurrentPage()->getName() );
-
 		$form = '<form method="post" action="'.$currentUrl.'">
+					'.$error.'
 					<input class="field" type="text" name="addUserEmail" placeholder="E-mail" value="" required="required" pattern="^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"/>
 					<input class="field" type="password" name="addUserPass" placeholder="Password" value="" required="required"/>
 					<input type="submit" name="add" value="add">
@@ -83,18 +95,30 @@ class LoginFormHelper
 		$build = \Flea\Helper::getBuildUtil();
 		$gen = \Flea\Helper::getGeneral();
 		$post = $gen->getCurrentPostUrl();
+		$error = '';
 		if (	isset($post['addUserEmail']) &&
 				isset($post['addUserPass']) )
 		{
-			if( $this->_login->addUser( $post['addUserEmail'], $post['addUserPass'] ) )
+			$vo = $this->_login->addUser( $post['addUserEmail'], $post['addUserPass'] );
+			if( $vo->content )
 			{
-				return '<script>location.reload();</script>';
+				$currentUrl = $build->getAbsUrl( $gen->getCurrentPage()->getName() );
+				header('Location: '.$currentUrl);
+			}
+			else if ( count($vo->errorList) > 0 )
+			{
+				$error .= '<strong class="error">';
+				foreach ($vo->errorList as $e)
+				{
+					$error .= $e . ' ';
+				}
+				$error .= '</strong>';
 			}
 		}
 
 		$currentUrl = $build->getAbsUrl( $gen->getCurrentPage()->getName() );
-
 		$form = '<form method="post" action="'.$currentUrl.'">
+					'.$error.'
 					<input class="field" type="text" name="addUserEmail" placeholder="E-mail" value="" required="required" pattern="^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"/>
 					<input class="field" type="password" name="addUserPass" placeholder="Password" value="" required="required"/>
 					<input type="submit" name="add" value="add">
@@ -112,18 +136,33 @@ class LoginFormHelper
 		$build = \Flea\Helper::getBuildUtil();
 		$gen = \Flea\General::getInstance();
 		$post = $gen->getCurrentPostUrl();
+		$error = '';
 		if (	isset($post['connectUserEmail']) &&
 				isset($post['connectUserPass']) )
 		{
-			if( $this->_login->connect( $post['connectUserEmail'], $post['connectUserPass'] ) )
+			$vo = $this->_login->connect( $post['connectUserEmail'], $post['connectUserPass'] );
+			if( $vo->content )
 			{
-				return '<script>location.reload();</script>';
+				//return '<script>location.reload();</script>';
+				$currentUrl = $build->getAbsUrl( $gen->getCurrentPage()->getName() );
+				header('Location: '.$currentUrl);
 			}
+			else if ( count($vo->errorList) > 0 )
+			{
+				$error .= '<strong class="error">';
+				foreach ($vo->errorList as $e)
+				{
+					$error .= $e . ' ';
+				}
+				$error .= '</strong>';
+			}
+			
 		}
 
 		$currentUrl = $build->getAbsUrl( $gen->getCurrentPage()->getName() );
 
 		$form = '<form method="post" action="'.$currentUrl.'">
+					'.$error.'
 					<input class="field" type="text" name="connectUserEmail" placeholder="E-mail" value="" required="required"/>
 					<input class="field" type="password" name="connectUserPass" placeholder="Password" value="" required="required"/>
 					<input type="submit" name="connect" value="connect">
@@ -145,12 +184,13 @@ class LoginFormHelper
 		{
 			if( $this->_login->disconnect() )
 			{
-				return '<script>location.reload();</script>';
+				//return '<script>location.reload();</script>';
+				$currentUrl = $buil->getAbsUrl( $gen->getCurrentPage()->getName() );
+				header('Location: '.$currentUrl);
 			}
 		}
 
 		$currentUrl = $buil->getAbsUrl( $gen->getCurrentPage()->getName() );
-
 		$form = '<form method="post" action="'.$currentUrl.'">
 					<input type="hidden" name="disconnectUser" value="1">
 					<input type="submit" name="disconnect" value="disconnect">
@@ -167,8 +207,20 @@ class LoginFormHelper
 	 */
 	public function getUserList( $key = null, $value = null )
 	{
-		$list = $this->_login->getUserList( $key, $value );
-		$output = '<ul>';
+		$vo = $this->_login->getUserList( $key, $value );
+		$error = '';
+		if ( $vo->error && count($vo->errorList) > 0 )
+		{
+			$error .= '<strong class="error">';
+			foreach ($vo->errorList as $e)
+			{
+				$error .= $e . ' ';
+			}
+			$error .= '</strong>';
+		}
+
+		$list = $vo->content;
+		$output = $error.'<ul>';
 		if ( is_array($list) )
 		{
 			foreach ($list as $userMail => $userDatas)

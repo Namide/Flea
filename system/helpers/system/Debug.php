@@ -139,9 +139,19 @@ class Debug
 			
 			if ( $this->_errorEcho )
 			{
-				echo $this->addHtmlReturns(implode( '<br>', $this->_errorList ));
+				echo $this->getErrorsHtml();
 			}
 		}
+	}
+	
+	/**
+	 * Get the list of errors with html tags.
+	 * 
+	 * @return string
+	 */
+	public function getErrorsHtml()
+	{
+		return $this->addHtmlReturns(implode( '<br>', $this->_errorList ));
 	}
 	
 	/**
@@ -186,10 +196,18 @@ class Debug
 		return $str;
 	}
 	
-	final private function __construct()
-    {
+	/**
+	 * Clear all datas without total timer.
+	 */
+	public function clear()
+	{
 		$this->_errorList = array();
 		$this->_timerList = array();
+	}
+
+	final private function __construct()
+    {
+		$this->clear();
 		$this->_timer = microtime(true);
 		$this->_totalTime = 0;
     }

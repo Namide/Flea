@@ -66,11 +66,11 @@ if ( _CACHE )
 		
 		if ( $cache->isPageCachable( $page ) )
 		{
-			$cache->startSave();
-				$page->render();
-			$cache->stopSave();
-			$content = BuildUtil::getInstance()->replaceFleaVars( $cache->getContent(), $page );
-			$cache->setContent( $content );
+			//$cache->startSave();
+			//$content = $page->render();
+			//$cache->stopSave();
+			//$content = BuildUtil::getInstance()->replaceFleaVars( $content, $page );
+			$cache->setContent( $page->render() ); // $content
 			$cache->writeCache( $urlStr, $page->getPhpHeader() );
 			
 			if ( _DEBUG )
@@ -79,7 +79,7 @@ if ( _CACHE )
 			}
 		}
 		
-		$page->render();
+		echo $page->render();
 		
 		if ( _DEBUG )
 		{
@@ -95,7 +95,7 @@ include_once _SYSTEM_DIRECTORY.'init/import.php';
 include_once _SYSTEM_DIRECTORY.'init/loadPages.php';
 include_once _SYSTEM_DIRECTORY.'init/buildPage.php';
 $page = General::getInstance()->getCurrentPage();
-$page->render();
+echo $page->render();
 
 if ( _DEBUG )
 {

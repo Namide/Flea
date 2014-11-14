@@ -21,8 +21,7 @@ function getMenu()
 		$output .= '<li><a href="{{rootPath}}'.$pageTemp->getName().'">';
 		$output .= $pageTemp->getHtmlTitle().'</a></li>';
 	}
-	//$output .= '<li><a href="'._ROOT_URL.'doc">Documentation'.(($lang==='fr')?' (en)':'').'</a></li>';
 	$output .= '</ul>';
-
+	
     return $output;
 }

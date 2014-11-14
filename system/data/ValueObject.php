@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * The MIT License
  *
  * Copyright 2014 Damien Doussaud (namide.com).
@@ -24,34 +24,55 @@
  * THE SOFTWARE.
  */
 
-if ( _DEBUG )
+namespace Flea;
+
+/**
+ * Datas used to the return of a function.
+ * With this object you can detect errors and you can list their informations.
+ *
+ * @author namide.com
+ */
+class ValueObject
 {
-	include_once _SYSTEM_DIRECTORY.'helpers/system/Debug.php';
-	Flea\Debug::getInstance();
-	if (!ini_get('display_errors')) { ini_set('display_errors', '1'); }
-	error_reporting(E_ALL);
-}
-
-include_once _SYSTEM_DIRECTORY.'data/SqlQuery.php';
-include_once _SYSTEM_DIRECTORY.'data/ValueObject.php';
-include_once _SYSTEM_DIRECTORY.'data/DataBase.php';
-include_once _SYSTEM_DIRECTORY.'data/list/DataList.php';
-include_once _SYSTEM_DIRECTORY.'data/list/LangList.php';
-include_once _SYSTEM_DIRECTORY.'data/Page.php';
-include_once _SYSTEM_DIRECTORY.'data/list/PageList.php';
-
-include_once _SYSTEM_DIRECTORY.'data/General.php';
-include_once _SYSTEM_DIRECTORY.'helpers/system/UrlUtil.php';
-include_once _SYSTEM_DIRECTORY.'helpers/common/InitUtil.php';
-include_once _SYSTEM_DIRECTORY.'helpers/common/BuildUtil.php';
-include_once _SYSTEM_DIRECTORY.'helpers/Helper.php';
-
-if ( _CACHE )
-{
-	include_once _SYSTEM_DIRECTORY.'helpers/system/Cache.php';
-}
-
-if ( _DEBUG )
-{
-	Flea\Debug::getInstance()->addTimeMark('imports');
+	/**
+	 * If true, an error has occurred.
+	 * Check the error list to find your error.
+	 * 
+	 * @var bool	If false, check the return in the propertie content
+	 */
+	public $error = false;
+	
+	/**
+	 * All the errors who have occurred.
+	 * 
+	 * @var array	List of the errors
+	 */
+	public $errorList;
+	
+	/**
+	 * Return of the method.
+	 * 
+	 * @var type	Before recover this one, check the errors
+	 */
+	public $content;
+	
+	/**
+	 * Construct the reponse of a function with this object.
+	 * 
+	 * @param type $content		Return of the function
+	 * @param type $error		True if an error has occurred
+	 */
+	public function __construct( $content, $error = false, $errorList = null )
+    {
+		$this->error = $error;
+		$this->content = $content;
+		if ( $errorList !== null )
+		{
+			$this->errorList = $errorList;
+		}
+		else
+		{
+			$this->errorList = array();
+		}
+    }
 }
