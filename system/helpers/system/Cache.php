@@ -55,7 +55,7 @@ class Cache
 		{
 			//$sql = 'CREATE TABLE `'.$tableName.'` ( url TEXT, header TEXT, content TEXT );';
 			$sql = SqlQuery::getTemp(SqlQuery::$TYPE_CREATE);
-			$sql->initCreate($tableName, array( 'url'=>'TEXT', 'header'=>'TEXT', 'content'=>'TEXT' ) );
+			$sql->initCreate($tableName, array( 'url'=>'TEXT', 'header'=>'TEXT', 'content'=>'TEXT', 'gzip'=>'TEXT' ) );
 			$this->_db->execute( $sql );
 		}
     }
@@ -90,6 +90,7 @@ class Cache
 		$obj['url'] = $url;
 		$obj['header'] = $header;
 		$obj['content'] = &$content;
+		$obj['gzip'] = gzencode($content, 9);
 		
 		$query = SqlQuery::getTemp(SqlQuery::$TYPE_INSERT);
 		$query->initInsertValues( $this->_tableName, $obj );
@@ -113,7 +114,23 @@ class Cache
 			{
 				header( $row[0]['header'] );
 			}
-			echo $row[0]['content'];
+			
+			// GZIP
+			if ( strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== false )
+			{
+				$gzip = $row[0]['gzip'];
+				//header('Content-Type: application/x-download');
+				header('Content-Encoding: gzip'); #
+				header('Content-Length: '.strlen($gzip)); #
+				//header('Content-Disposition: attachment; filename="myfile.html"');
+				//header('Cache-Control: no-cache, no-store, max-age=0, must-revalidate');
+				//header('Pragma: no-cache');
+				echo $gzip;
+			}
+			else
+			{
+				echo $row[0]['content'];
+			}
 		}
 		elseif(_DEBUG)
 		{

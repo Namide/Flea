@@ -518,8 +518,8 @@ class Page
 			exit;
 		}
 		
-		
-		$output = '<!doctype html><html><head><meta charset="UTF-8" />';
+		return BuildUtil::getInstance()->replaceFleaVars( $this->_htmlBody, $this );
+		/*$output = '<!doctype html><html><head><meta charset="UTF-8" />';
 		$output .= BuildUtil::getInstance()->replaceFleaVars( $this->_htmlHeader, $this );
 		if ( $this->_htmlTitle != '' )
 		{
@@ -530,7 +530,7 @@ class Page
 			$output .= '<meta name="description" content="'. BuildUtil::getInstance()->replaceFleaVars( $this->_htmlDescription, $this ). '"/>';
 		}
 		$output .= '</head><body>' . BuildUtil::getInstance()->replaceFleaVars( $this->_htmlBody, $this ). '</body></html>';
-		return $output;
+		return $output;*/
 	}
 
 	/**
