@@ -52,7 +52,7 @@ if ( _CACHE )
 		$cache->echoSaved( $urlStr );
 		if ( _DEBUG )
 		{
-			echo '<!--'.Debug::getInstance()->getTimes('load cache time').'-->';
+			//echo '<!--'.Debug::getInstance()->getTimes('load cache time').'-->';
 			Debug::getInstance()->dispatchErrors();
 		}
 	}
@@ -83,7 +83,7 @@ if ( _CACHE )
 		
 		if ( _DEBUG )
 		{
-			echo '<!--'.Debug::getInstance()->getTimes('render page time').'-->';
+			//echo '<!--'.Debug::getInstance()->getTimes('render page time').'-->';
 			Debug::getInstance()->dispatchErrors();
 		}
 	}
@@ -99,6 +99,6 @@ echo $page->render();
 
 if ( _DEBUG )
 {
-	echo '<!--'.Debug::getInstance()->getTimes('execute PHP time').'-->';
+	//echo '<!--'.Debug::getInstance()->getTimes('execute PHP time').'-->';
 	Debug::getInstance()->dispatchErrors();
 }

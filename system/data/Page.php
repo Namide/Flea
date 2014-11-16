@@ -57,6 +57,24 @@ class Page
 	 */
 	public static $TYPE_XML = 'xml';
 	
+	/**
+	 * CSS
+	 * @var string 
+	 */
+	public static $TYPE_CSS = 'css';
+	
+	/**
+	 * JavaScript
+	 * @var string 
+	 */
+	public static $TYPE_JS = 'js';
+	
+	/**
+	 * HTML
+	 * @var string 
+	 */
+	public static $TYPE_HTML = 'html';
+	
 	private static $_EMPTY = null;
 	
 	private $_id;
