@@ -64,7 +64,7 @@ class TagUtil
 		}
 		$pageList = PageList::getInstance();
 		$page = $pageList->getByName( $pageName, $lang );
-		$buildUtil = BuildUtil::getInstance();
+		$buildUtil = \Flea::getBuildUtil();
 		return '<a href="'.$buildUtil->getAbsUrlByPageUrl( $page->getPageUrl() ).'" '.$attInA.' hreflang="'.$page->getLang().'">'.$tagBefore.$page->getHtmlTitle().$tagAfter.'</a>';
 	}
 	
@@ -85,14 +85,14 @@ class TagUtil
 				if ( PageList::getInstance()->exist($page->getName(), $langTemp) )
 				{
 					$output .= '<li><a href="'
-						. BuildUtil::getInstance()->getAbsUrlByNameLang( $page->getName(), $langTemp )
+						. \Flea::getBuildUtil()->getAbsUrlByNameLang( $page->getName(), $langTemp )
 						. '" hreflang="' . $langTemp . '">'
 						. $langTemp . '</a></li>';
 				}
 				else
 				{
 					$output .= '<li><a href="'
-						. BuildUtil::getInstance()->getAbsUrlByNameLang( PageList::getInstance()->getDefaultPage( $langTemp )->getName(), $langTemp )
+						. \Flea::getBuildUtil()->getAbsUrlByNameLang( PageList::getInstance()->getDefaultPage( $langTemp )->getName(), $langTemp )
 						. '" hreflang="' . $langTemp . '">'
 						. $langTemp . '</a></li>';
 				}
@@ -161,7 +161,7 @@ class TagUtil
 					$url .= '/'.$path[$i];
 				}
 				$temp = '<li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">';
-				$temp .= '<a href="'.BuildUtil::getInstance()->getAbsUrlByPageUrl($url).'" itemprop="url">';
+				$temp .= '<a href="'.\Flea::getBuildUtil()->getAbsUrlByPageUrl($url).'" itemprop="url">';
 				$temp .= '<span itemprop="title">'.PageList::getInstance()->getByUrl($url)->getHtmlTitle().'</span>';
 				$temp .= '</a></li>';
 				$output .= ( $l > 0 ) ? $delimiter : '';

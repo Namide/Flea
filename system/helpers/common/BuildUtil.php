@@ -26,6 +26,8 @@
 
 namespace Flea;
 
+include_once _SYSTEM_DIRECTORY.'helpers/common/InitUtil.php';
+
 /**
  * Utils to write pages and template.
  * This class cannot be used before the building page time.

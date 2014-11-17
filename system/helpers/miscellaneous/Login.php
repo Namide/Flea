@@ -382,8 +382,8 @@ class Login
 	 * Only if your are admin and connected.<br>
 	 * <br>Example of addUser() in <code>en-build.php</code>
 	 * <pre>
-	 * $build = \Flea\Helper::getBuildUtil();
-	 * $gen = \Flea\Helper::getGeneral();
+	 * $build = Flea::getBuildUtil();
+	 * $gen = Flea::getGeneral();
 	 * $post = $gen->getCurrentPostUrl();
 	 * if (	isset($post['addUserEmail']) &&
 	 *		isset($post['addUserPass']) )
@@ -513,7 +513,7 @@ class Login
 	 * After this state a token will be storage in the session
 	 * <br>Example of connect() in <code>en-build.php</code>
 	 * <pre>
-	 * $build = \Flea\Helper::getBuildUtil();
+	 * $build = Flea::getBuildUtil();
 	 * $gen = \Flea\General::getInstance();
 	 * $post = $gen->getCurrentPostUrl();
 	 * if (	isset($post['connectUserEmail']) &&
@@ -599,7 +599,7 @@ class Login
 	 * Disconnect the current connected user.
 	 * <br>Example of connect() in <code>en-build.php</code>
 	 * <pre>
-	 * $buil = \Flea\Helper::getBuildUtil();
+	 * $buil = Flea::getBuildUtil();
 	 * $gen = \Flea\General::getInstance();
 	 * $post = $gen->getCurrentPostUrl();
 	 * if ( isset($post['disconnectUser']) )

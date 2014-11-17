@@ -29,7 +29,7 @@
 <body>
     
     <header>
-        <h1><a href="<?= Flea\Helper::getBuildUtil()->getAbsUrl( 'home' ) ?>">Flea</a></h1>
+        <h1><a href="<?= Flea::getBuildUtil()->getAbsUrl( 'home' ) ?>">Flea</a></h1>
         <nav>
             <?php echo getMenu(); ?>
         </nav>
@@ -42,7 +42,7 @@
     </div>
     
     <footer>
-        <?= \Flea\Helper::getTagUtil()->getOtherLanguages(); ?>
+        <?= Flea::getTagUtil()->getOtherLanguages(); ?>
     </footer>
 	
 </body>

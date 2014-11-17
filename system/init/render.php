@@ -69,7 +69,7 @@ if ( _CACHE )
 			//$cache->startSave();
 			//$content = $page->render();
 			//$cache->stopSave();
-			//$content = BuildUtil::getInstance()->replaceFleaVars( $content, $page );
+			//$content = \Flea::getBuildUtil()->replaceFleaVars( $content, $page );
 			$cache->setContent( $page->render() ); // $content
 			$cache->writeCache( $urlStr, $page->getPhpHeader() );
 			

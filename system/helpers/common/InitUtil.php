@@ -38,13 +38,13 @@ class InitUtil
     
     final private function __construct()
     {
-        $this->reset();
+        //$this->reset();
     }
 	
 	/**
 	 * Reset the object
 	 */
-    protected function reset() { }
+    //protected function reset() { }
 	
 	/**
 	 * Get an absolute URL for a file at the root of the website

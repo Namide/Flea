@@ -52,28 +52,46 @@ class Page
 	public static $TYPE_REDIRECT301 = 'redirect301';
 	
 	/**
+	 * HTML
+	 * @var string 
+	 */
+	public static $FORMAT_HTML = 'html';
+	
+	/**
 	 * XML
 	 * @var string 
 	 */
-	public static $TYPE_XML = 'xml';
+	public static $FORMAT_XML = 'xml';
 	
 	/**
 	 * CSS
 	 * @var string 
 	 */
-	public static $TYPE_CSS = 'css';
+	public static $FORMAT_CSS = 'css';
 	
 	/**
 	 * JavaScript
 	 * @var string 
 	 */
-	public static $TYPE_JS = 'js';
+	public static $FORMAT_JS = 'js';
 	
 	/**
-	 * HTML
+	 * PDF
 	 * @var string 
 	 */
-	public static $TYPE_HTML = 'html';
+	public static $FORMAT_PDF = 'pdf';
+		
+	/**
+	 * ZIP
+	 * @var string 
+	 */
+	public static $FORMAT_ZIP = 'zip';
+	
+	/**
+	 * Json
+	 * @var string 
+	 */
+	public static $FORMAT_JSON = 'json';
 	
 	private static $_EMPTY = null;
 	
@@ -189,6 +207,38 @@ class Page
 	 */
     public function getType() { return $this->_type; }
 	
+	private $_format;
+	/**
+	 * Format of the page.
+	 * The format can be :
+	 * - Page::$FORMAT_HTML, 
+	 * - Page::$FORMAT_XML, 
+	 * - Page::$FORMAT_CSS, 
+	 * - Page::$FORMAT_JS,
+	 * - Page::$FORMAT_JSON
+	 * 
+	 * @param string $format	format of the page
+	 */
+    public function setFormat( $format )
+	{
+		if (	_DEBUG &&
+				$format !== Page::$FORMAT_HTML &&
+				$format !== Page::$FORMAT_CSS &&
+				$format !== Page::$FORMAT_JS &&
+				$format !== Page::$FORMAT_JSON &&
+				$format !== Page::$FORMAT_XML )
+		{
+			Debug::getInstance()->addError('The format: '.$format.' don\'t exist');
+		}
+		$this->_format = $format;
+	}
+	/**
+	 * Format of the page
+	 * 
+	 * @return string		Foramt of the page
+	 */
+    public function getFormat() { return $this->_type; }
+	
 	private $_tags;
 	/**
 	 * Tags of the page.
@@ -246,7 +296,7 @@ class Page
 				$rows = DataBase::getInstance( _DB_DSN_PAGE )->fetchAll($query);
 				foreach ( $rows as $row )
 				{
-					$content = BuildUtil::getInstance ()->replaceFleaVars ( $row['value'], $this );
+					$content = \Flea::getBuildUtil()->replaceFleaVars ( $row['value'], $this );
 					$this->_contents->add($content, $row['key']);
 				}
 			}
@@ -500,15 +550,22 @@ class Page
 		
 		if ( $this->_template != '' && file_exists(_TEMPLATE_DIRECTORY.$this->_template.'.php') )
 		{
-			if ( $this->_phpHeader != '' && $activeHeader )
+			\Flea::getHeader()->appliHeaderOfPage($this);
+			
+			/*if ( $this->_phpHeader != '' && $activeHeader )
 			{
 				header( $this->_phpHeader );
 			}
 		
+			if ( $this->_format != 'html' && $activeHeader )
+			{
+				header( $this->_phpHeader );
+			}*/
+			
 			ob_start();
 			include _TEMPLATE_DIRECTORY.$this->_template.'.php';
 			$content = ob_get_clean();
-			return BuildUtil::getInstance()->replaceFleaVars( $content, $this );
+			return \Flea::getBuildUtil()->replaceFleaVars( $content, $this );
 		}
 		else
 		{
@@ -523,31 +580,33 @@ class Page
 	 */
 	public function renderWithoutTemplate( $activeHeader = true )
 	{
-		if ( $this->_phpHeader != '' && $activeHeader )
+		/*if ( $this->_phpHeader != '' && $activeHeader )
 		{
 			header( $this->_phpHeader );
-		}
+		}*/
 		
 		if ( $this->_type === Page::$TYPE_REDIRECT301 && $activeHeader )
 		{
-			$absNewURL = BuildUtil::getInstance()->replaceFleaVars( $this->_htmlBody, $this );
+			$absNewURL = \Flea::getBuildUtil()->replaceFleaVars( $this->_htmlBody, $this );
 			header( 'Status: 301 Moved Permanently' );
 			header( 'Location: '.$absNewURL );
 			exit;
 		}
 		
-		return BuildUtil::getInstance()->replaceFleaVars( $this->_htmlBody, $this );
+		\Flea::getHeader()->appliHeaderOfPage($this);
+		
+		return \Flea::getBuildUtil()->replaceFleaVars( $this->_htmlBody, $this );
 		/*$output = '<!doctype html><html><head><meta charset="UTF-8" />';
-		$output .= BuildUtil::getInstance()->replaceFleaVars( $this->_htmlHeader, $this );
+		$output .= \Flea::getBuildUtil()->replaceFleaVars( $this->_htmlHeader, $this );
 		if ( $this->_htmlTitle != '' )
 		{
-			$output .= '<title>'. BuildUtil::getInstance()->replaceFleaVars( $this->_htmlTitle, $this ). '</title>';
+			$output .= '<title>'. \Flea::getBuildUtil()->replaceFleaVars( $this->_htmlTitle, $this ). '</title>';
 		}
 		if ( $this->_htmlDescription != '' )
 		{
-			$output .= '<meta name="description" content="'. BuildUtil::getInstance()->replaceFleaVars( $this->_htmlDescription, $this ). '"/>';
+			$output .= '<meta name="description" content="'. \Flea::getBuildUtil()->replaceFleaVars( $this->_htmlDescription, $this ). '"/>';
 		}
-		$output .= '</head><body>' . BuildUtil::getInstance()->replaceFleaVars( $this->_htmlBody, $this ). '</body></html>';
+		$output .= '</head><body>' . \Flea::getBuildUtil()->replaceFleaVars( $this->_htmlBody, $this ). '</body></html>';
 		return $output;*/
 	}
 
@@ -570,6 +629,7 @@ class Page
 		
 		$this->_type = '';
 		$this->_date = '';
+		$this->_format = Page::$FORMAT_HTML;
 		
         $this->_visible = true;
         $this->_getEnabled = false;

@@ -2,7 +2,7 @@
 
 namespace Flea\admin;
 
-$login = \Flea\Helper::getLogin('sqlite:'._CONTENT_DIRECTORY.'flea-admin-login.sqlite');
+$login = Flea::getLogin('sqlite:'._CONTENT_DIRECTORY.'flea-admin-login.sqlite');
 	
 if ( !$login->hasUsersInList() )
 {

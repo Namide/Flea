@@ -241,6 +241,7 @@ class PageListCreate
 		if ( isset($cover) )			{ $page->setCover($cover) ; }
 				
 		if ( isset($phpHeader) )		{ $page->setPhpHeader($phpHeader) ; }
+		if ( isset($format) )			{ $page->setFormat($format) ; }
 		
 		if ( isset($tags) )				{ $page->getTags()->addMultiple($tags) ; }
 		if ( isset($tag) )				{ $page->getTags()->add($tag) ; }

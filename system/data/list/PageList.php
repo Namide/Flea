@@ -123,7 +123,7 @@ class PageList
 	}
 	
 	/**
-	 * Update the current page.
+	 * Update the page.
 	 * Used to build the body with the "build file" (ex: en-build.php).
 	 * 
 	 * @param Page $page	Page to update

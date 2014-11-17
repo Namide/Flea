@@ -55,7 +55,8 @@ class Cache
 		{
 			//$sql = 'CREATE TABLE `'.$tableName.'` ( url TEXT, header TEXT, content TEXT );';
 			$sql = SqlQuery::getTemp(SqlQuery::$TYPE_CREATE);
-			$sql->initCreate($tableName, array( 'url'=>'TEXT', 'header'=>'TEXT', 'content'=>'TEXT', 'gzip'=>'TEXT' ) );
+			$tables = array( 'url'=>'TEXT', 'header'=>'TEXT', 'content'=>'TEXT', 'gzip'=>'TEXT' );
+			$sql->initCreate($tableName, $tables);
 			$this->_db->execute( $sql );
 		}
     }

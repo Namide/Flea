@@ -70,6 +70,13 @@ $type = 'default';
 // Arguments to the php function header()
 // of the page (for other type than HTML, like XML)
 //$phpHeader = 'Content-Type: application/xml; charset=utf-8';	
+// Format of the page:
+// - 'html'
+// - 'css'
+// - 'js'
+// - 'xml'
+// - 'json'
+$format = 'html';
 
 // Add tags to the page
 $tags = array('importantPage', 'mainlyPage');

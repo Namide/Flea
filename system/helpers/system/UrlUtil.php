@@ -48,7 +48,7 @@ class UrlUtil
 	
     final private function __construct()
     {
-    	$this->reset();
+    	//$this->reset();
     }
 
 	/**

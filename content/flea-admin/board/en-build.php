@@ -130,7 +130,7 @@ function getLine( $num, $url, $dir, $lang, $errors, $links )
 				
 				$i++;
 				$body = $pageTemp->render(false);
-				$absURL = \Flea\Helper::getBuildUtil()->getAbsUrlByNameLang($pageTemp->getName(), $pageTemp->getLang() );
+				$absURL = Flea::getBuildUtil()->getAbsUrlByNameLang($pageTemp->getName(), $pageTemp->getLang() );
 				
 				$url = '<a href="' . $absURL . '">' . $pageTemp->getPageUrl() . '</a>';
 				

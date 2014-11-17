@@ -28,10 +28,7 @@ namespace Flea;
 
 General::getInstance()->initializesPages();
 
-UrlUtil::getInstance();
-BuildUtil::getInstance();
-
 if ( _DEBUG )
 {
-	Debug::getInstance()->addTimeMark('init page');
+	Debug::getInstance()->addTimeMark('init pages');
 }

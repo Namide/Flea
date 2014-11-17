@@ -2,11 +2,10 @@
 
 function getMenu()
 {
-	$templateUtils = \Flea\BuildUtil::getInstance();
-	$lang = \Flea\General::getInstance()->getCurrentLang();
+	//$templateUtils = Flea::getBuildUtil();
+	$lang = Flea::getGeneral()->getCurrentLang();
 	
 	if ( $lang == 'all' ) return '';
-	
 	
 	$pageList = \Flea\PageList::getInstance();
 

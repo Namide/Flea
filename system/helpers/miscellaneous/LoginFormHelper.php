@@ -51,8 +51,8 @@ class LoginFormHelper
 	 */
 	public function getFormRegisterUser( $role = 1 )
 	{
-		$build = \Flea\Helper::getBuildUtil();
-		$gen = \Flea\Helper::getGeneral();
+		$build = Flea::getBuildUtil();
+		$gen = Flea::getGeneral();
 		$post = $gen->getCurrentPostUrl();
 		$error = '';
 		if (	isset($post['addUserEmail']) &&
@@ -92,8 +92,8 @@ class LoginFormHelper
 	 */
 	public function getFormAddUser()
 	{
-		$build = \Flea\Helper::getBuildUtil();
-		$gen = \Flea\Helper::getGeneral();
+		$build = Flea::getBuildUtil();
+		$gen = Flea::getGeneral();
 		$post = $gen->getCurrentPostUrl();
 		$error = '';
 		if (	isset($post['addUserEmail']) &&
@@ -133,7 +133,7 @@ class LoginFormHelper
 	 */
 	public function getFormConnectUser()
 	{
-		$build = \Flea\Helper::getBuildUtil();
+		$build = Flea::getBuildUtil();
 		$gen = \Flea\General::getInstance();
 		$post = $gen->getCurrentPostUrl();
 		$error = '';
@@ -177,7 +177,7 @@ class LoginFormHelper
 	 */
 	public function getFormDisconnectUser()
 	{
-		$buil = \Flea\Helper::getBuildUtil();
+		$buil = Flea::getBuildUtil();
 		$gen = \Flea\General::getInstance();
 		$post = $gen->getCurrentPostUrl();
 		if ( isset($post['disconnectUser']) )

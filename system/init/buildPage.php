@@ -26,12 +26,15 @@
 
 namespace Flea;
 
+\Flea::getUrlUtil()->reset();
+\Flea::getBuildUtil()->reset();
+
 if ( file_exists(_CONTENT_DIRECTORY.'initBuild.php') )
 {
 	include _CONTENT_DIRECTORY.'initBuild.php';
 }
 
-$page = General::getInstance()->getCurrentPage();
+$page =  \Flea::getGeneral()->getCurrentPage();
 PageList::getInstance()->buildPage( $page );
 
 if ( _DEBUG )
