@@ -117,7 +117,7 @@ function getLine( $num, $url, $dir, $lang, $errors, $links )
 		{
 			
 			if ( $pageTemp->getType() != \Flea\Page::$TYPE_REDIRECT301 &&
-				 $pageTemp->getType() != \Flea\Page::$TYPE_XML &&
+				 $pageTemp->getFormat() == \Flea\Page::$FORMAT_HTML &&
 				 !$pageTemp->getTags()->hasValue('flea-admin') )
 			{
 				

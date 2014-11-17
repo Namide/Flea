@@ -1,7 +1,5 @@
 <?php
 
-namespace Flea\admin;
-
 $login = Flea::getLogin('sqlite:'._CONTENT_DIRECTORY.'flea-admin-login.sqlite');
 	
 if ( !$login->hasUsersInList() )

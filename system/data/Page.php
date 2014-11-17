@@ -237,7 +237,7 @@ class Page
 	 * 
 	 * @return string		Foramt of the page
 	 */
-    public function getFormat() { return $this->_type; }
+    public function getFormat() { return $this->_format; }
 	
 	private $_tags;
 	/**

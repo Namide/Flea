@@ -13,7 +13,7 @@
 	
 	<meta name="author" content="Namide" />
 
-	<!-- <link rel="stylesheet" type="text/css" href="{{templatePath}}flea-admin/css/admin.css" /> -->
+	<link rel="stylesheet" type="text/css" href="{{templatePath}}flea-admin/css/admin.css" />
 	
     <link rel="icon" type="image/png" href={{templatePath}}img/favicon.png" /> 
     
