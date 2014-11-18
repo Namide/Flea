@@ -12,7 +12,8 @@ function getMenu()
 	$output = '<ul>';
 	foreach( $pageList->getAllByLang( $lang ) as $pageTemp )
 	{
-		$output .= '<li><a href="{{pageNameToAbsUrl:'.$pageTemp->getName().'}}">';
+		$output .= '<li><a hreflang="'.$pageTemp->getLang().'" '
+				. 'href="{{pageNameToAbsUrl:'.$pageTemp->getName().'}}">';
 		$output .= $pageTemp->getHtmlTitle().'</a></li>';
 	}
 	foreach( $pageList->getAllByLang( 'all' ) as $pageTemp )

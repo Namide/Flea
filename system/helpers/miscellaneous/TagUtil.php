@@ -147,6 +147,7 @@ class TagUtil
 		}
 		
 		$path = explode('/', $currentPage->getPageUrl() ) ;
+		$lang = $currentPage->getLang();
 		$numParentsPages = count($path);
 		$output = '';
 		
@@ -161,7 +162,9 @@ class TagUtil
 					$url .= '/'.$path[$i];
 				}
 				$temp = '<li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">';
-				$temp .= '<a href="'.\Flea::getBuildUtil()->getAbsUrlByPageUrl($url).'" itemprop="url">';
+				$temp .= '<a href="'.\Flea::getBuildUtil()->getAbsUrlByPageUrl($url).'" '
+						. 'hreflang="'.$lang.'" '
+						. 'itemprop="url">';
 				$temp .= '<span itemprop="title">'.PageList::getInstance()->getByUrl($url)->getHtmlTitle().'</span>';
 				$temp .= '</a></li>';
 				$output .= ( $l > 0 ) ? $delimiter : '';
