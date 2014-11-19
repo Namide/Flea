@@ -494,7 +494,7 @@ class PageList
 	 * @param string $lang		Language of the default page
 	 * @return Page				Default page
 	 */
-    public function getDefaultPage( $lang = null )
+    public function getDefaultPage( $lang )
     {
 		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
 		$query->setLimit(1);
