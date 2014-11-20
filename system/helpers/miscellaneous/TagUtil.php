@@ -43,20 +43,21 @@ class TagUtil
 	 * Ex:
 	 * <pre>
 	 * $pageName = 'home';
-	 * $tagBefore = '<em>';
-	 * $tagAfter = '</em>';
+	 * $tagBeforeText = '<em>';
+	 * $tagAfterText = '</em>';
 	 * $attInA = 'class="link-home blue"';
-	 * getLink( $pageName, $tagBefore, $tagAfter, $attInA );
+	 * getLink( $pageName, null, $attInA, $tagBeforeText, $tagAfterText );
 	 * //output => <a href="http://flea.namide.com/en/home" class="link-home blue">Home page<em></em></a>
 	 * </pre>
 	 * 
-	 * @param string $pageName		Name of the page to linked
-	 * @param string $tagBefore		Tag before the title of the page (in the tag '<a></a>')
-	 * @param string $tagAfter		Tag after the title of the page (in the tag '<a></a>')
-	 * @param string $attInA		Additionnal attribute to the tag '<a></a>'
-	 * @return string				HTML link generated	
+	 * @param string $pageName			Name of the page to linked
+	 * @param string $lang				Language of the page (current language by default)
+	 * @param string $attInA			Additionnal attribute to the tag '<a></a>'
+	 * @param string $tagBeforeText		Tag before the title of the page (in the tag '<a></a>')
+	 * @param string $tagAfterText		Tag after the title of the page (in the tag '<a></a>')
+	 * @return string					HTML link generated	
 	 */
-	public function getLink( $pageName, $lang = null, $tagBefore = '', $tagAfter = '', $attInA = '' )
+	public function getLinkByName( $pageName, $lang = null, $attInA = '', $tagBeforeText = '', $tagAfterText = '' )
 	{
 		if( $lang === null )
 		{
@@ -64,10 +65,52 @@ class TagUtil
 		}
 		$pageList = PageList::getInstance();
 		$page = $pageList->getByName( $pageName, $lang );
-		$buildUtil = \Flea::getBuildUtil();
-		return '<a href="'.$buildUtil->getAbsUrlByPageUrl( $page->getPageUrl() ).'" '.$attInA.' hreflang="'.$page->getLang().'">'.$tagBefore.$page->getHtmlTitle().$tagAfter.'</a>';
+		return $this->getLink( $page, $attInA, $tagBeforeText, $tagAfterText );
 	}
 	
+	/**
+	 * Simple method to create a link with a page object.
+	 * 
+	 * @param \Flea\Page $page			Page to linked
+	 * @param string $attInA			Additionnal attribute to the tag '<a></a>'
+	 * @param string $tagBeforeText		Tag before the title of the page (in the tag '<a></a>')
+	 * @param string $tagAfterText		Tag after the title of the page (in the tag '<a></a>')
+	 * @return type
+	 */
+	public function getLink( Page $page, $attInA = '', $tagBeforeText = '', $tagAfterText = '' )
+	{
+		$buildUtil = \Flea::getBuildUtil();
+		return '<a href="'.$buildUtil->getAbsUrlByPageUrl( $page->getPageUrl() )
+				. '" '.$attInA.' hreflang="'.$page->getLang().'">'
+				. $tagBeforeText.$page->getHtmlTitle().$tagAfterText.'</a>';
+	}
+	
+	/**
+	 * Simple method to create an HTML list of pages.
+	 * 
+	 * @param array $pageList		Array of Page
+	 * @param string $attInUl		Additionnal attribute to the tag '<ul></ul>'
+	 * @param string $attInLi		Additionnal attribute to the tag '<li></li>'
+	 * @param string $attInA		Additionnal attribute to the tag '<a></a>'
+	 * @return string				HTML list generated
+	 */
+	public function getLinkList( array $pageList, $attInUl = '', $attInLi = '', $attInA = '' )
+	{
+		$out = '<ul '.$attInUl.'>';
+		foreach ($pageList as $page)
+		{
+			$out .= '<li '.$attInLi.'>'.$this->getLink( $page, $attInA ).'</li>';
+		}
+		$out .= '</ul>';
+		return $out;
+	}
+	
+	/**
+	 * Get an HTML list of all other languages with their language code ("en", "fr", "ko"...)
+	 * 
+	 * @param \Flea\Page $page		Actual page
+	 * @return string				An HTML list of others languages with links to the same page in other languages
+	 */
 	public function getOtherLanguages( Page $page = null )
 	{
 		if ( $page === null )
@@ -96,7 +139,6 @@ class TagUtil
 						. '" hreflang="' . $langTemp . '">'
 						. $langTemp . '</a></li>';
 				}
-				//$page = PageList::getInstance()->getByName($output, $lang);
 			}
 		}
 		$output .= '</ul>';
