@@ -177,7 +177,7 @@ class TagUtil
 	 * @param string $delimiter		String between the links
 	 * @return string				Tag of the breadcrump
 	 */
-	public function getBreadcrump( Page $currentPage = null, $delimiter = ' > ' )
+	public function getBreadcrump( Page $currentPage = null, $delimiter = '' )
 	{
 		if ( $currentPage === null )
 		{
