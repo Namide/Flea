@@ -109,7 +109,7 @@ function getLine( $num, $url, $dir, $lang, $errors, $links )
 		$request = \Flea\SqlQuery::getTemp( \Flea\SqlQuery::$TYPE_SELECT );
 		$request->setWhere('_visible > -1 OR _visible < 0');
 		//\Flea\General::getInstance()->initializesPages();
-		$pages = \Flea\PageList::getInstance()->getAll( $request );
+		$pages = Flea::getPageList()->getAll( $request );
 		$i = 0;
 		$seoList = '[';
 		

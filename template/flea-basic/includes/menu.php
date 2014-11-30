@@ -7,7 +7,7 @@ function getMenu()
 	
 	if ( $lang == 'all' ) return '';
 	
-	$pageList = \Flea\PageList::getInstance();
+	$pageList = Flea::getPageList();
 
 	$output = '<ul>';
 	foreach( $pageList->getAllByLang( $lang ) as $pageTemp )
