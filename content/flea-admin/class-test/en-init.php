@@ -12,7 +12,7 @@ $getEnabled = false;
 $getExplicit = false;
 $date = '2014-11-12';
 
-$htmlDescription = 'Tools to tests class of Flea.';
+$htmlDescription = 'Tools to tests class of Flea';
 $htmlHeader = '';
 $htmlTitle = 'Class test';
 

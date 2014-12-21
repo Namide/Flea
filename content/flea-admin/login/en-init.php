@@ -12,7 +12,7 @@ $getEnabled = false;
 $getExplicit = false;
 $date = '2014-11-13';
 
-$htmlDescription = 'Connection page of the Flea framework admin.';
+$htmlDescription = 'Connection page of the Flea framework admin';
 $htmlHeader = '';
 $htmlTitle = 'Login';
 

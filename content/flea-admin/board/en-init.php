@@ -12,7 +12,7 @@ $getEnabled = false;
 $getExplicit = false;
 $date = '2014-11-12';
 
-$htmlDescription = 'Tools to tests links and SEO of pages.';
+$htmlDescription = 'Tools to tests links and SEO of pages';
 $htmlHeader = '';
 $htmlTitle = 'Board';
 
