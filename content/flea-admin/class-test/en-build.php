@@ -1,6 +1,8 @@
 <?php
 namespace Flea\admin;
 
+include _CONTENT_DIRECTORY.'flea-admin/include/loginTest.php';
+
 if( _DEBUG )
 {
 	\Flea\Debug::getInstance()->setErrorBackNum(10);	// 0
