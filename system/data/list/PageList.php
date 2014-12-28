@@ -197,6 +197,9 @@ class PageList
 	 */
 	public function getWithOneOfTags( array $tags, $lang )
     {
+		if ( count($tags)<1 )
+			return array();
+		
 		$where = '_lang = \''.$lang.'\' AND '
 			. 'page_prop = \'_tags\' AND '
 			. '_visible = 1 AND (';
@@ -212,6 +215,7 @@ class PageList
 		
 		$query = SqlQuery::getTemp();
 		$query->setWhere($where);
+		
 		return $this->getByList ( $query );
     }
     
