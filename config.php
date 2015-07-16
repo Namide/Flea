@@ -24,6 +24,7 @@ define( '_TEMPLATE_DIRECTORY', 'template/' );
 define( '_CACHE_DIRECTORY', 'cache/' );
 
 
+
 /*
  *		PARAMETERS
  */
@@ -40,6 +41,9 @@ define( '_CACHE', false );
 // Maximum number of files in the cache directory
 // It is better to have 5 beyond the maximum number of cachable pages
 define( '_MAX_PAGE_CACHE', 50 );
+
+// Minify and concat all js and css files (_CACHE must be true)
+define( '_MINIFY', true );
 
 
 /*

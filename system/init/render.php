@@ -63,15 +63,25 @@ if ( _CACHE )
 		include_once _SYSTEM_DIRECTORY.'init/buildPage.php';
 		
 		$page = General::getInstance()->getCurrentPage();
-		
+		$html = $page->render();
+			
 		if ( $cache->isPageCachable( $page ) )
 		{
-			//$cache->startSave();
-			//$content = $page->render();
-			//$cache->stopSave();
-			//$content = \Flea::getBuildUtil()->replaceFleaVars( $content, $page );
-			$cache->setContent( $page->render() ); // $content
-			$cache->writeCache( $urlStr, $page->getPhpHeader() );
+			if ( _MINIFY ) 
+			{
+				include_once _SYSTEM_DIRECTORY.'libs/ganon.php';
+				include_once _SYSTEM_DIRECTORY.'libs/min-js.php';
+				include_once _SYSTEM_DIRECTORY.'helpers/system/MinifyJsCss.php';
+				
+				$html = MinifyJsCss::getInstance()->process($html);
+				
+				if ( _DEBUG )
+				{
+					Debug::getInstance()->addTimeMark('minify');
+				}
+			}
+			
+			$cache->writeCache( $urlStr, $page->getPhpHeader(), $html );
 			
 			if ( _DEBUG )
 			{
@@ -79,7 +89,7 @@ if ( _CACHE )
 			}
 		}
 		
-		echo $page->render();
+		echo $html;
 		
 		if ( _DEBUG )
 		{
