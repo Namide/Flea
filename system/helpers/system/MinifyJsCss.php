@@ -37,7 +37,7 @@ class MinifyJsCss
 	
 	public function process( $pageContent )
 	{
-		
+		$bu = BuildUtil::getInstance();
 
 		$cssList = array();
 		$cssListHash = array();
@@ -69,7 +69,7 @@ class MinifyJsCss
 
 			if ( $element->hasAttribute('href') )
 			{
-				$cssList[$element->media] .= file_get_contents($element->href);
+				$cssList[$element->media] .= file_get_contents( $bu->getPageUrlByAbsUrl($element->href) );
 				$cssListHash[$element->media] .= $element->href;
 			}
 			else
@@ -93,7 +93,7 @@ class MinifyJsCss
 			
 			if ( $element->hasAttribute('src') )
 			{
-				$jsHead .= file_get_contents($element->src).';';
+				$jsHead .= file_get_contents($bu->getPageUrlByAbsUrl($element->src)).';';
 				$jsHeadHash .= $element->src;
 			}
 			else
@@ -117,7 +117,7 @@ class MinifyJsCss
 			
 			if ( $element->hasAttribute("src") )
 			{
-				$jsBody .= file_get_contents($element->src).';';
+				$jsBody .= file_get_contents($bu->getPageUrlByAbsUrl($element->src)).';';
 				$jsBodyHash .= $element->src;
 			}
 			else
@@ -156,7 +156,6 @@ class MinifyJsCss
 		
 		// Save files
 		$uu = UrlUtil::getInstance();
-		$bu = BuildUtil::getInstance();
 		$cache = new Cache(_DB_DSN_CACHE);
 		
 		

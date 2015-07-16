@@ -67,7 +67,7 @@ class BuildUtil extends InitUtil
     }
 	
 	/**
-	 * Get the absoulte URL of a page by his page URL
+	 * Get the absolute URL of a page by his page URL
 	 * 
 	 * @param string $url				Page URL
 	 * @param array $gets				Additionnal GET of the URL
@@ -81,6 +81,18 @@ class BuildUtil extends InitUtil
 		return _ROOT_URL.$relUrl;
     }
     
+	/**
+	 * Fast method to get the page URL of a page by his page absolute URL.
+	 * Not efficient if you have getters, setters...
+	 * 
+	 * @param string $absUrl		Absolute URL of the page
+	 * @return string				Page URL
+	 */
+	public function getPageUrlByAbsUrl( $absUrl )
+	{
+		return strtr($absUrl, array(_ROOT_URL=>''));
+	}
+	
 	/**
 	 * Absolute URL for a page
 	 * 
