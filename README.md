@@ -4,10 +4,11 @@ Flea
 Lightweight PHP framework
 - Quick to install
 - Cache Management
-- Minify (CSS, JS)
-- GZip
+- Minify (CSS, JS, HTML)
+- GZip (CSS, JS, HTML)
 - Simple and permissive urls
 - Lightweight
+- Simple templating and content (migration easy)
 
 
 Initialize the languages
