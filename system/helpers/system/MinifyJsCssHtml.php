@@ -31,7 +31,7 @@ namespace Flea;
  *
  * @author Namide
  */
-class MinifyJsCss
+class MinifyJsCssHtml
 {
 	private static $_INSTANCE;
 	
@@ -49,11 +49,7 @@ class MinifyJsCss
 		$jsBodyHash = '';
 		$jsBodyTag;
 		
-		
-		// Parse the google code website into a DOM
-		//$html = file_get_dom('http://code.google.com/');
 		$html = str_get_dom($pageContent);
-
 		foreach($html('link[type="text/css"]') as $element)
 		{
 			$del = true;
@@ -65,7 +61,6 @@ class MinifyJsCss
 				$cssListTag[$element->media] = $element;
 				$del = false;
 			}
-
 
 			if ( $element->hasAttribute('href') )
 			{
@@ -131,21 +126,6 @@ class MinifyJsCss
 		}
 
 		
-
-
-		/*$jsHeadTemp = '';
-		foreach ($jsHead as $code)
-			$jsHeadTemp .= $code.';';*/
-
-		/*$jsBodyTemp = '';
-		foreach ($jsBody as $code)
-			$jsBodyTemp .= $code.';';*/
-
-		// Minify js
-		$jSqueeze = new \JSqueeze();
-		
-		
-
 		// Hash js and css for print
 		foreach ($cssListHash as &$cssHash)
 			$cssHash = 'css/'.md5($cssHash).'.css';
@@ -158,6 +138,8 @@ class MinifyJsCss
 		$uu = UrlUtil::getInstance();
 		$cache = new Cache(_DB_DSN_CACHE);
 		
+		// Minify js
+		$jSqueeze = new \JSqueeze();
 		
 		// WRITE HEAD JS
 		if ( $jsHead != '' )
@@ -172,8 +154,6 @@ class MinifyJsCss
 				$cache->writeCache( $jsHeadHash, 'Content-Type: application/javascript', $jsHead );
 			}
 		}
-		
-			
 		
 		
 		// WRITE BODY JS
@@ -216,6 +196,20 @@ class MinifyJsCss
 			}
 		}
 		
+		\HTML_Formatter::minify_html($html);
+		
+		/*$search = array(
+			'/\>[^\S ]+/s',  // strip whitespaces after tags, except space
+			'/[^\S ]+\</s',  // strip whitespaces before tags, except space
+			'/(\s)+/s'       // shorten multiple whitespace sequences
+		);
+		$replace = array(
+			'>',
+			'<',
+			'\\1'
+		);
+		$html = preg_replace($search, $replace, $html);*/
+		
 		return $html;
 	}
 	
@@ -225,9 +219,9 @@ class MinifyJsCss
 	final private function __clone() { }
 	
 	/**
-	 * Instance of the MinifyJsCss
+	 * Instance of the MinifyJsCssHtml
 	 * 
-	 * @return self		Instance of the MinifyJsCss
+	 * @return self		Instance of the MinifyJsCssHtml
 	 */
     final public static function getInstance()
     {

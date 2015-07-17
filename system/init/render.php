@@ -25,6 +25,7 @@
  */
 
 namespace Flea;
+$t = microtime(true);
 
 if ( _DEBUG )
 {
@@ -71,9 +72,9 @@ if ( _CACHE )
 			{
 				include_once _SYSTEM_DIRECTORY.'libs/ganon.php';
 				include_once _SYSTEM_DIRECTORY.'libs/min-js.php';
-				include_once _SYSTEM_DIRECTORY.'helpers/system/MinifyJsCss.php';
+				include_once _SYSTEM_DIRECTORY.'helpers/system/MinifyJsCssHtml.php';
 				
-				$html = MinifyJsCss::getInstance()->process($html);
+				$html = MinifyJsCssHtml::getInstance()->process($html);
 				
 				if ( _DEBUG )
 				{

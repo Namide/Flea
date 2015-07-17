@@ -22,6 +22,12 @@ $lang->add('fr');
 ```
 
 
+Todo
+------------------------
+
+Apache  `mod_expires`
+
+
 Initialize the page
 ------------------------
 
