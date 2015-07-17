@@ -23,12 +23,6 @@ $lang->add('fr');
 ```
 
 
-Todo
-------------------------
-
-Apache  `mod_expires`
-
-
 Initialize the page
 ------------------------
 
@@ -155,3 +149,9 @@ or template
 // $buildUtil->getAbsUrlByPageUrl( ‘page-url' );
 
 ```
+
+
+Todo
+------------------------
+
+Active apache `mod_expires` in .htaccess
