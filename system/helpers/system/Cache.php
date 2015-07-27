@@ -58,6 +58,10 @@ class Cache
 			$tables = array( 'url'=>'TEXT', 'header'=>'TEXT', 'content'=>'TEXT', 'gzip'=>'TEXT' );
 			$sql->initCreate($tableName, $tables);
 			$this->_db->execute( $sql );
+			
+			$fileTemplate = _SYSTEM_DIRECTORY.'helpers/system/autoCacheTemplate.php';
+			$fileNew = 'cache.php';
+			copy($fileTemplate, $fileNew);
 		}
     }
 	
