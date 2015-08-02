@@ -189,6 +189,60 @@ class PageList
     }
 	
 	/**
+	 * Return a list of pages with each page has this content
+	 * 
+	 * @param string $contentLabel		Label of the content
+	 * @param string $contentValue		Value of the content
+	 * @param string $lang				Language of the elements
+	 * @return array					List of elements
+	 */
+	public function getWithThisContent( $contentLabel, $contentValue, $lang )
+    {
+		$where = '_lang = \''.$lang.'\' AND '
+			. 'page_prop = \'_contents\' AND '
+			. 'key = \''.$contentLabel.'\' AND '
+			. 'value = \''.$contentValue.'\' AND '
+			. '_visible = 1';
+		
+		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
+		$query->setWhere($where);
+		
+		return $this->getByList($query);
+    }
+	
+	/**
+	 * Return a list of pages with each page has this content
+	 * 
+	 * @param string $contentLabel		Label of the content
+	 * @param array $contentValue		Value of the content
+	 * @param string $lang				Language of the elements
+	 * @return array					List of elements
+	 */
+	public function getWithOneOfThisContents( $contentLabel, array $contentValues, $lang )
+    {
+		$where = '_lang = \''.$lang.'\' AND '
+			. 'page_prop = \'_contents\' AND '
+			. 'key = \''.$contentLabel.'\' AND '				
+			. '_visible = 1 AND (';
+		
+		$first = true;
+		foreach ($contentValues as $val)
+		{
+			if ( !$first )
+				$where .= ' OR';
+			
+			$where .= ' value = \''.$val.'\'';
+			$first = false;
+		}
+		$where .= ')';
+		
+		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
+		$query->setWhere($where);
+		
+		return $this->getByList($query);
+    }
+	
+	/**
 	 * Return a list of pages with each page has at least one of your tags
 	 * 
 	 * @param array $tags		List of tags (withouts keys)
@@ -207,14 +261,16 @@ class PageList
 		$first = true;
 		foreach ($tags as $tag)
 		{
-			if ( !$first ) $where .= ' OR';
+			if ( !$first )
+				$where .= ' OR';
+			
 			$where .= ' value = \''.$tag.'\'';
 			$first = false;
 		}
 		$where .= ')';
-		
-		$query = SqlQuery::getTemp();
+		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
 		$query->setWhere($where);
+		
 		
 		return $this->getByList ( $query );
     }

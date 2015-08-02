@@ -76,6 +76,25 @@ class MinifyJsCssHtml
 			if ( $del )
 				$element->delete();
 		}
+		
+		foreach($html('style') as $element)
+		{
+			$del = true;
+			if ( !isset($cssList['screen']) )
+			{
+				$cssList['screen'] = '';
+				$cssListHash['screen'] = '';
+				
+				$cssListTag['screen'] = $element;
+				$del = false;
+			}
+
+			$cssList['screen'] .= $element->getInnerText();
+			$cssListHash['screen'] .= $element->getInnerText();
+			
+			if ( $del )
+				$element->delete();
+		}
 
 		foreach($html('head script') as $element)
 		{
@@ -139,7 +158,8 @@ class MinifyJsCssHtml
 		$cache = new Cache(_DB_DSN_CACHE);
 		
 		// Minify js
-		$jSqueeze = new \JSqueeze();
+		if ( _MINIFY_ENABLE_JS )
+			$jSqueeze = new \JSqueeze();
 		
 		// WRITE HEAD JS
 		if ( $jsHead != '' )
@@ -150,7 +170,8 @@ class MinifyJsCssHtml
 			$jsHeadTag->setInnerText('');
 			if ( !$cache->isWrited( $jsHeadHash ) )
 			{
-				$jsHead = $jSqueeze->squeeze($jsHead, true, false);
+				if ( _MINIFY_ENABLE_JS )
+					$jsHead = $jSqueeze->squeeze($jsHead, true, false);
 				$cache->writeCache( $jsHeadHash, 'Content-Type: application/javascript', $jsHead );
 			}
 		}
@@ -165,7 +186,8 @@ class MinifyJsCssHtml
 			$jsBodyTag->setInnerText('');
 			if ( !$cache->isWrited( $jsBodyHash ) )
 			{
-				$jsBody = $jSqueeze->squeeze($jsBody, true, false);
+				if ( _MINIFY_ENABLE_JS )
+					$jsBody = $jSqueeze->squeeze($jsBody, true, false);
 				$cache->writeCache( $jsBodyHash, 'Content-Type: application/javascript', $jsBody );
 			}
 		}
@@ -181,23 +203,41 @@ class MinifyJsCssHtml
 			{
 				// Minify CSS
 				$str = $cssList[$media];
-				$str = preg_replace( '#\s+#', ' ', $str );
-				$str = preg_replace( '#/\*.*?\*/#s', '', $str );
-				$str = str_replace( '; ', ';', $str );
-				$str = str_replace( ': ', ':', $str );
-				$str = str_replace( ' {', '{', $str );
-				$str = str_replace( '{ ', '{', $str );
-				$str = str_replace( ', ', ',', $str );
-				$str = str_replace( '} ', '}', $str );
-				$str = str_replace( ';}', '}', $str );
-				$str = trim( $str );
+				
+				if ( _MINIFY_ENABLE_CSS )
+				{
+					
+				
+					//$str = preg_replace( '#\s+#', ' ', $str );
+					//$str = preg_replace( '#/\*.*?\*/#s', '', $str );
+					/*$str = str_replace( '; ', ';', $str );
+					$str = str_replace( ': ', ':', $str );
+					$str = str_replace( ' {', '{', $str );
+					$str = str_replace( '{ ', '{', $str );
+					$str = str_replace( ', ', ',', $str );
+					$str = str_replace( '} ', '}', $str );
+					$str = str_replace( ';}', '}', $str );
+					$str = trim( $str );*/
+
+					$str = str_replace(array("\r","\n"), '', $str);
+					$str = preg_replace('`([^*/])\/\*([^*]|[*](?!/)){5,}\*\/([^*/])`Us', '$1$3', $str);
+					$str = preg_replace('`\s*({|}|,|:|;)\s*`', '$1', $str);
+					$str = str_replace(';}', '}', $str);
+					$str = preg_replace('`(?=|})[^{}]+{}`', '', $str);
+					$str = preg_replace('`[\s]+`', ' ', $str);
+				
+				}
 				
 				$cache->writeCache( $cssListHash[$media], 'Content-type: text/css', $str );
 			}
 		}
 		
-		\HTML_Formatter::minify_html($html);
-		
+		if ( _MINIFY_ENABLE_HTML )
+		{
+			// bug utf-8
+			\HTML_Formatter::minify_html($html);
+		}
+				
 		/*$search = array(
 			'/\>[^\S ]+/s',  // strip whitespaces after tags, except space
 			'/[^\S ]+\</s',  // strip whitespaces before tags, except space

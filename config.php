@@ -45,6 +45,15 @@ define( '_MAX_PAGE_CACHE', 50 );
 // Minify and concat all js and css files (_CACHE must be true)
 define( '_MINIFY', true );
 
+// Disable JavaScript minification
+define( '_MINIFY_ENABLE_JS', true );
+
+// Disable CSS minification
+define( '_MINIFY_ENABLE_CSS', true );
+
+// Disable HTML minification
+define( '_MINIFY_ENABLE_HTML', true );
+
 
 /*
  *		DATA BASE
