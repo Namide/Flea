@@ -43,6 +43,11 @@ class Debug
 	
 	private $_errorBackNum = 10;
 	
+	private $_errorJsAlert = false;
+	private $_errorEcho = true;
+	private $_errorFile = true;
+	private $_errorFileName = 'errors.log';
+	
 	/**
 	 * Number of functions called before the error.
 	 * Default is 10.
@@ -58,8 +63,6 @@ class Debug
 	 */
 	public function getErrorBackNum() { return $this->_errorBackNum; }
 
-	private $_errorJsAlert = false;
-	
 	/**
 	 * Force the JavaScript alert() to trace errors.
 	 * 
@@ -74,8 +77,6 @@ class Debug
 	 */
 	public function getErrorJsAlert() { return $this->_errorJsAlert; }
 
-	private $_errorEcho = true;
-	
 	/**
 	 * Force the php echo to trace errors in the page.
 	 * 
@@ -113,7 +114,7 @@ class Debug
 	 */
 	public function addError( $msg )
 	{
-		$error = $msg.'\n'.$this->getDebugBacktrace(1, $this->_errorBackNum);
+		$error = $msg."\n".$this->getDebugBacktrace(1, $this->_errorBackNum);
 		array_push( $this->_errorList, $error );
 	}
 	
@@ -125,6 +126,38 @@ class Debug
 	{
 		if ( count($this->_errorList) > 0 )
 		{
+			if ( $this->_errorFile )
+			{
+				include_once _SYSTEM_DIRECTORY.'helpers/miscellaneous/FileUtil.php';
+				
+				if ( !file_exists ( _CACHE_DIRECTORY ) )
+				{
+					FileUtil::writeProtectedDir(_CACHE_DIRECTORY);
+				}
+				
+				$fileName = _CACHE_DIRECTORY.$this->_errorFileName;
+				$file = fopen($fileName, 'a+');
+				
+				$page = General::getInstance()->getCurrentPage();
+				fputs($file, "\r\n");
+				fputs($file, "\r\n");
+				fputs($file, "url: " . $page->getPageUrl());
+				fputs($file, "\r\n");
+				fputs($file, "id: " . $page->getId());
+				fputs($file, "\r\n");
+				
+				foreach ($this->_errorList as $errorStr) {
+					//foreach (explode('\n', $errorStr) as $single) {
+						fputs($file, $errorStr);
+						fputs($file, "\r\n");
+					//}
+				}
+				//$datas .= implode( "\n", $this->_errorList );
+				
+				
+				fclose($file);
+				
+			}
 			
 			echo '<script>/*Errors*/';
 			if ( $this->_errorJsAlert )
@@ -269,7 +302,7 @@ class Debug
 				$ret[] = $str;
 			}
 		}
-		return implode('\n',$ret);
+		return implode("\n", $ret);
 	}
 	
 }
