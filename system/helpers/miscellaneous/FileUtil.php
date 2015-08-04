@@ -82,6 +82,51 @@ class FileUtil
 	}
 	
 	/**
+	 * Return the content of your CSS file with absolute URL for your pictures
+	 * 
+	 * @param string $cssFile	Path of your CSS file	
+	 * @return string			Content of your CSS
+	 */
+	public static function getCssContentWithAbsUrl( $cssFile )
+	{
+		$content = file_get_contents( $cssFile );
+		$regex = '/url\(([\'"]?.[^\'"]*\.(png|jpg|jpeg|gif)[\'"]?)\)/i';
+		preg_match_all($regex, $content, $links);
+		for( $i = 0; $i < count($links[1]); $i++ )
+		{
+			$newUrlCss = self::getAbsPathFromFile($cssFile, $links[1][$i]);
+			$content = str_replace( $links[1][$i], $newUrlCss, $content);
+		}
+		return $content;
+	}
+	
+	/**
+	 * Use $rootPath to create an absolute URL for $relPath.
+	 * Can be use to change an URL in a CSS file.
+	 * 
+	 * @param string $rootPath		Absolute URL of the container file like "http://domain.com/css/style.css"
+	 * @param string $relPath			Relative URL of the file like "../img/picture.jpg"
+	 * @return string					Absolute URL of the file like "http://domain.com/img/picture.jpg"
+	 */
+	public static function getAbsPathFromFile( $rootPath, $relPath )
+	{
+		$root = explode('/', $rootPath);
+		$rel = explode('/', $relPath);
+		
+		//if ( is_file($rootPath) )
+		array_pop($root);
+		
+		while ( $rel[0] == '..' )
+		{
+			array_pop($root);
+			array_shift($rel);
+		}
+		$final = array_merge( $root, $rel );
+		
+		return implode('/', $final);
+	}
+	
+	/**
 	 * Writes a directory with .htaccess (deny from all) if it doesn't exist.
 	 * It works recursively.
 	 * 
