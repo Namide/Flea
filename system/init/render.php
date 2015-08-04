@@ -100,7 +100,13 @@ if ( _CACHE )
 						if ($type == 'css')
 						{
 							include_once _SYSTEM_DIRECTORY.'helpers/miscellaneous/FileUtil.php';
-							$cache->writeCache( $newUrl, $head, FileUtil::getCssContentWithAbsUrl($url) );
+							$content = FileUtil::getCssContentWithAbsUrl($url);
+							$cache->writeCache( $newUrl, $head, $content );
+						}
+						else
+						{
+							$content = file_get_contents($url);
+							$cache->writeCache( $newUrl, $head, $content );
 						}
 					}
 					
