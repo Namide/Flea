@@ -332,7 +332,8 @@ class PageList
 		
 		$query = SqlQuery::getTemp();
 		$query->initCount($tableName);
-		$where = '_name = \''.$name.'\' AND _visible = 1';
+		//$where = '_name = \''.$name.'\' AND _visible = 1';
+		$where = '_name = \''.$name.'\'';
 		if ( $lang !== null ) { $where .= ' AND _lang = \''.$lang.'\''; }
 		$query->setWhere($where);
 		

@@ -145,10 +145,10 @@ class BuildUtil extends InitUtil
 	 * Return the default page if this one don't exist
 	 * 
 	 * @param string $lang
-	 * @param Page $page
+	 * @param Page &$page
 	 * @return Page
 	 */
-	public function getOtherLang( $lang, Page $page = null )
+	public function getOtherLang( $lang, Page &$page = null )
 	{
 		$pageList = PageList::getInstance();
 		if ( $page === null )
