@@ -5,8 +5,6 @@
  */
 
 // Absolute URL of the website
-//define( '_ROOT_URL', 'http://localhost/damien/github/Flea/' );
-//define( '_ROOT_URL', 'http://flea.namide.com/' );
 define( '_ROOT_URL', 'http://localhost/Flea/' );
 
 
@@ -53,6 +51,9 @@ define( '_MINIFY_ENABLE_CSS', true );
 
 // Disable HTML minification
 define( '_MINIFY_ENABLE_HTML', true );
+
+// GZIP CSS and JS
+define( '_GZIP_CSS_JS', true );
 
 
 /*

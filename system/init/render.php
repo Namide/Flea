@@ -68,7 +68,7 @@ if ( _CACHE )
 			
 		if ( $cache->isPageCachable( $page ) )
 		{
-			if ( _MINIFY ) 
+			if (_MINIFY) 
 			{
 				include_once _SYSTEM_DIRECTORY.'libs/ganon.php';
 				include_once _SYSTEM_DIRECTORY.'libs/min-js.php';
@@ -81,7 +81,7 @@ if ( _CACHE )
 					Debug::getInstance()->addTimeMark('minify');
 				}
 			}
-			else
+			else if (_GZIP_CSS_JS)
 			{
 				// GZIP ALL CSS AND JS FILES
 				
