@@ -68,20 +68,7 @@ if ( _CACHE )
 			
 		if ( $cache->isPageCachable( $page ) )
 		{
-			if (_MINIFY) 
-			{
-				include_once _SYSTEM_DIRECTORY.'libs/ganon.php';
-				include_once _SYSTEM_DIRECTORY.'libs/min-js.php';
-				include_once _SYSTEM_DIRECTORY.'helpers/system/MinifyJsCssHtml.php';
-				
-				$html = MinifyJsCssHtml::getInstance()->process($html);
-				
-				if ( _DEBUG )
-				{
-					Debug::getInstance()->addTimeMark('minify');
-				}
-			}
-			else if (_GZIP_CSS_JS)
+			if (_GZIP_CSS_JS)
 			{
 				// GZIP ALL CSS AND JS FILES
 				
