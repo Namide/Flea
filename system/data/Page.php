@@ -147,6 +147,23 @@ class Page
 	 */
     public function getLang() { return $this->_lang; }
 	
+	private $_date;
+	/**
+	 * Date of the Page, no set format
+	 * 
+	 * @param string $date	Date
+	 */
+    public function setDate( $date )
+	{
+		$this->_date = $date;
+	}
+	/**
+	 * Date of the Page
+	 * 
+	 * @return string	Date
+	 */
+    public function getDate() { return $this->_date; }
+	
 	private $_type;
 	/**
 	 * Type of the page.
@@ -265,8 +282,8 @@ class Page
 				$rows = DataBase::getInstance( _DB_DSN_PAGE )->fetchAll($query);
 				foreach ( $rows as $row )
 				{
-					$content = \Flea::getBuildUtil()->replaceFleaVars ( $row['value'], $this );
-					$this->_metas->add($content, $row['key']);
+					$meta = \Flea::getBuildUtil()->replaceFleaVars ( $row['value'], $this );
+					$this->_metas->add($meta, $row['key']);
 				}
 			}	
 		}
@@ -364,17 +381,17 @@ class Page
 	 */
     public function getPageUrl() { return $this->_url; }
 	
-	private $_additionalUrls;
+	private $_url301;
 	/**
-	 * Additionnal(s) URL for this page (without Root and GET)
+	 * Additional 301 URL for this page (without Root and GET)
 	 * 
 	 * @return DataList
 	 */
-    public function getAdditionalUrls()
+    public function getUrl301()
 	{
-		if ( $this->_additionalUrls === null )
+		if ( $this->_url301 === null )
 		{
-			$this->_additionalUrls = new DataList(false);
+			$this->_url301 = new DataList(false);
 			
 			$table_page = DataBase::objectToTableName( $this );
 			if ( DataBase::getInstance( _DB_DSN_PAGE )->exist($table_page) )
@@ -382,17 +399,17 @@ class Page
 				$table_list = $table_page.'_array';
 
 				$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
-				$where = array( 'page_id'=>$this->getId(), 'page_prop'=>'_additionalUrls' );
+				$where = array( 'page_id'=>$this->getId(), 'page_prop'=>'_url301' );
 				$query->initSelect( 'value', '`'.$table_list.'`', $where );
 				$rows = DataBase::getInstance( _DB_DSN_PAGE )->fetchAll($query);
 				foreach ( $rows as $row )
 				{
-					$this->_additionalUrls->add( $row['value'] );
+					$this->_url301->add( $row['value'] );
 				}
 			}
 		}
 		
-		return $this->_additionalUrls;
+		return $this->_url301;
 		
 	}
 	
@@ -526,13 +543,14 @@ class Page
 		$this->_tags = null;
 		
 		$this->_type = '';
+		$this->_date = '';
 		$this->_format = Page::$FORMAT_HTML;
 		
         $this->_visible = true;
         $this->_getEnabled = false;
 		$this->_getExplicit = true;
 		$this->_cachable = true;
-		$this->_additionalUrls = null;
+		$this->_url301 = null;
 		
 		$this->_url = '';
 		

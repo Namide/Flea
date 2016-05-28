@@ -14,12 +14,12 @@ function getMenu()
 	{
 		$output .= '<li><a hreflang="'.$pageTemp->getLang().'" '
 				. 'href="{{pageNameToAbsUrl:'.$pageTemp->getName().'}}">';
-		$output .= $pageTemp->getHtmlTitle().'</a></li>';
+		$output .= $pageTemp->getMetas('title').'</a></li>';
 	}
 	foreach( $pageList->getAllByLang( 'all' ) as $pageTemp )
 	{
 		$output .= '<li><a href="{{rootPath}}'.$pageTemp->getName().'">';
-		$output .= $pageTemp->getHtmlTitle().'</a></li>';
+		$output .= $pageTemp->getMetas('title').'</a></li>';
 	}
 	$output .= '</ul>';
 	

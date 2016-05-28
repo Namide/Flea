@@ -164,32 +164,32 @@ class BuildUtil extends InitUtil
 	}
 	
 	/**
-	 * Get one of the contents of a Page
+	 * Get one of the metass of a Page
 	 * 
-	 * @param type $contentKey			Key of the content
-	 * @param Page $page				Page to get the content
+	 * @param type $metaKey				Key of the meta
+	 * @param Page $page				Page to get the meta
 	 * @param type $replaceFleaVars		Replace or not the FleaVars
-	 * @return string					The corresponding formated content
+	 * @return string					The corresponding formated meta
 	 */
-	public function getContentOfPage( $contentKey, Page &$page, $replaceFleaVars = false )
+	public function getContentOfPage( $metaKey, Page &$page, $replaceFleaVars = false )
 	{
-		if( !$page->getContents()->hasKey( $contentKey ) ) 
+		if( !$page->getMetas()->hasKey( $metaKey ) ) 
 		{
 			if( _DEBUG )
 			{
-				Debug::getInstance()->addError('The content "'.$contentKey.'" '
+				Debug::getInstance()->addError('The meta "'.$metaKey.'" '
 				. ' don\'t exist for the page ['.$page->getId().']' );
 			}
 			return '';
 		}
 
-		$content = $page->getContents()->getValue($contentKey);
+		$meta = $page->getMetas()->getValue($metaKey);
 		if ( $replaceFleaVars )
 		{
-			return $this->replaceFleaVars($content, $page);
+			return $this->replaceFleaVars($meta, $page);
 		}
 		
-		return $content;
+		return $meta;
 	}
 	
 	/**
@@ -204,7 +204,7 @@ class BuildUtil extends InitUtil
 	 * - {{header}}				=> HTML header of the current page
 	 * - {{body}}				=> HTML body of the current page
 	 * - {{description}}		=> HTML description of the current page
-	 * - {{content:additionnal-label-content}}	=> $currentPage->getContent('additionnal-label-content');
+	 * - {{meta:additionnal-label-meta}}		=> $currentPage->getContent('additionnal-label-meta');
 	 * - {{pageNameToAbsUrl:page-name}}			=> $buildUtil->getAbsUrlByNameLang( ‘page-name', $currentLanguage );	
 	 * 
 	 * @param string $text		Original text
@@ -213,11 +213,11 @@ class BuildUtil extends InitUtil
 	 */
 	public function replaceFleaVars( $text, Page &$page = null )
     {
-		$replacePage = str_replace('{{title}}', $page->getHtmlTitle(), $text);
-		$replacePage = str_replace('{{header}}', $page->getHtmlHeader(), $replacePage);
-		$replacePage = str_replace('{{body}}', $page->getHtmlBody(), $replacePage);
-		$replacePage = str_replace('{{description}}', $page->getHtmlDescription(), $replacePage);
-		$replacePage = str_replace('{{cover}}', $page->getCover(), $replacePage);
+		//$replacePage = str_replace('{{title}}', $page->getHtmlTitle(), $text);
+		//$replacePage = str_replace('{{header}}', $page->getHtmlHeader(), $replacePage);
+		$replacePage = str_replace('{{body}}', $page->getHtmlBody(), $text);
+		//$replacePage = str_replace('{{description}}', $page->getHtmlDescription(), $replacePage);
+		//$replacePage = str_replace('{{cover}}', $page->getCover(), $replacePage);
 		
 		$replacePage = str_replace('{{rootPath}}', _ROOT_URL, $replacePage);
 		$replacePage = str_replace('{{templatePath}}', _ROOT_URL._TEMPLATE_DIRECTORY, $replacePage);
@@ -243,19 +243,19 @@ class BuildUtil extends InitUtil
 			
 		if ( $page !== null )
 		{
-			$replacePage = preg_replace_callback( '/\{\{content:(.*?)\}\}/', function ($matches) use($page)
+			$replacePage = preg_replace_callback( '/\{\{meta:(.*?)\}\}/', function ($matches) use($page)
 			{
-				if( !$page->getContents()->hasKey($matches[1]) ) 
+				if( !$page->getMetas()->hasKey($matches[1]) ) 
 				{
 					if( _DEBUG )
 					{
-						Debug::getInstance()->addError('The FleaVar {{content:'.$matches[1].'}}'
+						Debug::getInstance()->addError('The FleaVar {{meta:'.$matches[1].'}}'
 						. ' don\'t exist for the page ['.$page->getId().']' );
 					}
 					return '';
 				}
 				
-				return $page->getContents()->getValue($matches[1]);
+				return $page->getMetas()->getValue($matches[1]);
 				
 			}, $replacePage );
 		

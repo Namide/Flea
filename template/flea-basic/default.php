@@ -4,8 +4,8 @@
 <head>
 
     <meta charset="utf-8">
-	<title>{{title}} - Flea</title>
-    <meta name="description" content="{{description}}" />
+	<title>{{meta:title}} - Flea</title>
+    <meta name="description" content="{{meta:description}}" />
 	
 	
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
@@ -18,8 +18,6 @@
 	<link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'>
 	
     <link rel="icon" type="image/png" href="<?= Flea::getBuildUtil()->getTemplateAbsUrl( 'flea-basic/img/favicon.png' ) ?>" /> 
-    
-    {{header}}
     
 </head>
 
@@ -41,10 +39,10 @@
 			<?php
 				$tag = 'main-pages';
 				$list = Flea::getPageList()->getByTag($tag, $lang);
-				echo Flea::getTagUtil()->getLinkList($list);
+				echo Flea::getTagUtil()->getLinkList($list, 'title');
 			?>
         </nav>
-		<nav><?= Flea::getTagUtil()->getBreadcrump() ?></nav>
+		<nav><?= Flea::getTagUtil()->getBreadcrump('title') ?></nav>
     </header>
     
     <div id="content">

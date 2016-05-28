@@ -84,7 +84,7 @@ class PageList
 	
 	/**
 	 * Get the page and use the list of the page.
-	 * You can use the values used in the DataList of the Page (tags, contents...)
+	 * You can use the values used in the DataList of the Page (tags, metas...)
 	 * <br>Example:
 	 * <pre>
 	 * $query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
@@ -189,19 +189,19 @@ class PageList
     }
 	
 	/**
-	 * Return a list of pages with each page has this content
+	 * Return a list of pages with each page has this meta
 	 * 
-	 * @param string $contentLabel		Label of the content
-	 * @param string $contentValue		Value of the content
-	 * @param string $lang				Language of the elements
-	 * @return array					List of elements
+	 * @param string $metaLabel		Label of the meta
+	 * @param string $metaValue		Value of the meta
+	 * @param string $lang			Language of the elements
+	 * @return array				List of elements
 	 */
-	public function getWithThisContent( $contentLabel, $contentValue, $lang )
+	public function getWithThisContent( $metaLabel, $metaValue, $lang )
     {
 		$where = '_lang = \''.$lang.'\' AND '
-			. 'page_prop = \'_contents\' AND '
-			. 'key = \''.$contentLabel.'\' AND '
-			. 'value = \''.$contentValue.'\' AND '
+			. 'page_prop = \'_metas\' AND '
+			. 'key = \''.$metaLabel.'\' AND '
+			. 'value = \''.$metaValue.'\' AND '
 			. '_visible = 1';
 		
 		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
@@ -211,22 +211,22 @@ class PageList
     }
 	
 	/**
-	 * Return a list of pages with each page has this content
+	 * Return a list of pages with each page has this meta
 	 * 
-	 * @param string $contentLabel		Label of the content
-	 * @param array $contentValue		Value of the content
-	 * @param string $lang				Language of the elements
-	 * @return array					List of elements
+	 * @param string $metaLabel		Label of the meta
+	 * @param array $metaValue		Value of the meta
+	 * @param string $lang			Language of the elements
+	 * @return array				List of elements
 	 */
-	public function getWithOneOfThisContents( $contentLabel, array $contentValues, $lang )
+	public function getWithOneOfThisContents( $metaLabel, array $metaValues, $lang )
     {
 		$where = '_lang = \''.$lang.'\' AND '
-			. 'page_prop = \'_contents\' AND '
-			. 'key = \''.$contentLabel.'\' AND '				
+			. 'page_prop = \'_metas\' AND '
+			. 'key = \''.$metaLabel.'\' AND '				
 			. '_visible = 1 AND (';
 		
 		$first = true;
-		foreach ($contentValues as $val)
+		foreach ($metaValues as $val)
 		{
 			if ( !$first )
 				$where .= ' OR';
@@ -377,7 +377,7 @@ class PageList
 	 * @param string $folderName	Name of the folder thats contain the page
 	 * @return array				List of the pages generated (differents languages)
 	 */
-	protected function createPage( $folderName )
+	/*protected function createPage( $folderName )
     {
         $pages = array();
         
@@ -409,9 +409,9 @@ class PageList
         }
         
 		return $pages;
-    }
+    }*/
 	
-	private function initPage( Page &$page, $filename )
+	/*private function initPage( Page &$page, $filename )
     {
 		$str = file_get_contents($filename);
 		$json = json_decode($str, true);
@@ -493,7 +493,7 @@ class PageList
 		}
 		
 		return $page;
-    }
+    }*/
 	
 	/**
 	 * Get the page by relative URL

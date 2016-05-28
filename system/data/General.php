@@ -76,7 +76,8 @@ class General
 		if ( !$this->isDBInitialized() )
 		{
 			include_once _SYSTEM_DIRECTORY.'data/list/PageListCreate.php';
-			PageListCreate::getInstance()->addPagesByDir(_CONTENT_DIRECTORY);
+			//PageListCreate::getInstance()->addPagesByDir(_CONTENT_DIRECTORY);
+			PageListCreate::getInstance()->addPagesByCSV(_CONTENT_DIRECTORY);
 			
 			if (file_exists(_CONTENT_DIRECTORY.'initDB.php') )
 			{

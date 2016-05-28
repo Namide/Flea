@@ -40,11 +40,136 @@ class PageListCreate
 	 * 
 	 * @param type $dir				Root directory
 	 */
-	public function addPagesByDir( $dir )
+	/*public function addPagesByDir( $dir )
 	{
 		$listOfPages = $this->addPageByDirRecurs( $dir, '' );
 		$this->db_insertPages($listOfPages);
+	}*/
+	
+	/**
+	 * Add all pages with the CSV
+	 * 
+	 * @param type $dir				Root directory
+	 */
+	public function addPagesByCSV( $dir )
+	{
+		//$listOfPages = $this->addPageByDirRecurs( $dir, '' );
+		
+		
+		$csvName = $dir . 'pagelist.csv';
+		$csvFile = file( $csvName );
+		$num = -1;
+		$head = [];
+		$pageList = [];
+		foreach ( $csvFile as &$line ) {
+			
+			if ($num < 0)
+			{
+				$head = array_map( 'trim', str_getcsv($line) );
+			}
+			else
+			{
+				
+				$page = new Page();
+				
+				foreach ( str_getcsv($line) as $id => &$row)
+				{
+					$row = trim($row);
+					
+					switch ( $head[$id] )
+					{
+						case 'path': $page->setName( $row ); break;
+						case 'lang': $page->setLang( $row ); break;
+						case 'url': $page->setPageUrl( $row ); break;
+						case 'template': $page->setTemplate( $row ); break;
+						case 'visible': $page->setVisible( (bool) $row ); break;
+						case 'cachable': $page->setCachable( (bool) $row ); break;
+						case 'type': $page->setType( $row ); break;
+						case 'get.enable': $page->setGetEnabled( (bool) $row ); break;
+						case 'get.explicit': $page->setGetExplicit( (bool) $row ); break;
+						case 'header': $page->setPhpHeader( $row ); break;
+						case 'date': $page->setDate( $row ); break;
+						
+						case 'tags':
+							
+							if ($row !== '')
+							{
+								$aTemp = array_map( 'trim', explode(';', $row) );
+								$page->getTags()->addMultiple($aTemp);
+								break;
+							}
+						
+						case 'metas':
+							
+							if ($row !== '')
+							{
+								$aTemp = explode(';', $row);
+								foreach ($aTemp as &$pair)
+								{
+									$aTemp2 = explode(':', $pair);
+									if (count($aTemp2) > 1 ) 
+									{
+										$page->getMetas()->add( trim($aTemp2[1]), trim($aTemp2[0]) );
+									}
+									else if ( _DEBUG )
+									{
+										Debug::getInstance()->addError( 'The meta "' . $pair . '" must be a pair key:value in the CSV ' . $csvName  );
+									}
+								}
+							}
+								
+							break;
+						
+						case '301':
+							
+							if ($row !== '')
+							{
+								$aTemp = array_map( 'trim', explode(';', $row) );
+								$page->getUrl301()->addMultiple($aTemp);
+							}
+							break;
+						
+						default:
+							if ( _DEBUG )
+							{
+								Debug::getInstance()->addError( 'label "' . $head[$id] . '" is not correct in the CSV ' . $csvName  );
+							}
+					}
+				}
+				
+				$pageList[] = $page;
+			}
+			$num++;
+			
+			
+		}
+		
+		
+		
+		/*$list = array();
+		
+		if ( !file_exists($dir) ) { return $list; }
+
+		$dirOpen = opendir($dir);
+		while($file = @readdir($dirOpen))
+		{
+			if( $file != "." &&
+				$file != ".." &&
+				is_dir($dir.'/'.$file) )
+			{
+				$list1 = $this->addPageByDirRecurs( $dir.'/'.$file.'/', (($fileDirRel != '')?$fileDirRel.'/':'').$file );
+				$list2 = $this->createPage( (($fileDirRel != '')?$fileDirRel.'/':'').$file );
+				
+				
+				$list = array_merge($list, $list1, $list2);
+			}
+		}
+		closedir($dirOpen);*/
+		
+		
+		$this->db_insertPages($pageList);
 	}
+	
 	
 	/**
 	 * Add 301 redirections and other commands
@@ -88,7 +213,6 @@ class PageListCreate
 		$request->initCreate($tableName.'_array', array( 'page_id'=>'TEXT', 'page_prop'=>'TEXT', 'key'=>'TEXT', 'value'=>'TEXT') );
 		$db->execute( $request );
 	}
-
 
 	private function db_insertPages( array $list )
 	{
@@ -136,7 +260,7 @@ class PageListCreate
 	 * @param type $fileDirRel		Relative directory (for the recursivity)	
 	 * @return array				List of the pages added
 	 */
-	private function addPageByDirRecurs( $dir, $fileDirRel = '' )
+	/*private function addPageByDirRecurs( $dir, $fileDirRel = '' )
 	{
 		$list = array();
 		
@@ -159,7 +283,7 @@ class PageListCreate
 		closedir($dirOpen);
 		
 		return $list;
-	}
+	}*/
 	
 	/**
 	 * Add all the pages (by languages) in the folder
@@ -167,7 +291,7 @@ class PageListCreate
 	 * @param string $folderName	Name of the folder thats contain the page
 	 * @return array				List of the pages generated (differents languages)
 	 */
-	private function createPage( $folderName )
+	/*private function createPage( $folderName )
     {
         $pages = array();
         
@@ -199,9 +323,9 @@ class PageListCreate
         }
         
 		return $pages;
-    }
+    }*/
 	
-	private function initPage( Page &$page, $filename )
+	/*private function initPage( Page &$page, $filename )
     {
 		include $filename;
 		
@@ -248,7 +372,7 @@ class PageListCreate
 		if ( isset($contents) )			{ $page->getContents()->addMultiple($contents); }
 		
         return $page;
-    }
+    }*/
 	
 	final private function __construct() { }
 	
