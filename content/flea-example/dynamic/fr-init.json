@@ -1,0 +1,20 @@
+{
+	"url" : "dyn",
+	"template" : "flea-basic/default",
+	"visible" : true,
+	"cachable" : false,
+	
+	"get" : {
+		"enabled" : true,
+		"explicit" : true
+	},
+	
+	"metas" : {
+		"date" : "2014-04-01",
+		"title" : "Dynamic page"
+	},
+	
+	"tags" : [
+		"main-pages"
+	]
+}

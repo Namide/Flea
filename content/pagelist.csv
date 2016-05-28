@@ -1,0 +1,7 @@
+path,lang,url,template,tags,metas,visible,cachable,type,get enable,get explicit,301,header
+flea-example/doc,all,doc,,main-pages,title : Documentation,1,1,redirect301,0,,,Location: {{rootPath}}doc/index.html
+flea-example/dynamic,fr,dyn,flea-basic/default,main-pages,date : 2014-04-01 ; title : Dynamic page,1,0,,1,1,,
+flea-example/error404,en,error404,flea-basic/default,,date : 2014-05-01 ; title : Error 404 ; description : Page not found,0,1,error404,0,,,HTTP/1.0 404 Not Found
+flea-example/home,en,en,flea-basic/default,main-pages,date : 2014-05-01 ; title : Home ; description : Description,1,1,default,0,,,
+flea-example/home,fr,fr,flea-basic/default,main-pages,date : 2014-05-01 ; title : Accueil ; description : Description,1,1,default,0,,fr/accueil,
+flea-example/search,fr,fr/recherche,flea-basic/default,main-pages,date : 2014-05-02 ; title : Search ; description : Search page,1,0,default,1,1,,"<meta name=\""robots\"" content=\""all\"" />"

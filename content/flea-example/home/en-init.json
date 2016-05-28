@@ -1,0 +1,21 @@
+{
+	"url" : "en",
+	"template" : "flea-basic/default",
+	"visible" : true,
+	"cachable" : true,
+	"type" : "default",
+	
+	"get" : {
+		"enabled" : false
+	},
+	
+	"tags" : [
+		"main-pages"
+	],
+	
+	"metas" : {
+		"date" : "2014-05-01",
+		"title" : "Home",
+		"description" : "Description"
+	}
+}

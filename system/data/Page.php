@@ -123,20 +123,6 @@ class Page
 	 */
     public function getName() { return $this->_name; }
 	
-	private $_cover;
-	/**
-	 * Cover URL of the Page.
-	 * 
-	 * @param string $src	URL of the cover
-	 */
-    public function setCover( $src ) { $this->_cover = $src; }
-	/**
-	 * Cover URL of the Page
-	 * 
-	 * @return string	URL of the cover
-	 */
-    public function getCover() { return $this->_cover; }
-	
 	private $_lang;
 	/**
 	 * Language of the Page (fr, en, ko...)
@@ -160,23 +146,6 @@ class Page
 	 * @return string	Language
 	 */
     public function getLang() { return $this->_lang; }
-	
-	private $_date;
-	/**
-	 * Date of the Page, no set format
-	 * 
-	 * @param string $date	Date
-	 */
-    public function setDate( $date )
-	{
-		$this->_date = $date;
-	}
-	/**
-	 * Date of the Page
-	 * 
-	 * @return string	Date
-	 */
-    public function getDate() { return $this->_date; }
 	
 	private $_type;
 	/**
@@ -272,18 +241,18 @@ class Page
 		return $this->_tags;
 	}
 	
-	private $_contents;
+	private $_metas;
 	/**
-	 * A content is a pair with key and value.
-	 * You can't add 2 contents with same label.
+	 * A meta is a pair with key and value.
+	 * You can't add 2 metas with same label.
 	 * 
 	 * @return DataList 
 	 */
-	public function getContents()
+	public function getMetas()
 	{
-		if ( $this->_contents === null )
+		if ( $this->_metas === null )
 		{
-			$this->_contents = new DataList(true);
+			$this->_metas = new DataList(true);
 			
 			$table_page = DataBase::objectToTableName( $this );
 			if ( DataBase::getInstance( _DB_DSN_PAGE )->exist($table_page) )
@@ -291,19 +260,18 @@ class Page
 				$table_list = $table_page.'_array';
 
 				$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
-				$where = array( 'page_id'=>$this->getId(), 'page_prop'=>'_contents' );
+				$where = array( 'page_id'=>$this->getId(), 'page_prop'=>'_metas' );
 				$query->initSelect( 'key, value', '`'.$table_list.'`', $where );
 				$rows = DataBase::getInstance( _DB_DSN_PAGE )->fetchAll($query);
 				foreach ( $rows as $row )
 				{
 					$content = \Flea::getBuildUtil()->replaceFleaVars ( $row['value'], $this );
-					$this->_contents->add($content, $row['key']);
+					$this->_metas->add($content, $row['key']);
 				}
-			}
-			
-			
+			}	
 		}
-		return $this->_contents;
+		
+		return $this->_metas;
 	}
 	
 	private $_phpHeader;
@@ -449,21 +417,6 @@ class Page
 		return 0;
 	}
 	
-    private $_htmlHeader;
-	/**
-	 * Add to the content header HTML (links CSS, links JS...)
-	 * 
-	 * @param string $header	HTML header
-	 */
-    public function setHtmlHeader( $header ) { $this->_htmlHeader = $header; }
-	
-	/**
-	 * HTML content in the header
-	 * 
-	 * @return type		HTML header
-	 */
-	public function getHtmlHeader() { return $this->_htmlHeader; }
-	
     private $_htmlBody;
 	/**
 	 * Set the body of the page
@@ -479,34 +432,6 @@ class Page
 	 */
 	public function getHtmlBody() { return $this->_htmlBody; }
 
-    private $_htmlTitle;
-	/**
-	 * Set the title of the page
-	 * 
-	 * @param string $title		Title of the page
-	 */
-    public function setHtmlTitle( $title ) { $this->_htmlTitle = $title; }
-	/**
-	 * Title in the HTML page
-	 * 
-	 * @return string			Title of the page
-	 */
-    public function getHtmlTitle() { return $this->_htmlTitle; }
-
-	private $_htmlDescription;
-	/**
-	 * Set the description of the page
-	 * 
-	 * @param string $description		Desciption of the page
-	 */
-    public function setHtmlDescription( $description ) { $this->_htmlDescription = $description; }
-	/**
-	 * Description of the page (in the header)
-	 * 
-	 * @return string		Desciption of the page
-	 */
-    public function getHtmlDescription() { return $this->_htmlDescription; }
-	
     private $_template;
 	/**
 	 * Change the template of the page
@@ -552,16 +477,6 @@ class Page
 		{
 			\Flea::getHeader()->appliHeaderOfPage($this);
 			
-			/*if ( $this->_phpHeader != '' && $activeHeader )
-			{
-				header( $this->_phpHeader );
-			}
-		
-			if ( $this->_format != 'html' && $activeHeader )
-			{
-				header( $this->_phpHeader );
-			}*/
-			
 			ob_start();
 			include _TEMPLATE_DIRECTORY.$this->_template.'.php';
 			$content = ob_get_clean();
@@ -580,11 +495,6 @@ class Page
 	 */
 	public function renderWithoutTemplate( $activeHeader = true )
 	{
-		/*if ( $this->_phpHeader != '' && $activeHeader )
-		{
-			header( $this->_phpHeader );
-		}*/
-		
 		if ( $this->_type === Page::$TYPE_REDIRECT301 && $activeHeader )
 		{
 			$absNewURL = \Flea::getBuildUtil()->replaceFleaVars( $this->_htmlBody, $this );
@@ -596,18 +506,6 @@ class Page
 		\Flea::getHeader()->appliHeaderOfPage($this);
 		
 		return \Flea::getBuildUtil()->replaceFleaVars( $this->_htmlBody, $this );
-		/*$output = '<!doctype html><html><head><meta charset="UTF-8" />';
-		$output .= \Flea::getBuildUtil()->replaceFleaVars( $this->_htmlHeader, $this );
-		if ( $this->_htmlTitle != '' )
-		{
-			$output .= '<title>'. \Flea::getBuildUtil()->replaceFleaVars( $this->_htmlTitle, $this ). '</title>';
-		}
-		if ( $this->_htmlDescription != '' )
-		{
-			$output .= '<meta name="description" content="'. \Flea::getBuildUtil()->replaceFleaVars( $this->_htmlDescription, $this ). '"/>';
-		}
-		$output .= '</head><body>' . \Flea::getBuildUtil()->replaceFleaVars( $this->_htmlBody, $this ). '</body></html>';
-		return $output;*/
 	}
 
 	/**
@@ -624,11 +522,10 @@ class Page
 		}
 		$this->setLang( $lang );
 		$this->setName( $name );
-		$this->_contents = null;
+		$this->_metas = null;
 		$this->_tags = null;
 		
 		$this->_type = '';
-		$this->_date = '';
 		$this->_format = Page::$FORMAT_HTML;
 		
         $this->_visible = true;
@@ -639,13 +536,9 @@ class Page
 		
 		$this->_url = '';
 		
-		$this->_htmlTitle = $name;
-		$this->_htmlDescription = $name;
-		$this->_htmlHeader = '';
 		$this->_htmlBody = '';
 		
-		$this->_cover = '';
-        $this->_template = '';
+		$this->_template = '';
 		
 		$this->_phpHeader = '';
 		$this->_buildFile = '';

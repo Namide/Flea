@@ -1,0 +1,23 @@
+{
+	"url" : "admin/class-test",
+	"template" : "flea-admin/admin",
+	"visible" : false,
+	"cachable" : false,
+	"type" : "",
+	"header" : "",
+	
+	"get" : {
+		"enabled" : false,
+		"explicit" : false
+	},
+	
+	"tags" : [
+		"flea-admin"
+	],
+	
+	"metas" : {
+		"date" : "2014-11-12",
+		"title" : "Class test",
+		"description" : "Tools to tests class of Flea"
+	}
+}

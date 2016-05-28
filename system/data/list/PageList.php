@@ -137,7 +137,7 @@ class PageList
 		}
 		
 		ob_start();
-		$page = $this->initPage( $page, $page->getBuildFile() );
+		include $page->getBuildFile();
 		$page->setHtmlBody( ob_get_clean() );
 		
 		return $page;
@@ -386,7 +386,7 @@ class PageList
         
         foreach ( $langs as $lang )
         {
-            $filename = _CONTENT_DIRECTORY.$folderName.'/'.$lang.'-init.php';
+            $filename = _CONTENT_DIRECTORY.$folderName.'/'.$lang.'-init.json';
             
             if( file_exists ( $filename ) )
             {
@@ -413,12 +413,13 @@ class PageList
 	
 	private function initPage( Page &$page, $filename )
     {
-		include $filename;
+		$str = file_get_contents($filename);
+		$json = json_decode($str, true);
 		
-		if ( isset($type) )	
+		if ( isset($json['type']) )
 		{
-			$page->setType($type);
-			if ( $type == Page::$TYPE_ERROR404 )
+			$page->setType($json['type']);
+			if ( $page->getType() == Page::$TYPE_ERROR404 )
 			{
 				$this->_error404 = $page->getName();
 				$page->setVisible( false );
@@ -427,30 +428,71 @@ class PageList
 			}
 		}
 		
-		if ( isset($url) )				{ $page->setPageUrl($url) ; }
-		if ( isset($addUrl) )			{ $page->getAdditionalUrls()->add($addUrl); }
-		if ( isset($addUrls) )			{ $page->getAdditionalUrls()->addMultiple($addUrls); }
-		if ( isset($template) )			{ $page->setTemplate($template) ; }
+		if ( isset($json['url']) )
+		{
+			$page->setPageUrl($json['url']);
+		}
+		else if (_DEBUG)
+		{
+			Debug::getInstance()->addError( 'Add the url info in the file ' . $filename );
+		}
 		
-		if ( isset($visible) )			{ $page->setVisible($visible) ; }
-		if ( isset($cachable) )			{ $page->setCachable($cachable) ; }
+		if ( isset($json['301']) )	
+		{
+			if (is_array($json['301']))
+			{
+				$page->getAdditionalUrls()->addMultiple($json['301']);
+			}
+			else
+			{
+				$page->getAdditionalUrls()->add($json['301']);
+			}
+		}
+		if ( isset($json['template']) )	{ $page->setTemplate($json['template']); }
+		if ( isset($json['visible']) )	{ $page->setVisible($json['visible']); }
+		if ( isset($json['cachable']) )	{ $page->setCachable($json['cachable']); }
+		if ( isset($json['header']) )	{ $page->setPhpHeader($json['header']); }
+		if ( isset($json['tags']) )
+		{
+			if (is_array($json['tags']))
+			{
+				$page->getTags()->addMultiple($json['tags']);
+			}
+			else
+			{
+				$page->getTags()->add($json['tags']);
+			}
+		}
 		
-		if ( isset($getEnabled) )		{ $page->setGetEnabled($getEnabled) ; }
-		if ( isset($getExplicit) )		{ $page->setGetExplicit($getExplicit) ; }
-		if ( isset($date) )				{ $page->setDate($date) ; }
+		if ( isset($json['get']) )
+		{
+			if ( isset($json['get']['enabled']) )
+			{
+				$page->setGetEnabled($json['get']['enabled']);
+			}
+			
+			if ( isset($json['get']['explicit']) )
+			{
+				$page->setGetEnabled($json['get']['explicit']);
+			}
+		}
 		
-		if ( isset($htmlBody) )			{ $page->setHtmlBody($htmlBody) ; }
-		if ( isset($htmlDescription) )	{ $page->setHtmlDescription($htmlDescription) ; }
-		if ( isset($htmlHeader) )		{ $page->setHtmlHeader($htmlHeader) ; }
-		if ( isset($htmlTitle) )		{ $page->setHtmlTitle($htmlTitle) ; }
-				
-		if ( isset($phpHeader) )		{ $page->setPhpHeader($phpHeader) ; }
+		if ( isset($json['metas']) )
+		{
+			foreach ($json['metas'] as $key => $val)
+			{
+				if (!is_array($val))
+				{
+					$page->getMetas()->add($val, $key);
+				}
+				else if (_DEBUG)
+				{
+					Debug::getInstance()->addError( 'Can\'t have array in meta ' . $key . ' for the file ' . $filename );
+				}
+			}
+		}
 		
-		if ( isset($tags) )				{ $page->getTags()->addMultiple($tags) ; }
-		if ( isset($tag) )				{ $page->getTags()->add($tag) ; }
-		if ( isset($contents) )			{ $page->getContents()->addMultiple($contents); }
-		
-        return $page;
+		return $page;
     }
 	
 	/**
