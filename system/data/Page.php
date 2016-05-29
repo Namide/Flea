@@ -487,7 +487,7 @@ class Page
 		if ( _DEBUG && $this->_template != '' &&
 			!file_exists(_TEMPLATE_DIRECTORY.$this->_template.'.php') )
 		{
-			Debug::getInstance()->addError( 'The template "'._TEMPLATE_DIRECTORY.$this->_template.'.php don\'t exist": page:'.$this->_id );
+			Debug::getInstance()->addError( 'The template "' . _TEMPLATE_DIRECTORY . $this->_template . '.php don\'t exist": page:' . $this->_id );
 		}
 		
 		if ( $this->_template != '' && file_exists(_TEMPLATE_DIRECTORY.$this->_template.'.php') )

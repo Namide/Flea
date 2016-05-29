@@ -197,7 +197,10 @@ class PageListCreate
 				$page = new Page();
 				$page->setType( Page::$TYPE_REDIRECT301 );
 				$page->setPageUrl( $oldURL );
-				$page->setHtmlBody( $newURL );
+				$page->setName( 'redirect301' );
+				//$page->setHtmlBody( $newURL );
+				$page->setPhpHeader( 'Location: ' . $newURL );
+				
 				$page->setVisible( false );
 				$page->setCachable( false );
 				

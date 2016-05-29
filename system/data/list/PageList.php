@@ -372,130 +372,6 @@ class PageList
 	}
     
 	/**
-	 * Add all the pages (by languages) in the folder
-	 * 
-	 * @param string $folderName	Name of the folder thats contain the page
-	 * @return array				List of the pages generated (differents languages)
-	 */
-	/*protected function createPage( $folderName )
-    {
-        $pages = array();
-        
-        $langList = LangList::getInstance();
-        $langs = $langList->getList();
-        
-        foreach ( $langs as $lang )
-        {
-            $filename = _CONTENT_DIRECTORY.$folderName.'/'.$lang.'-init.json';
-            
-            if( file_exists ( $filename ) )
-            {
-				$page = new Page();
-				$page->setLang( $lang );
-				$page->setName( $folderName );
-				
-				$this->initPage($page, $filename);
-				
-				
-				$buildFile = _CONTENT_DIRECTORY.$folderName.'/'.$lang.'-build.php';
-				if( file_exists ( $buildFile ) )
-				{
-					$page->setBuildFile($buildFile);
-				}
-				
-				array_push( $pages, $page );
-            }
-			
-        }
-        
-		return $pages;
-    }*/
-	
-	/*private function initPage( Page &$page, $filename )
-    {
-		$str = file_get_contents($filename);
-		$json = json_decode($str, true);
-		
-		if ( isset($json['type']) )
-		{
-			$page->setType($json['type']);
-			if ( $page->getType() == Page::$TYPE_ERROR404 )
-			{
-				$this->_error404 = $page->getName();
-				$page->setVisible( false );
-				$page->setCachable( false );
-				$page->setPhpHeader( 'HTTP/1.0 404 Not Found' );
-			}
-		}
-		
-		if ( isset($json['url']) )
-		{
-			$page->setPageUrl($json['url']);
-		}
-		else if (_DEBUG)
-		{
-			Debug::getInstance()->addError( 'Add the url info in the file ' . $filename );
-		}
-		
-		if ( isset($json['301']) )	
-		{
-			if (is_array($json['301']))
-			{
-				$page->getAdditionalUrls()->addMultiple($json['301']);
-			}
-			else
-			{
-				$page->getAdditionalUrls()->add($json['301']);
-			}
-		}
-		if ( isset($json['template']) )	{ $page->setTemplate($json['template']); }
-		if ( isset($json['visible']) )	{ $page->setVisible($json['visible']); }
-		if ( isset($json['cachable']) )	{ $page->setCachable($json['cachable']); }
-		if ( isset($json['header']) )	{ $page->setPhpHeader($json['header']); }
-		if ( isset($json['tags']) )
-		{
-			if (is_array($json['tags']))
-			{
-				$page->getTags()->addMultiple($json['tags']);
-			}
-			else
-			{
-				$page->getTags()->add($json['tags']);
-			}
-		}
-		
-		if ( isset($json['get']) )
-		{
-			if ( isset($json['get']['enabled']) )
-			{
-				$page->setGetEnabled($json['get']['enabled']);
-			}
-			
-			if ( isset($json['get']['explicit']) )
-			{
-				$page->setGetEnabled($json['get']['explicit']);
-			}
-		}
-		
-		if ( isset($json['metas']) )
-		{
-			foreach ($json['metas'] as $key => $val)
-			{
-				if (!is_array($val))
-				{
-					$page->getMetas()->add($val, $key);
-				}
-				else if (_DEBUG)
-				{
-					Debug::getInstance()->addError( 'Can\'t have array in meta ' . $key . ' for the file ' . $filename );
-				}
-			}
-		}
-		
-		return $page;
-    }*/
-	
-	/**
 	 * Get the page by relative URL
 	 * 
 	 * @param string $relURL	Relative URL
@@ -510,10 +386,10 @@ class PageList
 		
 		// EXIST	
 		$query = SqlQuery::getTemp();
-		$query->setWhere( '_url LIKE \''.$relURL.'\' OR (page_prop = \'_url301\' AND value = \''.$relURL.'\')' );
+		$query->setWhere( '_url LIKE \'' . $relURL . '\' OR (page_prop = \'_url301\' AND value = \'' . $relURL . '\')' );
 		$pages1 = $this->getByList( $query );
 		if ( count($pages1) > 0 ) return current ($pages1);
-			
+		
 		
 		// EXIST WITH "/" AT THE END
 		if ( strlen($relURL) < 1 || (strlen($relURL) > 0 && $relURL[strlen($relURL)-1] !== '/') )
@@ -521,8 +397,8 @@ class PageList
 			$urlTemp = $relURL . '/';
 			
 			$query->clean(SqlQuery::$TYPE_SELECT);
-			$query->setWhere('_url LIKE \''.$urlTemp.'\'');
-			$pages = $this->getAll( $query );
+			$query->setWhere('_url LIKE \'' . $urlTemp . '\' OR (page_prop = \'_url301\' AND value = \'' . $urlTemp . '\')');
+			$pages = $this->getByList( $query );
 			if ( count($pages) > 0 ) return current ($pages);
 		}
 		
@@ -532,8 +408,8 @@ class PageList
 			$urlTemp = substr( $relURL, 0, strlen($relURL)-1 );
 			
 			$query->clean(SqlQuery::$TYPE_SELECT);
-			$query->setWhere('_url LIKE \''.$urlTemp.'\'');
-			$pages = $this->getAll( $query );
+			$query->setWhere('_url LIKE \'' . $urlTemp . '\' OR (page_prop = \'_url301\' AND value = \'' . $urlTemp . '\')');
+			$pages = $this->getByList( $query );
 			if ( count($pages) > 0 ) return current ($pages);
 		}
 

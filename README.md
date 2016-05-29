@@ -10,6 +10,7 @@ Lightweight PHP framework
 - Simple templating and content (migration easy)
 - Support multi language 
 - ~~Minify (CSS, JS, HTML)~~
+- Use CSV to manage pages (not content)
 
 
 Initialize the languages
@@ -28,7 +29,7 @@ Initialize the page
 ------------------------
 
 ##### initialization
-`content/home/{language}-init.php`
+`pagelist.csv`
 
 ```php
 // URL
@@ -95,11 +96,11 @@ Content of the page
 ------------------------
 
 ##### content
-`content/home/{language}-build.php`
+`content/home/{language}.php`
 
 ```html
 <article>
-	<h1>Welcome on {{title}}</h1>
+	<h1>Welcome on {{meta:title}}</h1>
 	<p>It's you home page.</p>
 	<img width="" height="" src="{{pageContentPath}}img/example.png" alt="image example">
 </article>
@@ -128,19 +129,16 @@ or template
 {{lang}}
 // Current language
 
-{{title}}
+{{meta:title}}
 // Title of the current page
-
-{{header}}
-// HTML header of the current page
 
 {{body}}
 // HTML body of the current page
 
-{{description}}
+{{meta:description}}
 // HTML description of the current page
 
-{{content:additionnal-label-content}}
+{{meta:additionnal-label-content}}
 // $currentPage->getContent('additionnal-label-content');
 
 {{pageNameToAbsUrl:page-name}}

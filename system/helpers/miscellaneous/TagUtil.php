@@ -46,7 +46,7 @@ class TagUtil
 	 * $tagBeforeText = '<em>';
 	 * $tagAfterText = '</em>';
 	 * $attInA = 'class="link-home blue"';
-	 * getLink( $pageName, null, $attInA, $tagBeforeText, $tagAfterText );
+	 * getLink( $pageName, 'title', null, $attInA, $tagBeforeText, $tagAfterText );
 	 * //output => <a href="http://flea.namide.com/en/home" class="link-home blue">Home page<em></em></a>
 	 * </pre>
 	 * 
