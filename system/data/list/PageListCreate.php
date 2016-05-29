@@ -89,7 +89,6 @@ class PageListCreate
 		$db->execute( $request );
 	}
 
-
 	private function db_insertPages( array $list )
 	{
 		$tableName = DataBase::objectToTableName( Page::getEmptyPage() );
@@ -100,8 +99,44 @@ class PageListCreate
 			$this->db_createPagesDB();
 		}
 		
+		// create CSV
+		$createCSV = false;
+		
+		$strTemp = '';
 		foreach ($list as $page) 
 		{
+			if ($createCSV)
+			{
+				$strTemp .= $page->getName() . ',';
+				$strTemp .= $page->getLang() . ',';
+				$strTemp .= $page->getPageUrl() . ',';
+				$strTemp .= $page->getTemplate() . ',';
+				$strTemp .= $page->getDate() . ',';
+				$strTemp .= '"' . implode( ' ; ', $page->getTags()->getArray() ) . '",';
+				$strTemp .= '"' . $page->getHtmlTitle() . '",';
+				$strTemp .= '"' . $page->getHtmlDescription() . '",';
+
+				$strTemp .= '"';
+				foreach ($page->getContents()->getArray() as $key => $value) {
+					$strTemp .= $key . ' : ' . $value . ' ; ';
+				}
+				if ($page->getHtmlHeader() != '')
+					$strTemp .= 'header : ' . $page->getHtmlHeader() . ' ; ';
+				if (count($page->getContents()->getArray()) > 0 || $page->getHtmlHeader() != '')
+					$strTemp = substr($strTemp, 0, -2);
+				$strTemp .= '",';
+
+				$strTemp .= ($page->getVisible() ? '1' : '0') . ',';
+				$strTemp .= ($page->getCachable() ? '1' : '0') . ',';
+				$strTemp .= '"' . $page->getType() . '",';
+				$strTemp .= ($page->getGetEnabled() ? '1' : '0') . ',';
+				$strTemp .= ($page->getGetExplicit() ? '1' : '0') . ',';
+				$strTemp .= '"' . implode( ' ; ', $page->getAdditionalUrls()->getArray() ) . '",';
+				$strTemp .= '"' . $page->getPhpHeader() . '"';
+				$strTemp .= "\n";
+			}
+				
+			
 			$pageVars = $page->getObjectVars();
 			
 			$request = SqlQuery::getTemp( SqlQuery::$TYPE_INSERT );
@@ -127,7 +162,11 @@ class PageListCreate
 				}
 			}
 		}
-	}
+		
+		if ($createCSV)
+			echo utf8_decode($strTemp);
+	}	
+			
 	
 	/**
 	 * Add all pages of a directory recursivly
