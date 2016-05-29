@@ -512,13 +512,13 @@ class Page
 	 */
 	public function renderWithoutTemplate( $activeHeader = true )
 	{
-		if ( $this->_type === Page::$TYPE_REDIRECT301 && $activeHeader )
+		/*if ( $this->_type === Page::$TYPE_REDIRECT301 && $activeHeader )
 		{
 			$absNewURL = \Flea::getBuildUtil()->replaceFleaVars( $this->_htmlBody, $this );
 			header( 'Status: 301 Moved Permanently' );
 			header( 'Location: '.$absNewURL );
 			exit;
-		}
+		}*/
 		
 		\Flea::getHeader()->appliHeaderOfPage($this);
 		

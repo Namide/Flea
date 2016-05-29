@@ -130,7 +130,13 @@ class PageListCreate
 							break;
 						
 						default:
-							if ( _DEBUG )
+							
+							$aTemp = array_map( 'trim', explode(':', $head[$id]) );
+							if ($aTemp[0] === 'meta' && count($aTemp) > 1 )
+							{
+								$page->getMetas()->add( $row, $aTemp[1] );
+							}
+							else if ( _DEBUG )
 							{
 								Debug::getInstance()->addError( 'label "' . $head[$id] . '" is not correct in the CSV ' . $csvName  );
 							}

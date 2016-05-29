@@ -68,7 +68,7 @@ class Header
 	{
 		if ( $page->getPhpHeader() != '' )
 		{
-			header( $page->getPhpHeader() );
+			header( BuildUtil::getInstance()->replaceFleaVars($page->getPhpHeader(), $page) );
 		}
 		
 		$this->appliHeaderByFormat( $page->getFormat() );

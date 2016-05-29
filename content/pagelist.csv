@@ -1,7 +1,7 @@
-path,lang,url,template,date,tags,metas,visible,cachable,type,get.enable,get.explicit,301,header
-flea-example/doc,all,doc,,2014-04-01,main-pages,title : Documentation,1,1,redirect301,0,,,Location: {{rootPath}}doc/index.html
-flea-example/dynamic,fr,dyn,flea-basic/default,2014-04-01,main-pages,title : Dynamic page ; description : Page dynamique (GET),1,0,,1,1,,
-flea-example/error404,en,error404,flea-basic/default,2014-05-01,,title : Error 404 ; description : Page not found,0,1,error404,0,,,HTTP/1.0 404 Not Found
-flea-example/home,en,en,flea-basic/default,2014-04-01,main-pages,title : Home ; description : Description,1,1,default,0,,/,
-flea-example/home,fr,fr,flea-basic/default,2014-04-01,main-pages,title : Accueil ; description : Description,1,1,default,0,,fr/accueil,
-flea-example/search,fr,fr/recherche,flea-basic/default,2014-04-01,main-pages,title : Search ; description : Search page,1,0,,1,1,,"<meta name=\""robots\"" content=\""all\"" />"
+path,lang,url,template,date,tags,meta:title,metas,visible,cachable,type,get.enable,get.explicit,301,header
+flea-example/doc,fr,doc,,2014-04-01,main-pages,Documentation,,1,0,redirect301,0,,,Location: {{rootPath}}doc/index.html
+flea-example/dynamic,fr,dyn,flea-basic/default,2014-04-01,main-pages,Dynamic page,description : Page dynamique (GET),1,0,,1,1,,
+flea-example/error404,en,error404,flea-basic/default,2014-05-01,,Error 404,description : Page not found ; info : metatest !,0,1,error404,0,,,HTTP/1.0 404 Not Found
+flea-example/home,en,en,flea-basic/default,2014-04-01,main-pages,Home,description : Description,1,1,default,0,,/,
+flea-example/home,fr,fr,flea-basic/default,2014-04-01,main-pages,Accueil,description : Description,1,1,default,0,,fr/accueil,
+flea-example/search,fr,fr/recherche,flea-basic/default,2014-04-01,main-pages,Search,description : Search page,1,0,,1,1,,"<meta name=\""robots\"" content=\""all\"" />"
