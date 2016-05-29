@@ -311,7 +311,7 @@ class Login
 	/**
 	 * List of the users.
 	 * Only if your are admin and connected
-	 * <br>Example of getUserList() in <code>en-build.php</code>
+	 * <br>Example of getUserList() in <code>en.php</code>
 	 * <pre>
 	 * $vo = $login->getUserList('group', 'admin');
 	 * $list = $vo->content;
@@ -380,7 +380,7 @@ class Login
 	/**
 	 * Add a new user.
 	 * Only if your are admin and connected.<br>
-	 * <br>Example of addUser() in <code>en-build.php</code>
+	 * <br>Example of addUser() in <code>en.php</code>
 	 * <pre>
 	 * $build = Flea::getBuildUtil();
 	 * $gen = Flea::getGeneral();
@@ -511,7 +511,7 @@ class Login
 	/**
 	 * Connect the user.
 	 * After this state a token will be storage in the session
-	 * <br>Example of connect() in <code>en-build.php</code>
+	 * <br>Example of connect() in <code>en.php</code>
 	 * <pre>
 	 * $build = Flea::getBuildUtil();
 	 * $gen = \Flea\General::getInstance();
@@ -597,7 +597,7 @@ class Login
 	
 	/**
 	 * Disconnect the current connected user.
-	 * <br>Example of connect() in <code>en-build.php</code>
+	 * <br>Example of connect() in <code>en.php</code>
 	 * <pre>
 	 * $buil = Flea::getBuildUtil();
 	 * $gen = \Flea\General::getInstance();

@@ -508,13 +508,23 @@ class PageList
 			Debug::getInstance()->addError( 'All pages must be initialised after use getByUrl()' );
 		}
 		
-		
 		// EXIST	
 		$query = SqlQuery::getTemp();
-		$query->setWhere( '_url LIKE \''.$relURL.'\' OR (page_prop = \'_additionalUrls\' AND value = \''.$relURL.'\')' );
+		$query->setWhere( '_url LIKE \''.$relURL.'\' OR (page_prop = \'_url301\' AND value = \''.$relURL.'\')' );
 		$pages1 = $this->getByList( $query );
 		if ( count($pages1) > 0 ) return current ($pages1);
+			
 		
+		// EXIST WITH "/" AT THE END
+		if ( strlen($relURL) < 1 || (strlen($relURL) > 0 && $relURL[strlen($relURL)-1] !== '/') )
+		{
+			$urlTemp = $relURL . '/';
+			
+			$query->clean(SqlQuery::$TYPE_SELECT);
+			$query->setWhere('_url LIKE \''.$urlTemp.'\'');
+			$pages = $this->getAll( $query );
+			if ( count($pages) > 0 ) return current ($pages);
+		}
 		
 		// EXIST WITHOUT "/" AT THE END
 		if ( strlen($relURL) > 0 && $relURL[strlen($relURL)-1] === '/' )
@@ -527,6 +537,7 @@ class PageList
 			if ( count($pages) > 0 ) return current ($pages);
 		}
 
+		
 		
 		$lang = LangList::getInstance()->getLangByNavigator();
 
@@ -665,7 +676,7 @@ class PageList
 	public function hasUrl( $url )
     {
 		$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
-		$query->setWhere( '_url LIKE \''.$url.'\' OR (page_prop = \'_additionalUrls\' AND value = \''.$url.'\')' );
+		$query->setWhere( '_url LIKE \''.$url.'\' OR (page_prop = \'_url301\' AND value = \''.$url.'\')' );
 		$query->setLimit(1);
 		$pages = $this->getByList( $query );
 		return ( count($pages) > 0 );
@@ -680,7 +691,7 @@ class PageList
     private function getLangByUrl( $url )
     {
 		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
-		$query->setWhere( '_url LIKE \''.$url.'\' OR (page_prop = \'_additionalUrls\' AND value = \''.$url.'\')' );
+		$query->setWhere( '_url LIKE \''.$url.'\' OR (page_prop = \'_url301\' AND value = \''.$url.'\')' );
 		$query->setLimit(1);
 		$pages = $this->getByList( $query );
 		if ( count($pages) > 0 ) { return current ($pages)->getLang(); }

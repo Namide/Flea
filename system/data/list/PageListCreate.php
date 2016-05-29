@@ -137,6 +137,9 @@ class PageListCreate
 					}
 				}
 				
+				$build = $dir . $page->getName() . '/' . $page->getLang() . '.php';
+				if ( file_exists($build) ) $page->setBuildFile ($build);
+				
 				$pageList[] = $page;
 			}
 			$num++;
