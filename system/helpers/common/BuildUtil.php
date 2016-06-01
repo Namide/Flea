@@ -213,6 +213,13 @@ class BuildUtil extends InitUtil
 	 */
 	public function replaceFleaVars( $text, Page &$page = null )
     {
+		$general = General::getInstance();
+		
+		if ($page === null)
+		{
+			$page = $general->getCurrentPage();
+		}
+		
 		//$replacePage = str_replace('{{title}}', $page->getHtmlTitle(), $text);
 		//$replacePage = str_replace('{{header}}', $page->getHtmlHeader(), $replacePage);
 		$replacePage = str_replace('{{body}}', $page->getHtmlBody(), $text);
@@ -223,14 +230,9 @@ class BuildUtil extends InitUtil
 		$replacePage = str_replace('{{templatePath}}', _ROOT_URL._TEMPLATE_DIRECTORY, $replacePage);
 		$replacePage = str_replace('{{contentPath}}', _ROOT_URL._CONTENT_DIRECTORY, $replacePage);
 		
-		$general = General::getInstance();
 		
 		$replacePage = str_replace('{{lang}}', $general->getCurrentLang(), $replacePage);
-		
-		if ( $page === null )
-		{
-			$page = $general->getCurrentPage();
-		}
+		$replacePage = str_replace('{{date}}', $page->getDate(), $replacePage);
 		
 		$replacePage = str_replace('{{pageContentPath}}', _ROOT_URL._CONTENT_DIRECTORY.$page->getName().'/', $replacePage);
 

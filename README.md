@@ -129,6 +129,9 @@ or template
 {{lang}}
 // Current language
 
+{{date}}
+// Date of the current page
+
 {{meta:title}}
 // Title of the current page
 
