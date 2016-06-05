@@ -468,10 +468,10 @@ class PageList
 
 		// CREATE PAGE ERROR 404
 			$page = new Page();
-			$page->setHtmlHeader( '<title>Error 404 - Not found</title>
+			/*$page->setHtmlHeader( '<title>Error 404 - Not found</title>
 					<meta charset="UTF-8" />
 					<meta name="robots" content="noindex,nofollow" />
-					<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />' );
+					<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />' );*/
 			$page->setHtmlBody( '<h1>Error 404 - Not found</h1>' );
 			$this->makeError404Page($page);
 			return $page;
