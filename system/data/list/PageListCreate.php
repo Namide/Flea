@@ -149,31 +149,8 @@ class PageListCreate
 				$pageList[] = $page;
 			}
 			$num++;
-			
-			
+		
 		}
-		
-		
-		
-		/*$list = array();
-		
-		if ( !file_exists($dir) ) { return $list; }
-
-		$dirOpen = opendir($dir);
-		while($file = @readdir($dirOpen))
-		{
-			if( $file != "." &&
-				$file != ".." &&
-				is_dir($dir.'/'.$file) )
-			{
-				$list1 = $this->addPageByDirRecurs( $dir.'/'.$file.'/', (($fileDirRel != '')?$fileDirRel.'/':'').$file );
-				$list2 = $this->createPage( (($fileDirRel != '')?$fileDirRel.'/':'').$file );
-				
-				
-				$list = array_merge($list, $list1, $list2);
-			}
-		}
-		closedir($dirOpen);*/
 		
 		
 		$this->db_insertPages($pageList);
@@ -241,7 +218,7 @@ class PageListCreate
 			$pageVars = $page->getObjectVars();
 			
 			$request = SqlQuery::getTemp( SqlQuery::$TYPE_INSERT );
-			$request->initInsertValues( $tableName, $pageVars);
+			$request->initInsertValues( $tableName, $pageVars );
 			$db->execute($request);
 			
 			foreach ($pageVars as $key => $value)
