@@ -46,18 +46,19 @@ class TagUtil
 	 * $tagBeforeText = '<em>';
 	 * $tagAfterText = '</em>';
 	 * $attInA = 'class="link-home blue"';
-	 * getLink( $pageName, null, $attInA, $tagBeforeText, $tagAfterText );
+	 * getLink( $pageName, 'title', null, $attInA, $tagBeforeText, $tagAfterText );
 	 * //output => <a href="http://flea.namide.com/en/home" class="link-home blue">Home page<em></em></a>
 	 * </pre>
 	 * 
 	 * @param string $pageName			Name of the page to linked
+	 * @param string $metaKey			Key of the meta to the content of the tag '<a></a>'
 	 * @param string $lang				Language of the page (current language by default)
 	 * @param string $attInA			Additionnal attribute to the tag '<a></a>'
 	 * @param string $tagBeforeText		Tag before the title of the page (in the tag '<a></a>')
 	 * @param string $tagAfterText		Tag after the title of the page (in the tag '<a></a>')
 	 * @return string					HTML link generated	
 	 */
-	public function getLinkByName( $pageName, $lang = null, $attInA = '', $tagBeforeText = '', $tagAfterText = '' )
+	public function getLinkByName( $pageName, $metaKey, $lang = null, $attInA = '', $tagBeforeText = '', $tagAfterText = '' )
 	{
 		if( $lang === null )
 		{
@@ -65,41 +66,43 @@ class TagUtil
 		}
 		$pageList = PageList::getInstance();
 		$page = $pageList->getByName( $pageName, $lang );
-		return $this->getLink( $page, $attInA, $tagBeforeText, $tagAfterText );
+		return $this->getLink( $page, $metaKey, $attInA, $tagBeforeText, $tagAfterText );
 	}
 	
 	/**
 	 * Simple method to create a link with a page object.
 	 * 
 	 * @param \Flea\Page $page			Page to linked
+	 * @param string $metaKey			Key of the meta to the content of the tag '<a></a>'
 	 * @param string $attInA			Additionnal attribute to the tag '<a></a>'
 	 * @param string $tagBeforeText		Tag before the title of the page (in the tag '<a></a>')
 	 * @param string $tagAfterText		Tag after the title of the page (in the tag '<a></a>')
 	 * @return type
 	 */
-	public function getLink( Page $page, $attInA = '', $tagBeforeText = '', $tagAfterText = '' )
+	public function getLink( Page $page, $metaKey, $attInA = '', $tagBeforeText = '', $tagAfterText = '' )
 	{
 		$buildUtil = \Flea::getBuildUtil();
-		return '<a href="'.$buildUtil->getAbsUrlByPageUrl( $page->getPageUrl() )
-				. '" '.$attInA.' hreflang="'.$page->getLang().'">'
-				. $tagBeforeText.$page->getHtmlTitle().$tagAfterText.'</a>';
+		return '<a href="' . $buildUtil->getAbsUrlByPageUrl( $page->getPageUrl() )
+				. '" ' . $attInA . ' hreflang="' . $page->getLang() . '">'
+				. $tagBeforeText . $page->getMetas()->getValue($metaKey) . $tagAfterText.'</a>';
 	}
 	
 	/**
 	 * Simple method to create an HTML list of pages.
 	 * 
 	 * @param array $pageList		Array of Page
+	 * @param string $metaKey		Key of the meta to the content of the tag '<a></a>'
 	 * @param string $attInUl		Additionnal attribute to the tag '<ul></ul>'
 	 * @param string $attInLi		Additionnal attribute to the tag '<li></li>'
 	 * @param string $attInA		Additionnal attribute to the tag '<a></a>'
 	 * @return string				HTML list generated
 	 */
-	public function getLinkList( array $pageList, $attInUl = '', $attInLi = '', $attInA = '' )
+	public function getLinkList( array $pageList, $metaKey, $attInUl = '', $attInLi = '', $attInA = '' )
 	{
 		$out = '<ul '.$attInUl.'>';
 		foreach ($pageList as $page)
 		{
-			$out .= '<li '.$attInLi.'>'.$this->getLink( $page, $attInA ).'</li>';
+			$out .= '<li '.$attInLi.'>'.$this->getLink( $page, $metaKey, $attInA ).'</li>';
 		}
 		$out .= '</ul>';
 		return $out;
@@ -173,11 +176,12 @@ class TagUtil
 	 * Simple method to get breadcrump of the current page.
 	 * It have microdatas.
 	 * 
+	 * @param type $metaTitle		Key of the meta to have the title of the page
 	 * @param Page $currentPage		Current page (optional if the pages are initialized)
 	 * @param string $delimiter		String between the links
 	 * @return string				Tag of the breadcrump
 	 */
-	public function getBreadcrump( Page $currentPage = null, $delimiter = '' )
+	public function getBreadcrump( $metaTitle, Page $currentPage = null, $delimiter = '' )
 	{
 		if ( $currentPage === null )
 		{
@@ -207,7 +211,7 @@ class TagUtil
 				$temp .= '<a href="'.\Flea::getBuildUtil()->getAbsUrlByPageUrl($url).'" '
 						. 'hreflang="'.$lang.'" '
 						. 'itemprop="url">';
-				$temp .= '<span itemprop="title">'.PageList::getInstance()->getByUrl($url)->getHtmlTitle().'</span>';
+				$temp .= '<span itemprop="title">'.PageList::getInstance()->getByUrl($url)->getMetas()->getValue($metaTitle).'</span>';
 				$temp .= '</a></li>';
 				$output .= ( $l > 0 ) ? $delimiter : '';
 				$output .= $temp;

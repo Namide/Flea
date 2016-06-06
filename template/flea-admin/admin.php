@@ -34,7 +34,7 @@
 					$query->setWhere(' _lang = \'en\' AND page_prop = \'_tags\' AND value = \'flea-admin\' ');
 					foreach( Flea::getPageList()->getByList( $query ) as $pageTemp )
 					{
-						echo Flea::getTagUtil()->getLink($pageTemp);
+						echo Flea::getTagUtil()->getLink($pageTemp, 'title');
 					}
 				?>
 			</ul>

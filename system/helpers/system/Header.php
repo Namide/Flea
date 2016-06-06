@@ -35,6 +35,15 @@ class Header
 {
 	private static $_INSTANCE;
 	
+	/**
+	 * Get the header for a format.
+	 * Example : 
+	 * getHeaderOfPage(Page::$FORMAT_HTML)
+	 * return 'Content-Type: text/html'
+	 * 
+	 * @param string $format
+	 * @return string
+	 */
 	public function getHeaderOfPage($format)
 	{
 		switch ($format)
@@ -64,16 +73,27 @@ class Header
 		return '';
 	}
 	
+	/**
+	 * Appli the header of the page (custom header and format).
+	 * 
+	 * @param \Flea\Page $page
+	 */
 	public function appliHeaderOfPage(Page &$page)
 	{
 		if ( $page->getPhpHeader() != '' )
 		{
-			header( $page->getPhpHeader() );
+			header( BuildUtil::getInstance()->replaceFleaVars($page->getPhpHeader(), $page) );
 		}
 		
 		$this->appliHeaderByFormat( $page->getFormat() );
 	}
 	
+	/**
+	 * Appli the header for the format.
+	 * Example 'Content-Type: text/html' for an HTML page
+	 * 
+	 * @param type $format
+	 */
 	public function appliHeaderByFormat( $format )
 	{
 		$headForm = $this->getHeaderOfPage( $format );
@@ -82,7 +102,6 @@ class Header
 			header( $headForm );
 		}
 	}
-	
 	
 	final private function __construct() { }
 	

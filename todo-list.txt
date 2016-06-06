@@ -1,5 +1,8 @@
 TODO LIST
 
+	Un CSV à la place des init par page
+	déplacer les données facultatives (multiples URL, 301, title, description...) dans les meta des pages
+
 	SearchEngine.php
 	? TradUtil.php
 	ImgUtil.php

@@ -124,16 +124,25 @@ class DataBase
 		try
 		{
 			$stmt = $this->_pdo->prepare( $query->getRequest() );
-			$binds = $query->getBinds();
-			if ( $binds !== null )
+			
+			if ($query->getType() === SqlQuery::$TYPE_MULTI_INSERT)
 			{
-				foreach ($binds as $bind)
+				$stmt->execute( $query->getBinds() );
+			}
+			else
+			{
+				$binds = $query->getBinds();
+				if ( $binds !== null )
 				{
-					$stmt->bindValue($bind[0], $bind[1], $bind[2]);
+					foreach ($binds as $bind)
+					{
+						$stmt->bindValue($bind[0], $bind[1], $bind[2]);
+					}
 				}
+
+				$stmt->execute();
 			}
 			
-			$stmt->execute();
 			$stmt = null;
 			
 			return true;
@@ -240,6 +249,7 @@ class DataBase
 		try
 		{
 			$this->_pdo = new \PDO( $dsn, _DB_USER, _DB_PASS, _DB_OPTIONS );
+			$this->_multiReqNum = 0;
 			
 			if ( _DEBUG )
 			{

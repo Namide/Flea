@@ -4,4 +4,3 @@
 <?php
 
 var_dump( Flea::getGeneral()->getCurrentGetUrl() );
-	 

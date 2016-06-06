@@ -62,7 +62,7 @@ include_once _SYSTEM_DIRECTORY.'init/loadPages.php';
 <div style="float:left; width:320px;">
 	<div>
 		<a href="<?= $absUrl ?>"><?= $page->getPageUrl() ?></a><br>
-		<?= $page->getHtmlTitle().' ('.$page->getLang().')' ?>
+		<?= $page->getName().' ('.$page->getLang().')' ?>
 	</div>
 	<iframe src="<?= $absUrl ?>" width="320" height="420"></iframe>
 </div>

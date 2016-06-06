@@ -1,21 +1,41 @@
-Flea
-====
+# Flea
 
-Lightweight PHP framework
+Version: 2.0
+
+__Lightweight PHP framework__
 - Quick to install
+- Lightweight
 - Cache Management
 - GZip (CSS, JS, HTML)
 - Simple and permissive urls
-- Lightweight
 - Simple templating and content (migration easy)
-- Support multi language 
+- Support multi language
+- Use CSV to manage pages (not content) - _New!_
 - ~~Minify (CSS, JS, HTML)~~
 
 
-Initialize the languages
-------------------------
+__Requirements__
+- PHP version 5.6 or greater  
+- PDO (SqLite by default)
 
-##### list of languages
+## Roadmap
+
+### Todo
+
+ - Active apache `mod_expires` in `.htaccess`
+ - Clean redirect 301 from CSV and `content/initDB.php`
+
+
+### Ok
+
+ - optimize `system/data/list/PageListCreate.php` -> db_insertPages();  
+   -> Init (40x faster); 100 pages: 93.03 sec -> 2.15 sec 
+
+
+
+## Initialize the languages
+
+### list of languages
 `content/initLang.php`
 
 ```php
@@ -24,89 +44,99 @@ $lang->add('fr');
 ```
 
 
-Initialize the page
-------------------------
+## Initialize the page
 
-##### initialization
-`content/home/{language}-init.php`
+### initialization
+`pagelist.csv`
 
-```php
-// URL
-$url = 'en/home';
-// Additional URL
-$addUrl = 'en/homepage';
-// List of additional URL
-//$addUrls = array('en/homepage/1', 'en/homepage/2'); 
+```csv
+
+path
+// exemple: pages/about
+
+lang
+// exemple: en
+
+url
+// exemple: en/about
+
+template
 // Name of the template	
-$template = 'default';
+// exemple: default
 
+date
+// Date of the creation of the page (for sorting)
+// exemple: 2016-05-29
+
+tags
+// Add tags to the page
+// exemple: page ; about ; skills
+
+meta:{custom}
+// Additional content, replace {custom} by the label of your content
+// exemple: meta:title -> About me
+// exemple: meta:description -> I'm a creative developper
+
+metas
+// like meta:{custom} but in one cell
+// exemple: title : About me ; description : I'm a creative developper
+
+visible
 // Is the page visible ? (in the sitemap...)
-$visible = true;
-// Is the page cachable ?
-$cachable = true;
+// exemple: 1
 
+cachable
+// Is the page cachable ?
+// exemple: 1
+
+type
+// Type of the page: 
+// exemple: 
+//			-> Nothing if the page is basic
+// exemple: default
+//			-> if it's the default page
+// exemple: error404
+//			-> if it's the error 404 page
+
+get.enable
 // Active the GET handler for this page
-$getEnabled = false;
+// exemple: 1
+
+get.explicit
 // If the GET is explicit the URL contains the labels of values.
 // URL: www.flea.namide.com/games
-// GET: array( 'page'=>2, 'tag'=>'RTS' );
-// ( explicit ) www.flea.namide.com/games/page/2/tag/RTS
-// ( !explicit ) www.flea.namide.com/games/2/RTS
-$getExplicit = true;
-// Date of the creation of the page (for sorting)
-$date = '2014-05-01';
+// ( get.explicit == 1) -> www.flea.namide.com/games/page/2/tag/RTS
+//						   array( 'page'=>2, 'tag'=>'RTS' );
+//
+// ( get.explicit == 0) -> www.flea.namide.com/games/2/RTS
+//						   array( 2, 'RTS' );
+// exemple: 1
 
-$htmlBody = '<h1>Page d\'accueil</h1>';
-// description of the page
-$htmlDescription = 'FWK is a really fun framework!';
-// Additional tags in the head (like CSS, JS, meta...)
-$htmlHeader = '<meta name="robots" content="all" />';
-// title of the page
-$htmlTitle = 'accueil';
-// add cover for the page
-$cover = '{{pageContentPath}}img/cover-photo.jpg';
+301
+// List of additional URL for 301 redirection
+// exemple: about ; en/me
 
-// Type of the page: 
-// - ''
-// - 'default' if it's the default page
-// - 'error404' if it's the error 404 page
-$type = 'default';
+header
 // Arguments to the php function header()
 // of the page (for other type than HTML, like XML)
-//$phpHeader = 'Content-Type: application/xml; charset=utf-8';	
-// Format of the page:
-// - 'html'
-// - 'css'
-// - 'js'
-// - 'xml'
-// - 'json'
-$format = 'html';
-
-// Add tags to the page
-$tags = array('importantPage', 'mainlyPage');
-// Add 1 tag to the page		
-$tag = 'konamiCodeEnabled';
-// Add additionals contents accessible
-// (from other pages or with the template)
-$contents = array( 'resume'=>'Home page', 'important'=>3 );
+// example: Content-Type: application/xml; charset=utf-8'
 ```
 
-Content of the page
-------------------------
+## Content of the page
 
-##### content
-`content/home/{language}-build.php`
+### content
+`pages/about/{language}.php`
 
 ```html
 <article>
-	<h1>Welcome on {{title}}</h1>
-	<p>It's you home page.</p>
+	<h1>Welcome on {{meta:title}}</h1>
+	<p>{{meta:description}}</p>
 	<img width="" height="" src="{{pageContentPath}}img/example.png" alt="image example">
 </article>
 ```
 
-Flea variables
-------------------------
+
+## Flea variables
 
 Used in the build page `content/home/{language}-build.php`
 of init page `content/home/{language}-init.php`
@@ -128,31 +158,21 @@ or template
 {{lang}}
 // Current language
 
-{{title}}
-// Title of the current page
+{{date}}
+// Date of the current page
 
-{{header}}
-// HTML header of the current page
+{{meta:title}}
+// Title of the current page
 
 {{body}}
 // HTML body of the current page
 
-{{description}}
-// HTML description of the current page
-
-{{content:additionnal-label-content}}
-// $currentPage->getContent('additionnal-label-content');
+{{meta:additionnal-custom-label-content}}
+// $currentPage->getMetas()->getValue('additionnal-custom-label-content');
 
 {{pageNameToAbsUrl:page-name}}
 // $buildUtil->getAbsUrlByIdLang( ‘page-name', $currentLanguage );
 
 {{urlPageToAbsoluteUrl:page-url}}
 // $buildUtil->getAbsUrlByPageUrl( ‘page-url' );
-
 ```
-
-
-Todo
-------------------------
-
-Active apache `mod_expires` in .htaccess

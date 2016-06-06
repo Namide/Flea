@@ -84,7 +84,7 @@ class PageList
 	
 	/**
 	 * Get the page and use the list of the page.
-	 * You can use the values used in the DataList of the Page (tags, contents...)
+	 * You can use the values used in the DataList of the Page (tags, metas...)
 	 * <br>Example:
 	 * <pre>
 	 * $query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
@@ -137,7 +137,7 @@ class PageList
 		}
 		
 		ob_start();
-		$page = $this->initPage( $page, $page->getBuildFile() );
+		include $page->getBuildFile();
 		$page->setHtmlBody( ob_get_clean() );
 		
 		return $page;
@@ -189,19 +189,19 @@ class PageList
     }
 	
 	/**
-	 * Return a list of pages with each page has this content
+	 * Return a list of pages with each page has this meta
 	 * 
-	 * @param string $contentLabel		Label of the content
-	 * @param string $contentValue		Value of the content
-	 * @param string $lang				Language of the elements
-	 * @return array					List of elements
+	 * @param string $metaLabel		Label of the meta
+	 * @param string $metaValue		Value of the meta
+	 * @param string $lang			Language of the elements
+	 * @return array				List of elements
 	 */
-	public function getWithThisContent( $contentLabel, $contentValue, $lang )
+	public function getWithThisContent( $metaLabel, $metaValue, $lang )
     {
 		$where = '_lang = \''.$lang.'\' AND '
-			. 'page_prop = \'_contents\' AND '
-			. 'key = \''.$contentLabel.'\' AND '
-			. 'value = \''.$contentValue.'\' AND '
+			. 'page_prop = \'_metas\' AND '
+			. 'key = \''.$metaLabel.'\' AND '
+			. 'value = \''.$metaValue.'\' AND '
 			. '_visible = 1';
 		
 		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
@@ -211,22 +211,22 @@ class PageList
     }
 	
 	/**
-	 * Return a list of pages with each page has this content
+	 * Return a list of pages with each page has this meta
 	 * 
-	 * @param string $contentLabel		Label of the content
-	 * @param array $contentValue		Value of the content
-	 * @param string $lang				Language of the elements
-	 * @return array					List of elements
+	 * @param string $metaLabel		Label of the meta
+	 * @param array $metaValue		Value of the meta
+	 * @param string $lang			Language of the elements
+	 * @return array				List of elements
 	 */
-	public function getWithOneOfThisContents( $contentLabel, array $contentValues, $lang )
+	public function getWithOneOfThisContents( $metaLabel, array $metaValues, $lang )
     {
 		$where = '_lang = \''.$lang.'\' AND '
-			. 'page_prop = \'_contents\' AND '
-			. 'key = \''.$contentLabel.'\' AND '				
+			. 'page_prop = \'_metas\' AND '
+			. 'key = \''.$metaLabel.'\' AND '				
 			. '_visible = 1 AND (';
 		
 		$first = true;
-		foreach ($contentValues as $val)
+		foreach ($metaValues as $val)
 		{
 			if ( !$first )
 				$where .= ' OR';
@@ -372,88 +372,6 @@ class PageList
 	}
     
 	/**
-	 * Add all the pages (by languages) in the folder
-	 * 
-	 * @param string $folderName	Name of the folder thats contain the page
-	 * @return array				List of the pages generated (differents languages)
-	 */
-	protected function createPage( $folderName )
-    {
-        $pages = array();
-        
-        $langList = LangList::getInstance();
-        $langs = $langList->getList();
-        
-        foreach ( $langs as $lang )
-        {
-            $filename = _CONTENT_DIRECTORY.$folderName.'/'.$lang.'-init.php';
-            
-            if( file_exists ( $filename ) )
-            {
-				$page = new Page();
-				$page->setLang( $lang );
-				$page->setName( $folderName );
-				
-				$this->initPage($page, $filename);
-				
-				
-				$buildFile = _CONTENT_DIRECTORY.$folderName.'/'.$lang.'-build.php';
-				if( file_exists ( $buildFile ) )
-				{
-					$page->setBuildFile($buildFile);
-				}
-				
-				array_push( $pages, $page );
-            }
-			
-        }
-        
-		return $pages;
-    }
-	
-	private function initPage( Page &$page, $filename )
-    {
-		include $filename;
-		
-		if ( isset($type) )	
-		{
-			$page->setType($type);
-			if ( $type == Page::$TYPE_ERROR404 )
-			{
-				$this->_error404 = $page->getName();
-				$page->setVisible( false );
-				$page->setCachable( false );
-				$page->setPhpHeader( 'HTTP/1.0 404 Not Found' );
-			}
-		}
-		
-		if ( isset($url) )				{ $page->setPageUrl($url) ; }
-		if ( isset($addUrl) )			{ $page->getAdditionalUrls()->add($addUrl); }
-		if ( isset($addUrls) )			{ $page->getAdditionalUrls()->addMultiple($addUrls); }
-		if ( isset($template) )			{ $page->setTemplate($template) ; }
-		
-		if ( isset($visible) )			{ $page->setVisible($visible) ; }
-		if ( isset($cachable) )			{ $page->setCachable($cachable) ; }
-		
-		if ( isset($getEnabled) )		{ $page->setGetEnabled($getEnabled) ; }
-		if ( isset($getExplicit) )		{ $page->setGetExplicit($getExplicit) ; }
-		if ( isset($date) )				{ $page->setDate($date) ; }
-		
-		if ( isset($htmlBody) )			{ $page->setHtmlBody($htmlBody) ; }
-		if ( isset($htmlDescription) )	{ $page->setHtmlDescription($htmlDescription) ; }
-		if ( isset($htmlHeader) )		{ $page->setHtmlHeader($htmlHeader) ; }
-		if ( isset($htmlTitle) )		{ $page->setHtmlTitle($htmlTitle) ; }
-				
-		if ( isset($phpHeader) )		{ $page->setPhpHeader($phpHeader) ; }
-		
-		if ( isset($tags) )				{ $page->getTags()->addMultiple($tags) ; }
-		if ( isset($tag) )				{ $page->getTags()->add($tag) ; }
-		if ( isset($contents) )			{ $page->getContents()->addMultiple($contents); }
-		
-        return $page;
-    }
-	
-	/**
 	 * Get the page by relative URL
 	 * 
 	 * @param string $relURL	Relative URL
@@ -466,13 +384,23 @@ class PageList
 			Debug::getInstance()->addError( 'All pages must be initialised after use getByUrl()' );
 		}
 		
-		
 		// EXIST	
 		$query = SqlQuery::getTemp();
-		$query->setWhere( '_url LIKE \''.$relURL.'\' OR (page_prop = \'_additionalUrls\' AND value = \''.$relURL.'\')' );
+		$query->setWhere( '_url LIKE \'' . $relURL . '\' OR (page_prop = \'_url301\' AND value = \'' . $relURL . '\')' );
 		$pages1 = $this->getByList( $query );
 		if ( count($pages1) > 0 ) return current ($pages1);
 		
+		
+		// EXIST WITH "/" AT THE END
+		if ( strlen($relURL) < 1 || (strlen($relURL) > 0 && $relURL[strlen($relURL)-1] !== '/') )
+		{
+			$urlTemp = $relURL . '/';
+			
+			$query->clean(SqlQuery::$TYPE_SELECT);
+			$query->setWhere('_url LIKE \'' . $urlTemp . '\' OR (page_prop = \'_url301\' AND value = \'' . $urlTemp . '\')');
+			$pages = $this->getByList( $query );
+			if ( count($pages) > 0 ) return current ($pages);
+		}
 		
 		// EXIST WITHOUT "/" AT THE END
 		if ( strlen($relURL) > 0 && $relURL[strlen($relURL)-1] === '/' )
@@ -480,11 +408,12 @@ class PageList
 			$urlTemp = substr( $relURL, 0, strlen($relURL)-1 );
 			
 			$query->clean(SqlQuery::$TYPE_SELECT);
-			$query->setWhere('_url LIKE \''.$urlTemp.'\'');
-			$pages = $this->getAll( $query );
+			$query->setWhere('_url LIKE \'' . $urlTemp . '\' OR (page_prop = \'_url301\' AND value = \'' . $urlTemp . '\')');
+			$pages = $this->getByList( $query );
 			if ( count($pages) > 0 ) return current ($pages);
 		}
 
+		
 		
 		$lang = LangList::getInstance()->getLangByNavigator();
 
@@ -539,10 +468,10 @@ class PageList
 
 		// CREATE PAGE ERROR 404
 			$page = new Page();
-			$page->setHtmlHeader( '<title>Error 404 - Not found</title>
+			/*$page->setHtmlHeader( '<title>Error 404 - Not found</title>
 					<meta charset="UTF-8" />
 					<meta name="robots" content="noindex,nofollow" />
-					<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />' );
+					<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />' );*/
 			$page->setHtmlBody( '<h1>Error 404 - Not found</h1>' );
 			$this->makeError404Page($page);
 			return $page;
@@ -623,7 +552,7 @@ class PageList
 	public function hasUrl( $url )
     {
 		$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
-		$query->setWhere( '_url LIKE \''.$url.'\' OR (page_prop = \'_additionalUrls\' AND value = \''.$url.'\')' );
+		$query->setWhere( '_url LIKE \''.$url.'\' OR (page_prop = \'_url301\' AND value = \''.$url.'\')' );
 		$query->setLimit(1);
 		$pages = $this->getByList( $query );
 		return ( count($pages) > 0 );
@@ -638,7 +567,7 @@ class PageList
     private function getLangByUrl( $url )
     {
 		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
-		$query->setWhere( '_url LIKE \''.$url.'\' OR (page_prop = \'_additionalUrls\' AND value = \''.$url.'\')' );
+		$query->setWhere( '_url LIKE \''.$url.'\' OR (page_prop = \'_url301\' AND value = \''.$url.'\')' );
 		$query->setLimit(1);
 		$pages = $this->getByList( $query );
 		if ( count($pages) > 0 ) { return current ($pages)->getLang(); }

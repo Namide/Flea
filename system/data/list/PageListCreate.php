@@ -40,11 +40,122 @@ class PageListCreate
 	 * 
 	 * @param type $dir				Root directory
 	 */
-	public function addPagesByDir( $dir )
+	/*public function addPagesByDir( $dir )
 	{
 		$listOfPages = $this->addPageByDirRecurs( $dir, '' );
 		$this->db_insertPages($listOfPages);
+	}*/
+	
+	/**
+	 * Add all pages with the CSV
+	 * 
+	 * @param type $dir				Root directory
+	 */
+	public function addPagesByCSV( $dir )
+	{
+		//$listOfPages = $this->addPageByDirRecurs( $dir, '' );
+		
+		
+		$csvName = $dir . 'pagelist.csv';
+		$csvFile = file( $csvName );
+		$num = -1;
+		$head = [];
+		$pageList = [];
+		foreach ( $csvFile as &$line ) {
+			
+			if ($num < 0)
+			{
+				$head = array_map( 'trim', str_getcsv($line) );
+			}
+			else
+			{
+				
+				$page = new Page();
+				
+				foreach ( str_getcsv($line) as $id => &$row)
+				{
+					$row = trim($row);
+					
+					switch ( $head[$id] )
+					{
+						case 'path': $page->setName( $row ); break;
+						case 'lang': $page->setLang( $row ); break;
+						case 'url': $page->setPageUrl( $row ); break;
+						case 'template': $page->setTemplate( $row ); break;
+						case 'visible': $page->setVisible( (bool) $row ); break;
+						case 'cachable': $page->setCachable( (bool) $row ); break;
+						case 'type': $page->setType( $row ); break;
+						case 'get.enable': $page->setGetEnabled( (bool) $row ); break;
+						case 'get.explicit': $page->setGetExplicit( (bool) $row ); break;
+						case 'header': $page->setPhpHeader( $row ); break;
+						case 'date': $page->setDate( $row ); break;
+						
+						case 'tags':
+							
+							if ($row !== '')
+							{
+								$aTemp = array_map( 'trim', explode(';', $row) );
+								$page->getTags()->addMultiple($aTemp);
+								break;
+							}
+						
+						case 'metas':
+							
+							if ($row !== '')
+							{
+								$aTemp = explode(';', $row);
+								foreach ($aTemp as &$pair)
+								{
+									$aTemp2 = explode(':', $pair);
+									if (count($aTemp2) > 1 ) 
+									{
+										$page->getMetas()->add( trim($aTemp2[1]), trim($aTemp2[0]) );
+									}
+									else if ( _DEBUG )
+									{
+										Debug::getInstance()->addError( 'The meta "' . $pair . '" must be a pair key:value in the CSV ' . $csvName  );
+									}
+								}
+							}
+								
+							break;
+						
+						case '301':
+							
+							if ($row !== '')
+							{
+								$aTemp = array_map( 'trim', explode(';', $row) );
+								$page->getUrl301()->addMultiple($aTemp);
+							}
+							break;
+						
+						default:
+							
+							$aTemp = array_map( 'trim', explode(':', $head[$id]) );
+							if ($aTemp[0] === 'meta' && count($aTemp) > 1 )
+							{
+								$page->getMetas()->add( $row, $aTemp[1] );
+							}
+							else if ( _DEBUG )
+							{
+								Debug::getInstance()->addError( 'label "' . $head[$id] . '" is not correct in the CSV ' . $csvName  );
+							}
+					}
+				}
+				
+				$build = $dir . $page->getName() . '/' . $page->getLang() . '.php';
+				if ( file_exists($build) ) $page->setBuildFile ($build);
+				
+				$pageList[] = $page;
+			}
+			$num++;
+		
+		}
+		
+		
+		$this->db_insertPages($pageList);
 	}
+	
 	
 	/**
 	 * Add 301 redirections and other commands
@@ -63,7 +174,10 @@ class PageListCreate
 				$page = new Page();
 				$page->setType( Page::$TYPE_REDIRECT301 );
 				$page->setPageUrl( $oldURL );
-				$page->setHtmlBody( $newURL );
+				$page->setName( 'redirect301' );
+				//$page->setHtmlBody( $newURL );
+				$page->setPhpHeader( 'Location: ' . $newURL );
+				
 				$page->setVisible( false );
 				$page->setCachable( false );
 				
@@ -89,7 +203,6 @@ class PageListCreate
 		$db->execute( $request );
 	}
 
-
 	private function db_insertPages( array $list )
 	{
 		$tableName = DataBase::objectToTableName( Page::getEmptyPage() );
@@ -100,32 +213,88 @@ class PageListCreate
 			$this->db_createPagesDB();
 		}
 		
+		$keys1 = array();
+		$keys2 = array();
+		$values1 = array();
+		$values2 = array();
+		$length1 = 1;
+		$length2 = 1;
+		
+		//$req1 = new SqlQuery( SqlQuery::$TYPE_INSERT );
+		//$req2 = new SqlQuery( SqlQuery::$TYPE_INSERT );
+		
 		foreach ($list as $page) 
 		{
-			$pageVars = $page->getObjectVars();
+			$allVars = $page->getObjectVars();
+			$obj1 = array();
+			//$db->execute($request);
 			
-			$request = SqlQuery::getTemp( SqlQuery::$TYPE_INSERT );
-			$request->initInsertValues( $tableName, $pageVars);
-			$db->execute($request);
-			
-			foreach ($pageVars as $key => $value)
+			foreach ($allVars as $key => $value)
 			{
 				if(	gettype($value) == 'array' )
 				{
 					foreach ($value as $key2 => $val2)
 					{
-						$obj = array();
-						$obj['page_id'] = $pageVars['_id'];
-						$obj['page_prop'] = $key;
-						$obj['key'] = $key2;
-						$obj['value'] = $val2;
+						$obj2 = array();
+						$obj2['page_id'] = $allVars['_id'];
+						$obj2['page_prop'] = $key;
+						$obj2['key'] = $key2;
+						$obj2['value'] = $val2;
 						
-						$request->clean( SqlQuery::$TYPE_INSERT );
-						$request->initInsertValues( $tableName.'_array', $obj );
-						$db->execute($request);
+						if (count($keys2) < 1)
+						{
+							$keys2 = array_keys($obj2);
+							$length2 = count($keys2);
+						}
+						else if ( (count($values2) + 1) * $length2 > 999 )
+						{
+							$req = SqlQuery::getTemp(SqlQuery::$TYPE_MULTI_INSERT);
+							$req->initMultiInsertValues($tableName . '_array', $keys2, $values2);
+							$db->execute($req);
+							$values2 = array();
+						}
+						
+						$values2[] = array_values($obj2);
+						
+						/*$request->clean( SqlQuery::$TYPE_INSERT );
+						$request->initInsertValues( $tableName.'_array', $obj2 );
+						$db->execute($request);*/
 					}
+					
+				}
+				elseif ( $value !== null )
+				{
+					$obj1[$key] = $value;
 				}
 			}
+			
+			if (count($keys1) < 1)
+			{
+				$keys1 = array_keys($obj1);
+				$length1 = count($keys1);
+			}
+			else if ( (count($values1) + 1) * $length1 > 999 )
+			{
+				$req = SqlQuery::getTemp(SqlQuery::$TYPE_MULTI_INSERT);
+				$req->initMultiInsertValues($tableName, $keys1, $values1);
+				$db->execute($req);
+				$values1 = array();
+			}
+			$values1[] = array_values($obj1);
+		}
+		
+		if ( count($values1) > 0 )
+		{
+			$req = SqlQuery::getTemp(SqlQuery::$TYPE_MULTI_INSERT);
+			$req->initMultiInsertValues($tableName, $keys1, $values1);
+			$db->execute($req);
+		}
+		
+		if ( count($values2) > 0 )
+		{
+			$req->clean(SqlQuery::$TYPE_MULTI_INSERT);
+			$req->initMultiInsertValues($tableName . '_array', $keys2, $values2);
+			$db->execute($req);
 		}
 	}
 	
@@ -136,7 +305,7 @@ class PageListCreate
 	 * @param type $fileDirRel		Relative directory (for the recursivity)	
 	 * @return array				List of the pages added
 	 */
-	private function addPageByDirRecurs( $dir, $fileDirRel = '' )
+	/*private function addPageByDirRecurs( $dir, $fileDirRel = '' )
 	{
 		$list = array();
 		
@@ -159,7 +328,7 @@ class PageListCreate
 		closedir($dirOpen);
 		
 		return $list;
-	}
+	}*/
 	
 	/**
 	 * Add all the pages (by languages) in the folder
@@ -167,7 +336,7 @@ class PageListCreate
 	 * @param string $folderName	Name of the folder thats contain the page
 	 * @return array				List of the pages generated (differents languages)
 	 */
-	private function createPage( $folderName )
+	/*private function createPage( $folderName )
     {
         $pages = array();
         
@@ -199,9 +368,9 @@ class PageListCreate
         }
         
 		return $pages;
-    }
+    }*/
 	
-	private function initPage( Page &$page, $filename )
+	/*private function initPage( Page &$page, $filename )
     {
 		include $filename;
 		
@@ -248,7 +417,7 @@ class PageListCreate
 		if ( isset($contents) )			{ $page->getContents()->addMultiple($contents); }
 		
         return $page;
-    }
+    }*/
 	
 	final private function __construct() { }
 	
