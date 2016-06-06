@@ -123,7 +123,6 @@ class DataBase
 	{
 		try
 		{
-			print_r($query->getRequest());
 			$stmt = $this->_pdo->prepare( $query->getRequest() );
 			
 			if ($query->getType() === SqlQuery::$TYPE_MULTI_INSERT)
@@ -137,7 +136,6 @@ class DataBase
 				{
 					foreach ($binds as $bind)
 					{
-						print_r($bind);
 						$stmt->bindValue($bind[0], $bind[1], $bind[2]);
 					}
 				}

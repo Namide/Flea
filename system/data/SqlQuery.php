@@ -589,6 +589,7 @@ class SqlQuery
 		$this->_insert = 'INTO `' . $tableName . '` (' . implode(', ', $keys) . ')';
 		
 		$this->_values = array();
+		$binds = array();
 		foreach ($values as $line)
 		{
 			$tmp = array();
@@ -597,10 +598,10 @@ class SqlQuery
 				$tmp[] = '?';
 			}
 			$this->_values[] = implode(', ', $tmp);
+			$binds = array_merge($binds, $line);
 		}
 		$this->_values = implode('), (', $this->_values);
-		
-		$this->_binds = $values;
+		$this->_binds = $binds;
 	}
 	
 	/**

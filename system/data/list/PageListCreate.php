@@ -217,60 +217,85 @@ class PageListCreate
 		$keys2 = array();
 		$values1 = array();
 		$values2 = array();
+		$length1 = 1;
+		$length2 = 1;
 		
 		//$req1 = new SqlQuery( SqlQuery::$TYPE_INSERT );
 		//$req2 = new SqlQuery( SqlQuery::$TYPE_INSERT );
 		
 		foreach ($list as $page) 
 		{
-			$pageVars = $page->getObjectVars();
-			$pageVars2 = array();
+			$allVars = $page->getObjectVars();
+			$obj1 = array();
 			//$db->execute($request);
 			
-			foreach ($pageVars as $key => $value)
+			foreach ($allVars as $key => $value)
 			{
 				if(	gettype($value) == 'array' )
 				{
 					foreach ($value as $key2 => $val2)
 					{
-						$obj = array();
-						$obj['page_id'] = $pageVars['_id'];
-						$obj['page_prop'] = $key;
-						$obj['key'] = $key2;
-						$obj['value'] = $val2;
+						$obj2 = array();
+						$obj2['page_id'] = $allVars['_id'];
+						$obj2['page_prop'] = $key;
+						$obj2['key'] = $key2;
+						$obj2['value'] = $val2;
 						
 						if (count($keys2) < 1)
 						{
-							$keys2 = array_keys($obj);
+							$keys2 = array_keys($obj2);
+							$length2 = count($keys2);
 						}
-						$values2[] = array_values($obj);
+						else if ( (count($values2) + 1) * $length2 > 999 )
+						{
+							$req = SqlQuery::getTemp(SqlQuery::$TYPE_MULTI_INSERT);
+							$req->initMultiInsertValues($tableName . '_array', $keys2, $values2);
+							$db->execute($req);
+							$values2 = array();
+						}
+						
+						$values2[] = array_values($obj2);
 						
 						/*$request->clean( SqlQuery::$TYPE_INSERT );
-						$request->initInsertValues( $tableName.'_array', $obj );
+						$request->initInsertValues( $tableName.'_array', $obj2 );
 						$db->execute($request);*/
 					}
 					
 				}
-				elseif ( $value != null )
+				elseif ( $value !== null )
 				{
-					$pageVars2[$key] = $value;
+					$obj1[$key] = $value;
 				}
 			}
 			
 			if (count($keys1) < 1)
 			{
-				$keys1 = array_keys($pageVars2);
+				$keys1 = array_keys($obj1);
+				$length1 = count($keys1);
 			}
-			$values1[] = array_values($pageVars2);
+			else if ( (count($values1) + 1) * $length1 > 999 )
+			{
+				$req = SqlQuery::getTemp(SqlQuery::$TYPE_MULTI_INSERT);
+				$req->initMultiInsertValues($tableName, $keys1, $values1);
+				$db->execute($req);
+				$values1 = array();
+			}
+			$values1[] = array_values($obj1);
 		}
 		
-		$req = SqlQuery::getTemp(SqlQuery::$TYPE_MULTI_INSERT);
-		$req->initMultiInsertValues($tableName, $keys1, $values1);
-		$db->execute($req);
+		if ( count($values1) > 0 )
+		{
+			$req = SqlQuery::getTemp(SqlQuery::$TYPE_MULTI_INSERT);
+			$req->initMultiInsertValues($tableName, $keys1, $values1);
+			$db->execute($req);
+		}
 		
-		$req->clean(SqlQuery::$TYPE_MULTI_INSERT);
-		$req->initMultiInsertValues($tableName, $keys2, $values2);
-		$db->execute($req);
+		if ( count($values2) > 0 )
+		{
+			$req->clean(SqlQuery::$TYPE_MULTI_INSERT);
+			$req->initMultiInsertValues($tableName . '_array', $keys2, $values2);
+			$db->execute($req);
+		}
 	}
 	
 	/**
