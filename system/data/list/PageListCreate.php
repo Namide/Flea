@@ -213,13 +213,19 @@ class PageListCreate
 			$this->db_createPagesDB();
 		}
 		
+		$keys1 = array();
+		$keys2 = array();
+		$values1 = array();
+		$values2 = array();
+		
+		//$req1 = new SqlQuery( SqlQuery::$TYPE_INSERT );
+		//$req2 = new SqlQuery( SqlQuery::$TYPE_INSERT );
+		
 		foreach ($list as $page) 
 		{
 			$pageVars = $page->getObjectVars();
-			
-			$request = SqlQuery::getTemp( SqlQuery::$TYPE_INSERT );
-			$request->initInsertValues( $tableName, $pageVars );
-			$db->execute($request);
+			$pageVars2 = array();
+			//$db->execute($request);
 			
 			foreach ($pageVars as $key => $value)
 			{
@@ -233,13 +239,38 @@ class PageListCreate
 						$obj['key'] = $key2;
 						$obj['value'] = $val2;
 						
-						$request->clean( SqlQuery::$TYPE_INSERT );
+						if (count($keys2) < 1)
+						{
+							$keys2 = array_keys($obj);
+						}
+						$values2[] = array_values($obj);
+						
+						/*$request->clean( SqlQuery::$TYPE_INSERT );
 						$request->initInsertValues( $tableName.'_array', $obj );
-						$db->execute($request);
+						$db->execute($request);*/
 					}
+					
+				}
+				elseif ( $value != null )
+				{
+					$pageVars2[$key] = $value;
 				}
 			}
+			
+			if (count($keys1) < 1)
+			{
+				$keys1 = array_keys($pageVars2);
+			}
+			$values1[] = array_values($pageVars2);
 		}
+		
+		$req = SqlQuery::getTemp(SqlQuery::$TYPE_MULTI_INSERT);
+		$req->initMultiInsertValues($tableName, $keys1, $values1);
+		$db->execute($req);
+		
+		$req->clean(SqlQuery::$TYPE_MULTI_INSERT);
+		$req->initMultiInsertValues($tableName, $keys2, $values2);
+		$db->execute($req);
 	}
 	
 	/**

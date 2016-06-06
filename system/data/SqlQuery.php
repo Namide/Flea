@@ -69,6 +69,15 @@ class SqlQuery
 	 */
 	public static $TYPE_DELETE = 5;
 	
+	/**
+	 * Flag for a multiple insert request
+	 * 
+	 * @var int 
+	 */
+	public static $TYPE_MULTI_INSERT = 6;
+	
+	//private static $_SALTZ = 0;
+	
 	private static $_TEMP = null;
 	
 	/**
@@ -568,6 +577,77 @@ class SqlQuery
 	}
 	
 	/**
+	 * Initialize you SqlQuery with a self::$TYPE_MULTI_INSERT request.
+	 * 
+	 * @param string $tableName		Name of the table		
+	 * @param array $keys			List of keys for values
+	 * @param array $values			Bidimentionnal array with datas
+	 */
+	public function initMultiInsertValues( $tableName, array $keys, array $values )
+	{
+		$this->_type = self::$TYPE_MULTI_INSERT;
+		$this->_insert = 'INTO `' . $tableName . '` (' . implode(', ', $keys) . ')';
+		
+		$this->_values = array();
+		foreach ($values as $line)
+		{
+			$tmp = array();
+			foreach ($line as $row)
+			{
+				$tmp[] = '?';
+			}
+			$this->_values[] = implode(', ', $tmp);
+		}
+		$this->_values = implode('), (', $this->_values);
+		
+		$this->_binds = $values;
+	}
+	
+	/**
+	 * Add more values to an SqlQuery with the type self::$TYPE_INSERT.
+	 * 
+	 * @param array $values		Associative array with datas (keys for rows names)
+	 */
+	/*public function addMultiInsert( array $values )
+	{
+		if ($this->_values == '' && _DEBUG)
+		{
+			Debug::getInstance()->addError('You must to initialize the insertion query with values before adding mutiple insertions');
+		}
+		
+		$this->_values .= '), (';
+		$first = true;
+		self::$_SALTZ++;
+		foreach ( $values as $key => $value )
+		{
+			if ( gettype($value) == 'boolean' )
+			{
+				$this->_values .= ( ($first) ? ':' : ', :' ) . $key . self::$_SALTZ . '_';
+				$this->_binds[] = array( ':' . $key . self::$_SALTZ . '_', ( ($value) ? '1' : '0'), \PDO::PARAM_BOOL );
+				$first = false;
+			}
+			elseif ( gettype($value) == 'integer' )
+			{
+				$this->_values .= ( ($first) ? ':' : ', :' ) . $key . self::$_SALTZ . '_';
+				$this->_binds[] = array( ':' . $key . self::$_SALTZ . '_', $value, \PDO::PARAM_INT );
+				$first = false;
+			}
+			elseif ( gettype($value) == 'double' )
+			{
+				$this->_values .= ( ($first) ? ':' : ', :' ) . $key . self::$_SALTZ . '_';
+				$this->_binds[] = array( ':' . $key . self::$_SALTZ . '_', $value, \PDO::PARAM_STR );
+				$first = false;
+			}
+			elseif ( gettype($value) == 'string' )
+			{
+				$this->_values .= ( ($first) ? ':' : ', :' ) . $key . self::$_SALTZ . '_';
+				$this->_binds[] = array( ':' . $key . self::$_SALTZ . '_', $value, \PDO::PARAM_STR );
+				$first = false;
+			}
+		}
+	}*/
+	
+	/**
 	 * Initialize you SqlQuery with a self::$TYPE_UPDATE request.
 	 * 
 	 * @param string $tableName		Name of the table		
@@ -620,7 +700,7 @@ class SqlQuery
 				if ( $first ) $first = false;
 			}
 		}
-		$this->_create .= ' );';
+		$this->_create .= ' )';
 	}
 	
 	/**
@@ -739,6 +819,10 @@ class SqlQuery
 				return $this->getRequestDelete();
 				break;
 			
+			case self::$TYPE_MULTI_INSERT:
+				return $this->getRequestMuliInsert();
+				break;
+			
 			default :
 				if( _DEBUG && $this->_type == 0 )
 				{
@@ -760,7 +844,7 @@ class SqlQuery
 		{
 			Debug::getInstance()->addError('For a TYPE_CREATE SQL query You must init the var "create"');
 		}
-		return 'CREATE '.$this->_create;
+		return 'CREATE ' . $this->_create . ';';
 	}
 	
 	/**
@@ -785,7 +869,7 @@ class SqlQuery
 		if($this->_having != '') { $request .= ' HAVING ' . $this->_having; }
 		if($this->_orderBy != '') { $request .= ' ORDER BY ' . $this->_orderBy; }
 		if($this->_limit != '') { $request .= ' LIMIT ' . $this->_limit; }
-		return $request;
+		return $request . ';';
 	}
 	
 	/**
@@ -806,7 +890,23 @@ class SqlQuery
 		if($this->_values != '') { $request .= ' VALUES (' . $this->_values . ')'; }
 		if($this->_set != '') { $request .= ' SET ' . $this->_groupBy; }
 		if($this->_select != '') { $request .= ' SELECT ' . $this->_select; }
-		return $request;
+		return $request . ';';
+	}
+	
+	private function getRequestMuliInsert()
+	{
+		if(_DEBUG)
+		{
+			if($this->_insert == '')
+			{
+				Debug::getInstance()->addError('For a TYPE_INSERT SQL query You must init the var "insert"');
+			}
+		}
+		$request = 'INSERT ' . $this->_insert;
+		if($this->_values != '') { $request .= ' VALUES (' . $this->_values . ')'; }
+		if($this->_set != '') { $request .= ' SET ' . $this->_groupBy; }
+		if($this->_select != '') { $request .= ' SELECT ' . $this->_select; }
+		return $request . ';';
 	}
 	
 	/**
@@ -832,7 +932,7 @@ class SqlQuery
 		if($this->_where != '') { $request .= ' WHERE ' . $this->_where; }
 		if($this->_orderBy != '') { $request .= ' ORDER BY ' . $this->_orderBy; }
 		if($this->_limit != '') { $request .= ' LIMIT ' . $this->_limit; }
-		return $request;
+		return $request . ';';
 	}
 	
 	/**
