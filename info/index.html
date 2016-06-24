@@ -1,0 +1,168 @@
+<html>
+
+<head>
+  <title>Flea</title>
+  <meta name="description" content="Lightweight PHP framework">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link href="style.css" type="text/css" rel="stylesheet">
+</head>
+
+<body>
+  <h1>Flea</h1>
+  <p>Version: 2.0</p>
+  <p><strong>Lightweight PHP framework</strong></p>
+  <ul>
+    <li>Quick to install</li>
+    <li>Lightweight (fast processes)</li>
+    <li>Cache Management</li>
+    <li>GZip (CSS, JS, HTML)</li>
+    <li>Simple and permissive urls</li>
+    <li>Simple templating and content (migration easy)</li>
+    <li>Support multi language</li>
+    <li>Use CSV to manage pages meta datas (not content) - <em>New!</em></li>
+    <li><s>Minify (CSS, JS, HTML)</s></li>
+  </ul>
+  <p><strong>Requirements</strong></p>
+  <ul>
+    <li>PHP version 7.0 or greater</li>
+    <li>PDO (SqLite by default)</li>
+  </ul>
+  <p><strong>Links</strong></p>
+  <ul>
+    <li><a href="https://github.com/namide/flea" data-original-href="https://github.com/namide/flea">Sources</a></li>
+    <li><a href="http://flea.namide.com/doc/" data-original-href="http://flea.namide.com/doc/">Documentation</a></li>
+  </ul>
+  <h2>Roadmap</h2>
+  <h3>Todo</h3>
+  <ul>
+    <li>Active apache <code>mod_expires</code> in <code>.htaccess</code></li>
+    <li>Clean redirect 301 from CSV and <code>content/initDB.php</code></li>
+  </ul>
+  <h2>Get started</h2>
+  <h3>Initialize the languages</h3>
+  <h4>list of languages</h4>
+  <p><code>content/initLang.php</code></p>
+  <pre><code class="language-php">$lang-&gt;addDefault(<span class="hljs-string">'en'</span>);
+$lang-&gt;add(<span class="hljs-string">'fr'</span>);
+</code></pre>
+  <h3>Initialize the page</h3>
+  <h4>initialization</h4>
+  <p><code>pagelist.csv</code></p>
+  <pre><code class="language-csv">
+path
+<span class="hljs-comment">// exemple: pages/about</span>
+
+lang
+<span class="hljs-comment">// exemple: en</span>
+
+url
+<span class="hljs-comment">// exemple: en/about</span>
+
+template
+<span class="hljs-comment">// Name of the template	</span>
+<span class="hljs-comment">// exemple: default</span>
+
+date
+<span class="hljs-comment">// Date of the creation of the page (for sorting)</span>
+<span class="hljs-comment">// exemple: 2016-05-29</span>
+
+tags
+<span class="hljs-comment">// Add tags to the page</span>
+<span class="hljs-comment">// exemple: page ; about ; skills</span>
+
+meta:{custom}
+<span class="hljs-comment">// Additional content, replace {custom} by the label of your content</span>
+<span class="hljs-comment">// exemple: meta:title -&gt; About me</span>
+<span class="hljs-comment">// exemple: meta:description -&gt; I'm a creative developper</span>
+
+metas
+<span class="hljs-comment">// like meta:{custom} but in one cell</span>
+<span class="hljs-comment">// exemple: title : About me ; description : I'm a creative developper</span>
+
+visible
+<span class="hljs-comment">// Is the page visible ? (in the sitemap...)</span>
+<span class="hljs-comment">// exemple: 1</span>
+
+cachable
+<span class="hljs-comment">// Is the page cachable ?</span>
+<span class="hljs-comment">// exemple: 1</span>
+
+type
+<span class="hljs-comment">// Type of the page: </span>
+<span class="hljs-comment">// exemple: </span>
+<span class="hljs-comment">//			-&gt; Nothing if the page is basic</span>
+<span class="hljs-comment">// exemple: default</span>
+<span class="hljs-comment">//			-&gt; if it's the default page</span>
+<span class="hljs-comment">// exemple: error404</span>
+<span class="hljs-comment">//			-&gt; if it's the error 404 page</span>
+
+get<span class="hljs-selector-class">.enable</span>
+<span class="hljs-comment">// Active the GET handler for this page</span>
+<span class="hljs-comment">// exemple: 1</span>
+
+get<span class="hljs-selector-class">.explicit</span>
+<span class="hljs-comment">// If the GET is explicit the URL contains the labels of values.</span>
+<span class="hljs-comment">// URL: www.flea.namide.com/games</span>
+<span class="hljs-comment">// ( get.explicit == 1) -&gt; www.flea.namide.com/games/page/2/tag/RTS</span>
+<span class="hljs-comment">//						   array( 'page'=&gt;2, 'tag'=&gt;'RTS' );</span>
+<span class="hljs-comment">//</span>
+<span class="hljs-comment">// ( get.explicit == 0) -&gt; www.flea.namide.com/games/2/RTS</span>
+<span class="hljs-comment">//						   array( 2, 'RTS' );</span>
+<span class="hljs-comment">// exemple: 1</span>
+
+<span class="hljs-number">301</span>
+<span class="hljs-comment">// List of additional URL for 301 redirection</span>
+<span class="hljs-comment">// exemple: about ; en/me</span>
+
+<span class="hljs-selector-tag">header</span>
+<span class="hljs-comment">// Arguments to the php function header()</span>
+<span class="hljs-comment">// of the page (for other type than HTML, like XML)</span>
+<span class="hljs-comment">// example: Content-Type: application/xml; charset=utf-8'</span>
+</code></pre>
+  <h3>Content of the page</h3>
+  <h4>content</h4>
+  <p><code>pages/about/{language}.php</code></p>
+  <pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">article</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Welcome on {{meta:title}}<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>{{meta:description}}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">width</span>=<span class="hljs-string">""</span> <span class="hljs-attr">height</span>=<span class="hljs-string">""</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"{{pageContentPath}}img/example.png"</span> <span class="hljs-attr">alt</span>=<span class="hljs-string">"image example"</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">article</span>&gt;</span>
+</code></pre>
+  <h3>Flea variables</h3>
+  <p>Used in the build page <code>content/home/{language}-build.php</code> of init page <code>content/home/{language}-init.php</code> or template</p>
+  <pre><code class="language-php">{{rootPath}}
+<span class="hljs-comment">// URL of the root</span>
+
+{{templatePath}}
+<span class="hljs-comment">// URL of the template directory</span>
+
+{{contentPath}}
+<span class="hljs-comment">// URL of the content directory</span>
+
+{{pageContentPath}}
+<span class="hljs-comment">// URL of the page in the content directory</span>
+
+{{lang}}
+<span class="hljs-comment">// Current language</span>
+
+{{date}}
+<span class="hljs-comment">// Date of the current page</span>
+
+{{meta:title}}
+<span class="hljs-comment">// Title of the current page</span>
+
+{{body}}
+<span class="hljs-comment">// HTML body of the current page</span>
+
+{{meta:additionnal-custom-label-content}}
+<span class="hljs-comment">// $currentPage-&gt;getMetas()-&gt;getValue('additionnal-custom-label-content');</span>
+
+{{pageNameToAbsUrl:page-name}}
+<span class="hljs-comment">// $buildUtil-&gt;getAbsUrlByIdLang( ‘page-name', $currentLanguage );</span>
+
+{{urlPageToAbsoluteUrl:page-url}}
+<span class="hljs-comment">// $buildUtil-&gt;getAbsUrlByPageUrl( ‘page-url' );</span>
+</code></pre>
+</body>
+
+</html>

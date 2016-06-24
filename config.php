@@ -5,7 +5,7 @@
  */
 
 // Absolute URL of the website
-define( '_ROOT_URL', 'http://localhost/Flea/' );
+define( '_ROOT_URL', 'http://localhost/flea/' );
 
 
 // Directory name of the system's files

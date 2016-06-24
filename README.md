@@ -4,19 +4,24 @@ Version: 2.0
 
 __Lightweight PHP framework__
 - Quick to install
-- Lightweight
+- Lightweight (fast processes)
 - Cache Management
 - GZip (CSS, JS, HTML)
 - Simple and permissive urls
 - Simple templating and content (migration easy)
 - Support multi language
-- Use CSV to manage pages (not content) - _New!_
+- Use CSV to manage pages meta datas (not content) - _New!_
 - ~~Minify (CSS, JS, HTML)~~
 
 
 __Requirements__
-- PHP version 5.6 or greater  
+- PHP version 7.0 or greater  
 - PDO (SqLite by default)
+
+
+__Links__
+- [Sources](https://github.com/namide/flea)
+- [Documentation](http://flea.namide.com/doc/)
 
 ## Roadmap
 
@@ -26,16 +31,11 @@ __Requirements__
  - Clean redirect 301 from CSV and `content/initDB.php`
 
 
-### Ok
+## Get started
 
- - optimize `system/data/list/PageListCreate.php` -> db_insertPages();  
-   -> Init (40x faster); 100 pages: 93.03 sec -> 2.15 sec 
+### Initialize the languages
 
-
-
-## Initialize the languages
-
-### list of languages
+#### list of languages
 `content/initLang.php`
 
 ```php
@@ -44,9 +44,9 @@ $lang->add('fr');
 ```
 
 
-## Initialize the page
+### Initialize the page
 
-### initialization
+#### initialization
 `pagelist.csv`
 
 ```csv
@@ -122,9 +122,9 @@ header
 // example: Content-Type: application/xml; charset=utf-8'
 ```
 
-## Content of the page
+### Content of the page
 
-### content
+#### content
 `pages/about/{language}.php`
 
 ```html
@@ -136,7 +136,7 @@ header
 ```
 
 
-## Flea variables
+### Flea variables
 
 Used in the build page `content/home/{language}-build.php`
 of init page `content/home/{language}-init.php`
