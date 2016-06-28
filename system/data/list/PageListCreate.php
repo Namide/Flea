@@ -72,7 +72,8 @@ class PageListCreate
 				
 				$page = new Page();
 				
-				foreach ( str_getcsv($line) as $id => &$row)
+				$csvStr = str_getcsv($line);
+				foreach ( $csvStr as $id => &$row)
 				{
 					$row = trim($row);
 					
