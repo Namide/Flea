@@ -1,5 +1,5 @@
 <?php
-    //header('Content-Type: application/xml; charset=utf-8');
+//header('Content-Type: application/xml; charset=utf-8');
 ?>
 
 {{body}}

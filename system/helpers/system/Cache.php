@@ -31,118 +31,105 @@ namespace Flea;
  *
  * @author Namide
  */
-class Cache
-{
+class Cache {
+
 	//private $_rootDir;
 	private $_content;
 	private $_db;
 	private $_tableName;
+
 	//private $_dataUtil;
-	
-	
+
 	/**
 	 * Directory for write the file(s)
 	 * 
 	 * @param string $rootDir	Root directory
 	 */
-	function __construct( $dbDsnCache/*$rootDir = null*/, $tableName = 'pages_cached' )
-	{
+	function __construct($dbDsnCache/* $rootDir = null */, $tableName = 'pages_cached') {
 		$this->_db = DataBase::getInstance($dbDsnCache);
 		$this->_tableName = $tableName;
 		$this->_content = '';
-		
-		if ( !$this->_db->exist($tableName) )
-		{
+
+		if (!$this->_db->exist($tableName)) {
 			//$sql = 'CREATE TABLE `'.$tableName.'` ( url TEXT, header TEXT, content TEXT );';
 			$sql = SqlQuery::getTemp(SqlQuery::$TYPE_CREATE);
-			$tables = array( 'url'=>'TEXT', 'header'=>'TEXT', 'content'=>'TEXT', 'gzip'=>'TEXT' );
+			$tables = array('url' => 'TEXT', 'header' => 'TEXT', 'content' => 'TEXT', 'gzip' => 'TEXT');
 			$sql->initCreate($tableName, $tables);
-			$this->_db->execute( $sql );
-			
-			$fileTemplate = _SYSTEM_DIRECTORY.'helpers/system/autoCacheTemplate.php';
+			$this->_db->execute($sql);
+
+			$fileTemplate = _SYSTEM_DIRECTORY . 'helpers/system/autoCacheTemplate.php';
 			$fileNew = 'cache.php';
 			copy($fileTemplate, $fileNew);
 		}
-    }
-	
+	}
+
 	/**
 	 * Test if the file is already writed
 	 * 
 	 * @param string $fileName	Name of the file
 	 * @return bool				true if the file is writted, false if error has occured
 	 */
-	public function isWrited( $strUrl )
-	{
-		$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
-		$query->initCount( $this->_tableName, array('url'=>$strUrl), array('LIKE') );
-		return $this->_db->count( $query ) > 0;
+	public function isWrited($strUrl) {
+		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
+		$query->initCount($this->_tableName, array('url' => $strUrl), array('LIKE'));
+		return $this->_db->count($query) > 0;
 	}
-	
+
 	/**
 	 * Write the file in the directory
 	 * 
 	 * @param type $fileName	Name of the file
 	 * @param type $content		Content of the file (optional)
 	 */
-	public function writeCache( $url, $header = '', &$content = null )
-	{
-		if ( $content === null )
-		{
+	public function writeCache($url, $header = '', &$content = null) {
+		if ($content === null) {
 			$content = $this->_content;
 		}
-		
+
 		$obj = array();
 		$obj['url'] = $url;
 		$obj['header'] = $header;
 		$obj['content'] = &$content;
 		$obj['gzip'] = gzencode($content, 9);
-		
+
 		$query = SqlQuery::getTemp(SqlQuery::$TYPE_INSERT);
-		$query->initInsertValues( $this->_tableName, $obj );
-		$this->_db->execute( $query );
+		$query->initInsertValues($this->_tableName, $obj);
+		$this->_db->execute($query);
 	}
-	
+
 	/**
 	 * Echo the file (with the function readfile)
 	 */
-	public function echoSaved( $url )
-	{
+	public function echoSaved($url) {
 		//$query = 'SELECT * FROM `'.$this->_tableName.'` WHERE url LIKE \''.$url.'\'';
-		$query = SqlQuery::getTemp( SqlQuery::$TYPE_SELECT );
-		$where = array('url'=>$url);
+		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
+		$where = array('url' => $url);
 		$sign = array('LIKE');
-		$query->initSelect('*', '`'.$this->_tableName.'`', $where, $sign );
+		$query->initSelect('*', '`' . $this->_tableName . '`', $where, $sign);
 		$row = $this->_db->fetchAll($query);
-		if ( $row > 0 ) 
-		{
-			if ( $row[0]['header'] != '' ) 
-			{
-				header( $row[0]['header'] );
+		if ($row > 0) {
+			if ($row[0]['header'] != '') {
+				header($row[0]['header']);
 			}
-			
+
 			// GZIP
-			if ( strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== false )
-			{
+			if (strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== false) {
 				$gzip = $row[0]['gzip'];
 				//header('Content-Type: application/x-download');
 				header('Content-Encoding: gzip'); #
-				header('Content-Length: '.strlen($gzip)); #
+				header('Content-Length: ' . strlen($gzip)); #
 				//header('Content-Disposition: attachment; filename="myfile.html"');
 				//header('Cache-Control: no-cache, no-store, max-age=0, must-revalidate');
 				//header('Pragma: no-cache');
 				echo $gzip;
-			}
-			else
-			{
+			} else {
 				echo $row[0]['content'];
 			}
-		}
-		elseif(_DEBUG)
-		{
-			Debug::getInstance()->addError( 'The URL '.$url.' don\'t exist in the cache data base' );
+		} elseif (_DEBUG) {
+			Debug::getInstance()->addError('The URL ' . $url . ' don\'t exist in the cache data base');
 		}
 	}
-	
+
 	/**
 	 * Test if the page is cachable.
 	 * A page is cachable if :
@@ -152,104 +139,97 @@ class Cache
 	 * @param Page $page	Page to test
 	 * @return boolean		true if the page is cachable, false if the page is uncachable
 	 */
-	public function isPageCachable( Page &$page )
-	{
-		if ( $this->getNumFilesSaved() < _MAX_PAGE_CACHE )
-		{
+	public function isPageCachable(Page &$page) {
+		if ($this->getNumFilesSaved() < _MAX_PAGE_CACHE) {
 			return $page->getCachable();
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Start to save the communication (echo...)
 	 */
-	public function startSave()
-	{
-		/*if( !file_exists(_CACHE_DIRECTORY) )
-		{
-			mkdir( _CACHE_DIRECTORY, 0777 );
-		}
-		
-		if( !file_exists(_CACHE_DIRECTORY.'.htaccess') )
-		{
-			$htaccess = fopen( _CACHE_DIRECTORY.'.htaccess' , "w" );
-			$htaccessContent = 'deny from all
-<Files ../index.php>
-allow from all
-</Files>';
-			fwrite($htaccess, $htaccessContent);
-			fclose($htaccess); 
-		}*/
+	public function startSave() {
+		/* if( !file_exists(_CACHE_DIRECTORY) )
+		  {
+		  mkdir( _CACHE_DIRECTORY, 0777 );
+		  }
+
+		  if( !file_exists(_CACHE_DIRECTORY.'.htaccess') )
+		  {
+		  $htaccess = fopen( _CACHE_DIRECTORY.'.htaccess' , "w" );
+		  $htaccessContent = 'deny from all
+		  <Files ../index.php>
+		  allow from all
+		  </Files>';
+		  fwrite($htaccess, $htaccessContent);
+		  fclose($htaccess);
+		  } */
 		ob_start();
 	}
-	
+
 	/**
 	 * Get the content saved
 	 * 
 	 * @return string		Content saved
 	 */
-	public function getContent()
-	{
+	public function getContent() {
 		return $this->_content;
 	}
-	
+
 	/**
 	 * Set the content
 	 * 
 	 * @param string $content		Change the content
 	 */
-	public function setContent( $content )
-	{
+	public function setContent($content) {
 		$this->_content = $content;
 	}
-	
+
 	/**
 	 * Stop to save the communication (echo...)
 	 * 
 	 * @return string		Content saved
 	 */
-	public function stopSave()
-	{
+	public function stopSave() {
 		$content = ob_get_contents();
 		ob_end_clean();
-		
+
 		$this->_content = $content;
 		return $content;
 	}
-	
+
 	/**
 	 * Num of files saved
 	 * 
 	 * @param string $cacheDirectory		Directory of the files
 	 * @return int							Number of files cached
 	 */
-	public function getNumFilesSaved()
-	{
+	public function getNumFilesSaved() {
 		$query = SqlQuery::getTemp();
-		$query->initCount( $this->_tableName );
-		return $this->_db->count( $query );
+		$query->initCount($this->_tableName);
+		return $this->_db->count($query);
 	}
-	
-	/*private static function getNumFilesRecurs( $dir )
-	{
-		$num = 0;
-		if ( !file_exists($dir) ) return $num;
-		
-		$MyDirectory = opendir($dir);
-		while ( $Entry = @readdir($MyDirectory) )
-		{
-			if ( is_dir($dir.'/'.$Entry) && $Entry != '.' && $Entry != '..' )
-			{
-				$num += self::getNumFilesRecurs($dir.'/'.$Entry);
-			}
-			elseif ( substr($Entry, 0, 1) != '.' ) 
-			{
-				$num++;
-			}
-		}
-		closedir($MyDirectory);
-		
-		return $num;
-	}*/
+
+	/* private static function getNumFilesRecurs( $dir )
+	  {
+	  $num = 0;
+	  if ( !file_exists($dir) ) return $num;
+
+	  $MyDirectory = opendir($dir);
+	  while ( $Entry = @readdir($MyDirectory) )
+	  {
+	  if ( is_dir($dir.'/'.$Entry) && $Entry != '.' && $Entry != '..' )
+	  {
+	  $num += self::getNumFilesRecurs($dir.'/'.$Entry);
+	  }
+	  elseif ( substr($Entry, 0, 1) != '.' )
+	  {
+	  $num++;
+	  }
+	  }
+	  closedir($MyDirectory);
+
+	  return $num;
+	  } */
 }

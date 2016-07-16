@@ -26,7 +26,7 @@
 
 namespace Flea;
 
-include_once _SYSTEM_DIRECTORY.'helpers/common/InitUtil.php';
+include_once _SYSTEM_DIRECTORY . 'helpers/common/InitUtil.php';
 
 /**
  * Utils to write pages and template.
@@ -34,8 +34,8 @@ include_once _SYSTEM_DIRECTORY.'helpers/common/InitUtil.php';
  *
  * @author Namide
  */
-class BuildUtil extends InitUtil
-{
+class BuildUtil extends InitUtil {
+
 	/**
 	 * Get the page with the pageName
 	 * 
@@ -43,10 +43,8 @@ class BuildUtil extends InitUtil
 	 * @param string $lang			Language of the page (if null it's the current language)
 	 * @return Page					Instance of the Page
 	 */
-	public function getPage( $pageName, $lang = null )
-	{
-		if ( $lang === null )
-		{
+	public function getPage($pageName, $lang = null) {
+		if ($lang === null) {
 			$lang = General::getInstance()->getCurrentLang();
 		}
 		return PageList::getInstance()->getByName($pageName, $lang);
@@ -59,13 +57,12 @@ class BuildUtil extends InitUtil
 	 * @param array $gets			Additionnal GET of the URL
 	 * @return string				Absolute URL
 	 */
-	public function getAbsUrlByPage( Page $page, array $gets = null )
-    {
+	public function getAbsUrlByPage(Page $page, array $gets = null) {
 		$relUrl = UrlUtil::getInstance()->getRelUrlByIdLang($page, $gets);
-		
-        return _ROOT_URL.$relUrl;
-    }
-	
+
+		return _ROOT_URL . $relUrl;
+	}
+
 	/**
 	 * Get the absolute URL of a page by his page URL
 	 * 
@@ -74,13 +71,12 @@ class BuildUtil extends InitUtil
 	 * @param boolean $explicitGet		Are this GET datas explicit
 	 * @return string					Absolute URL of the page
 	 */
-    public function getAbsUrlByPageUrl( $url, array $gets = null, $explicitGet = true )
-    {
-		$relUrl = UrlUtil::getInstance()->getRelUrlByPageUrl( $url, $gets, $explicitGet );
-		
-		return _ROOT_URL.$relUrl;
-    }
-    
+	public function getAbsUrlByPageUrl($url, array $gets = null, $explicitGet = true) {
+		$relUrl = UrlUtil::getInstance()->getRelUrlByPageUrl($url, $gets, $explicitGet);
+
+		return _ROOT_URL . $relUrl;
+	}
+
 	/**
 	 * Fast method to get the page URL of a page by his page absolute URL.
 	 * Not efficient if you have getters, setters...
@@ -88,11 +84,10 @@ class BuildUtil extends InitUtil
 	 * @param string $absUrl		Absolute URL of the page
 	 * @return string				Page URL
 	 */
-	public function getPageUrlByAbsUrl( $absUrl )
-	{
-		return strtr($absUrl, array(_ROOT_URL=>''));
+	public function getPageUrlByAbsUrl($absUrl) {
+		return strtr($absUrl, array(_ROOT_URL => ''));
 	}
-	
+
 	/**
 	 * Absolute URL for a page
 	 * 
@@ -101,31 +96,28 @@ class BuildUtil extends InitUtil
 	 * @param array $getUrl			Array of GET of the page (optional)
 	 * @return string				Absolute URL
 	 */
-	public function getAbsUrlByNameLang( $pageName, $lang, array $getUrl = null )
-    {
+	public function getAbsUrlByNameLang($pageName, $lang, array $getUrl = null) {
 		$PageList = PageList::getInstance();
 		$page = $PageList->getByName($pageName, $lang);
 		$relUrl = UrlUtil::getInstance()->getRelUrlByIdLang($page, $getUrl);
-		
-        return _ROOT_URL.$relUrl;
-    }
-	
+
+		return _ROOT_URL . $relUrl;
+	}
+
 	/**
 	 * Reset the object (new evaluation of current page)
 	 */
-	public function reset()
-	{
+	public function reset() {
 		$pageList = PageList::getInstance();
 		$general = General::getInstance();
-        if ( _DEBUG && !$general->isPagesInitialized() )
-		{
-			Debug::getInstance()->addError( 'All pages must be initialised after use BuildUtil class' );
+		if (_DEBUG && !$general->isPagesInitialized()) {
+			Debug::getInstance()->addError('All pages must be initialised after use BuildUtil class');
 		}
-        $pageUrl = $general->getCurrentPageUrl();
-        $page = $pageList->getByUrl( $pageUrl );
+		$pageUrl = $general->getCurrentPageUrl();
+		$page = $pageList->getByUrl($pageUrl);
 		$general->setCurrentPage($page);
 	}
-    
+
 	/**
 	 * Absolute URL for a page
 	 * 
@@ -133,13 +125,12 @@ class BuildUtil extends InitUtil
 	 * @param array $gets		Additionnal GET of the URL
 	 * @return string			Absolute URL of the page		
 	 */
-    public function getAbsUrl( $pageName, array $gets = null )
-    {
+	public function getAbsUrl($pageName, array $gets = null) {
 		$lang = General::getInstance()->getCurrentLang();
-		
+
 		return $this->getAbsUrlByNameLang($pageName, $lang, $gets);
-    }
-	
+	}
+
 	/**
 	 * Return the equivalent page in other language.
 	 * Return the default page if this one don't exist
@@ -148,21 +139,18 @@ class BuildUtil extends InitUtil
 	 * @param Page &$page
 	 * @return Page
 	 */
-	public function getOtherLang( $lang, Page &$page = null )
-	{
+	public function getOtherLang($lang, Page &$page = null) {
 		$pageList = PageList::getInstance();
-		if ( $page === null )
-		{
+		if ($page === null) {
 			$page = General::getInstance()->getCurrentPage();
 		}
-		if ( $pageList->has( $page->getName(), $lang) )
-		{
+		if ($pageList->has($page->getName(), $lang)) {
 			return $pageList->getByName($page->getName(), $lang);
 		}
-		
+
 		return $pageList->getDefaultPage($lang);
 	}
-	
+
 	/**
 	 * Get one of the metass of a Page
 	 * 
@@ -171,27 +159,23 @@ class BuildUtil extends InitUtil
 	 * @param type $replaceFleaVars		Replace or not the FleaVars
 	 * @return string					The corresponding formated meta
 	 */
-	public function getContentOfPage( $metaKey, Page &$page, $replaceFleaVars = false )
-	{
-		if( !$page->getMetas()->hasKey( $metaKey ) ) 
-		{
-			if( _DEBUG )
-			{
-				Debug::getInstance()->addError('The meta "'.$metaKey.'" '
-				. ' don\'t exist for the page ['.$page->getId().']' );
+	public function getContentOfPage($metaKey, Page &$page, $replaceFleaVars = false) {
+		if (!$page->getMetas()->hasKey($metaKey)) {
+			if (_DEBUG) {
+				Debug::getInstance()->addError('The meta "' . $metaKey . '" '
+						. ' don\'t exist for the page [' . $page->getId() . ']');
 			}
 			return '';
 		}
 
 		$meta = $page->getMetas()->getValue($metaKey);
-		if ( $replaceFleaVars )
-		{
+		if ($replaceFleaVars) {
 			return $this->replaceFleaVars($meta, $page);
 		}
-		
+
 		return $meta;
 	}
-	
+
 	/**
 	 * Format the text by converting the Flea variables to real datas.
 	 * List of Flea variables :
@@ -211,74 +195,63 @@ class BuildUtil extends InitUtil
 	 * @param Page $page		Current page
 	 * @return string			Formated text				
 	 */
-	public function replaceFleaVars( $text, Page &$page = null )
-    {
+	public function replaceFleaVars($text, Page &$page = null) {
 		$general = General::getInstance();
-		
-		if ($page === null)
-		{
+
+		if ($page === null) {
 			$page = $general->getCurrentPage();
 		}
-		
+
 		//$replacePage = str_replace('{{title}}', $page->getHtmlTitle(), $text);
 		//$replacePage = str_replace('{{header}}', $page->getHtmlHeader(), $replacePage);
 		$replacePage = str_replace('{{body}}', $page->getHtmlBody(), $text);
 		//$replacePage = str_replace('{{description}}', $page->getHtmlDescription(), $replacePage);
 		//$replacePage = str_replace('{{cover}}', $page->getCover(), $replacePage);
-		
+
 		$replacePage = str_replace('{{rootPath}}', _ROOT_URL, $replacePage);
-		$replacePage = str_replace('{{templatePath}}', _ROOT_URL._TEMPLATE_DIRECTORY, $replacePage);
-		$replacePage = str_replace('{{contentPath}}', _ROOT_URL._CONTENT_DIRECTORY, $replacePage);
-		
-		
+		$replacePage = str_replace('{{templatePath}}', _ROOT_URL . _TEMPLATE_DIRECTORY, $replacePage);
+		$replacePage = str_replace('{{contentPath}}', _ROOT_URL . _CONTENT_DIRECTORY, $replacePage);
+
+
 		$replacePage = str_replace('{{lang}}', $general->getCurrentLang(), $replacePage);
 		$replacePage = str_replace('{{date}}', $page->getDate(), $replacePage);
-		
-		$replacePage = str_replace('{{pageContentPath}}', _ROOT_URL._CONTENT_DIRECTORY.$page->getName().'/', $replacePage);
 
-		
-		$replacePage = preg_replace_callback( '/\{\{urlPageToAbsoluteUrl:(.*?)\}\}/', function ($matches)
-		{
+		$replacePage = str_replace('{{pageContentPath}}', _ROOT_URL . _CONTENT_DIRECTORY . $page->getName() . '/', $replacePage);
+
+
+		$replacePage = preg_replace_callback('/\{\{urlPageToAbsoluteUrl:(.*?)\}\}/', function ($matches) {
 			return BuildUtil::getInstance()->getAbsUrlByPageUrl($matches[1]);
+		}, $replacePage);
 
-		}, $replacePage );
-			
-		if ( $page !== null )
-		{
-			$replacePage = preg_replace_callback( '/\{\{meta:(.*?)\}\}/', function ($matches) use($page)
-			{
-				if( !$page->getMetas()->hasKey($matches[1]) ) 
-				{
-					if( _DEBUG )
-					{
-						Debug::getInstance()->addError('The FleaVar {{meta:'.$matches[1].'}}'
-						. ' don\'t exist for the page ['.$page->getId().']' );
+		if ($page !== null) {
+			$replacePage = preg_replace_callback('/\{\{meta:(.*?)\}\}/', function ($matches) use($page) {
+				if (!$page->getMetas()->hasKey($matches[1])) {
+					if (_DEBUG) {
+						Debug::getInstance()->addError('The FleaVar {{meta:' . $matches[1] . '}}'
+								. ' don\'t exist for the page [' . $page->getId() . ']');
 					}
 					return '';
 				}
-				
+
 				return $page->getMetas()->getValue($matches[1]);
-				
-			}, $replacePage );
-		
-			$replacePage = preg_replace_callback( '/\{\{pageNameToAbsUrl:(.*?)\}\}/', function ($matches) use($page)
-			{
+			}, $replacePage);
+
+			$replacePage = preg_replace_callback('/\{\{pageNameToAbsUrl:(.*?)\}\}/', function ($matches) use($page) {
 				$lang = $page->getLang();
-				
-				if ( !PageList::getInstance()->has($matches[1], $lang) )
-				{
-					if( _DEBUG )
-					{
-						Debug::getInstance()->addError('The page {{pageNameToAbsUrl:'.$matches[1].'}}'
-						. ' don\'t exist for the language ['.$lang.']' );
+
+				if (!PageList::getInstance()->has($matches[1], $lang)) {
+					if (_DEBUG) {
+						Debug::getInstance()->addError('The page {{pageNameToAbsUrl:' . $matches[1] . '}}'
+								. ' don\'t exist for the language [' . $lang . ']');
 					}
 					return '';
 				}
-				
-				return BuildUtil::getInstance()->getAbsUrlByNameLang( $matches[1], $lang );
-			}, $replacePage );
+
+				return BuildUtil::getInstance()->getAbsUrlByNameLang($matches[1], $lang);
+			}, $replacePage);
 		}
 
-        return $replacePage;
-    }
+		return $replacePage;
+	}
+
 }

@@ -32,75 +32,68 @@ namespace Flea;
  *
  * @author Namide
  */
-class InitUtil
-{
+class InitUtil {
+
 	private static $_INSTANCES = array();
-    
-    final private function __construct()
-    {
-        //$this->reset();
-    }
-	
+
+	final private function __construct() {
+		//$this->reset();
+	}
+
 	/**
 	 * Reset the object
 	 */
-    //protected function reset() { }
-	
+	//protected function reset() { }
+
 	/**
 	 * Get an absolute URL for a file at the root of the website
 	 * 
 	 * @param string $file		Name of the file
 	 * @return string			Absolute URL of the file
 	 */
-	public function getRootAbsUrl( $file )
-    {
-        return _ROOT_URL.$file;
-    }
-	
+	public function getRootAbsUrl($file) {
+		return _ROOT_URL . $file;
+	}
+
 	/**
 	 * Get an absolute URL for a file in the template directory
 	 * 
 	 * @param string $file		Name of the file
 	 * @return string			Absolute URL of the file
 	 */
-    public function getTemplateAbsUrl( $file )
-    {
-       return _ROOT_URL._TEMPLATE_DIRECTORY.$file;
-    }
-    
+	public function getTemplateAbsUrl($file) {
+		return _ROOT_URL . _TEMPLATE_DIRECTORY . $file;
+	}
+
 	/**
 	 * Get an absolute URL for a file in the content directory
 	 * 
 	 * @param string $file		Name of the file
 	 * @return string			Absolute URL of the file
 	 */
-    public function getContentAbsUrl( $file )
-    {
-       return _ROOT_URL._CONTENT_DIRECTORY.$file;
-    }
-	
-	final private function __clone()
-    {
-        if ( _DEBUG )
-		{
-			Debug::getInstance()->addError( 'You can\'t clone a singleton' );
+	public function getContentAbsUrl($file) {
+		return _ROOT_URL . _CONTENT_DIRECTORY . $file;
+	}
+
+	final private function __clone() {
+		if (_DEBUG) {
+			Debug::getInstance()->addError('You can\'t clone a singleton');
 		}
-    }
-	
+	}
+
 	/**
 	 * Instance of the object
 	 * 
 	 * @return static		Instance of the object InitUtil
 	 */
-    public static function getInstance()
-    {
-        $c = get_called_class();
- 
-        if(!isset(self::$_INSTANCES[$c]))
-        {
-            self::$_INSTANCES[$c] = new $c;
-        }
- 
-        return self::$_INSTANCES[$c];
-    }
+	public static function getInstance() {
+		$c = get_called_class();
+
+		if (!isset(self::$_INSTANCES[$c])) {
+			self::$_INSTANCES[$c] = new $c;
+		}
+
+		return self::$_INSTANCES[$c];
+	}
+
 }

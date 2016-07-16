@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * The MIT License
  *
  * Copyright 2014 Damien Doussaud (namide.com).
@@ -29,15 +29,13 @@ namespace Flea;
 \Flea::getUrlUtil()->reset();
 \Flea::getBuildUtil()->reset();
 
-if ( file_exists(_CONTENT_DIRECTORY.'initBuild.php') )
-{
-	include _CONTENT_DIRECTORY.'initBuild.php';
+if (file_exists(_CONTENT_DIRECTORY . 'initBuild.php')) {
+	include _CONTENT_DIRECTORY . 'initBuild.php';
 }
 
-$page =  \Flea::getGeneral()->getCurrentPage();
-PageList::getInstance()->buildPage( $page );
+$page = \Flea::getGeneral()->getCurrentPage();
+PageList::getInstance()->buildPage($page);
 
-if ( _DEBUG )
-{
+if (_DEBUG) {
 	Debug::getInstance()->addTimeMark('build page');
 }

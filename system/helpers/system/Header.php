@@ -31,10 +31,10 @@ namespace Flea;
  *
  * @author Namide
  */
-class Header
-{
+class Header {
+
 	private static $_INSTANCE;
-	
+
 	/**
 	 * Get the header for a format.
 	 * Example : 
@@ -44,10 +44,8 @@ class Header
 	 * @param string $format
 	 * @return string
 	 */
-	public function getHeaderOfPage($format)
-	{
-		switch ($format)
-		{
+	public function getHeaderOfPage($format) {
+		switch ($format) {
 			case Page::$FORMAT_HTML:
 				return 'Content-Type: text/html';
 				break;
@@ -72,53 +70,52 @@ class Header
 		}
 		return '';
 	}
-	
+
 	/**
 	 * Appli the header of the page (custom header and format).
 	 * 
 	 * @param \Flea\Page $page
 	 */
-	public function appliHeaderOfPage(Page &$page)
-	{
-		if ( $page->getPhpHeader() != '' )
-		{
-			header( BuildUtil::getInstance()->replaceFleaVars($page->getPhpHeader(), $page) );
+	public function appliHeaderOfPage(Page &$page) {
+		if ($page->getPhpHeader() != '') {
+			header(BuildUtil::getInstance()->replaceFleaVars($page->getPhpHeader(), $page));
 		}
-		
-		$this->appliHeaderByFormat( $page->getFormat() );
+
+		$this->appliHeaderByFormat($page->getFormat());
 	}
-	
+
 	/**
 	 * Appli the header for the format.
 	 * Example 'Content-Type: text/html' for an HTML page
 	 * 
 	 * @param type $format
 	 */
-	public function appliHeaderByFormat( $format )
-	{
-		$headForm = $this->getHeaderOfPage( $format );
-		if ( $headForm != '' )
-		{
-			header( $headForm );
+	public function appliHeaderByFormat($format) {
+		$headForm = $this->getHeaderOfPage($format);
+		if ($headForm != '') {
+			header($headForm);
 		}
 	}
-	
-	final private function __construct() { }
-	
-	final private function __clone() { }
-	
+
+	final private function __construct() {
+		
+	}
+
+	final private function __clone() {
+		
+	}
+
 	/**
 	 * Instance of the Header
 	 * 
 	 * @return self		Instance of the Header
 	 */
-    final public static function getInstance()
-    {
-        if( !isset( self::$_INSTANCE ) )
-        {
-            self::$_INSTANCE = new self();
-        }
- 
-        return self::$_INSTANCE;
-    }
+	final public static function getInstance() {
+		if (!isset(self::$_INSTANCE)) {
+			self::$_INSTANCE = new self();
+		}
+
+		return self::$_INSTANCE;
+	}
+
 }

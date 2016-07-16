@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * The MIT License
  *
  * Copyright 2014 Damien Doussaud (namide.com).
@@ -26,8 +26,7 @@
 
 namespace Flea;
 
-if ( !file_exists(_CACHE_DIRECTORY.'.htaccess') )
-{
-	include _SYSTEM_DIRECTORY.'helpers/miscellaneous/FileUtil.php';
+if (!file_exists(_CACHE_DIRECTORY . '.htaccess')) {
+	include _SYSTEM_DIRECTORY . 'helpers/miscellaneous/FileUtil.php';
 	FileUtil::writeProtectedDir(_CACHE_DIRECTORY);
 }

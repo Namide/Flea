@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * The MIT License
  *
  * Copyright 2014 Damien Doussaud (namide.com).
@@ -24,32 +24,31 @@
  * THE SOFTWARE.
  */
 
-if ( _DEBUG )
-{
-	include_once _SYSTEM_DIRECTORY.'helpers/system/Debug.php';
+if (_DEBUG) {
+	include_once _SYSTEM_DIRECTORY . 'helpers/system/Debug.php';
 	Flea\Debug::getInstance();
-	if (!ini_get('display_errors')) { ini_set('display_errors', '1'); }
+	if (!ini_get('display_errors')) {
+		ini_set('display_errors', '1');
+	}
 	error_reporting(E_ALL);
 }
 
-include_once _SYSTEM_DIRECTORY.'data/SqlQuery.php';
-include_once _SYSTEM_DIRECTORY.'data/ValueObject.php';
-include_once _SYSTEM_DIRECTORY.'data/DataBase.php';
-include_once _SYSTEM_DIRECTORY.'data/list/DataList.php';
-include_once _SYSTEM_DIRECTORY.'data/list/LangList.php';
-include_once _SYSTEM_DIRECTORY.'data/Page.php';
-include_once _SYSTEM_DIRECTORY.'data/list/PageList.php';
+include_once _SYSTEM_DIRECTORY . 'data/SqlQuery.php';
+include_once _SYSTEM_DIRECTORY . 'data/ValueObject.php';
+include_once _SYSTEM_DIRECTORY . 'data/DataBase.php';
+include_once _SYSTEM_DIRECTORY . 'data/list/DataList.php';
+include_once _SYSTEM_DIRECTORY . 'data/list/LangList.php';
+include_once _SYSTEM_DIRECTORY . 'data/Page.php';
+include_once _SYSTEM_DIRECTORY . 'data/list/PageList.php';
 
-include_once _SYSTEM_DIRECTORY.'data/General.php';
-include_once _SYSTEM_DIRECTORY.'helpers/system/UrlUtil.php';
-include_once _SYSTEM_DIRECTORY.'Flea.php';
+include_once _SYSTEM_DIRECTORY . 'data/General.php';
+include_once _SYSTEM_DIRECTORY . 'helpers/system/UrlUtil.php';
+include_once _SYSTEM_DIRECTORY . 'Flea.php';
 
-if ( _CACHE )
-{
-	include_once _SYSTEM_DIRECTORY.'helpers/system/Cache.php';
+if (_CACHE) {
+	include_once _SYSTEM_DIRECTORY . 'helpers/system/Cache.php';
 }
 
-if ( _DEBUG )
-{
+if (_DEBUG) {
 	Flea\Debug::getInstance()->addTimeMark('imports');
 }

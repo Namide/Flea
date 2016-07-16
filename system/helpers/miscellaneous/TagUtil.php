@@ -32,12 +32,14 @@ namespace Flea;
  *
  * @author damien
  */
-class TagUtil
-{
+class TagUtil {
+
 	private static $_INSTANCE;
 
-	private function __construct() { }
-	
+	private function __construct() {
+		
+	}
+
 	/**
 	 * Simple method to create a link.
 	 * Ex:
@@ -58,17 +60,15 @@ class TagUtil
 	 * @param string $tagAfterText		Tag after the title of the page (in the tag '<a></a>')
 	 * @return string					HTML link generated	
 	 */
-	public function getLinkByName( $pageName, $metaKey, $lang = null, $attInA = '', $tagBeforeText = '', $tagAfterText = '' )
-	{
-		if( $lang === null )
-		{
+	public function getLinkByName($pageName, $metaKey, $lang = null, $attInA = '', $tagBeforeText = '', $tagAfterText = '') {
+		if ($lang === null) {
 			$lang = General::getInstance()->getCurrentLang();
 		}
 		$pageList = PageList::getInstance();
-		$page = $pageList->getByName( $pageName, $lang );
-		return $this->getLink( $page, $metaKey, $attInA, $tagBeforeText, $tagAfterText );
+		$page = $pageList->getByName($pageName, $lang);
+		return $this->getLink($page, $metaKey, $attInA, $tagBeforeText, $tagAfterText);
 	}
-	
+
 	/**
 	 * Simple method to create a link with a page object.
 	 * 
@@ -79,14 +79,13 @@ class TagUtil
 	 * @param string $tagAfterText		Tag after the title of the page (in the tag '<a></a>')
 	 * @return type
 	 */
-	public function getLink( Page $page, $metaKey, $attInA = '', $tagBeforeText = '', $tagAfterText = '' )
-	{
+	public function getLink(Page $page, $metaKey, $attInA = '', $tagBeforeText = '', $tagAfterText = '') {
 		$buildUtil = \Flea::getBuildUtil();
-		return '<a href="' . $buildUtil->getAbsUrlByPageUrl( $page->getPageUrl() )
+		return '<a href="' . $buildUtil->getAbsUrlByPageUrl($page->getPageUrl())
 				. '" ' . $attInA . ' hreflang="' . $page->getLang() . '">'
-				. $tagBeforeText . $page->getMetas()->getValue($metaKey) . $tagAfterText.'</a>';
+				. $tagBeforeText . $page->getMetas()->getValue($metaKey) . $tagAfterText . '</a>';
 	}
-	
+
 	/**
 	 * Simple method to create an HTML list of pages.
 	 * 
@@ -97,58 +96,49 @@ class TagUtil
 	 * @param string $attInA		Additionnal attribute to the tag '<a></a>'
 	 * @return string				HTML list generated
 	 */
-	public function getLinkList( array $pageList, $metaKey, $attInUl = '', $attInLi = '', $attInA = '' )
-	{
-		$out = '<ul '.$attInUl.'>';
-		foreach ($pageList as $page)
-		{
-			$out .= '<li '.$attInLi.'>'.$this->getLink( $page, $metaKey, $attInA ).'</li>';
+	public function getLinkList(array $pageList, $metaKey, $attInUl = '', $attInLi = '', $attInA = '') {
+		$out = '<ul ' . $attInUl . '>';
+		foreach ($pageList as $page) {
+			$out .= '<li ' . $attInLi . '>' . $this->getLink($page, $metaKey, $attInA) . '</li>';
 		}
 		$out .= '</ul>';
 		return $out;
 	}
-	
+
 	/**
 	 * Get an HTML list of all other languages with their language code ("en", "fr", "ko"...)
 	 * 
 	 * @param \Flea\Page $page		Actual page
 	 * @return string				An HTML list of others languages with links to the same page in other languages
 	 */
-	public function getOtherLanguages( Page $page = null )
-	{
-		if ( $page === null )
-		{
+	public function getOtherLanguages(Page $page = null) {
+		if ($page === null) {
 			$page = General::getInstance()->getCurrentPage();
 		}
 		$langList = LangList::getInstance()->getList();
 		$currentLang = General::getInstance()->getCurrentLang();
-		
+
 		$output = '<ul>';
-		foreach ($langList as $langTemp)
-		{
-			if ( $langTemp != 'all' && $langTemp != $currentLang )
-			{
-				if ( PageList::getInstance()->exist($page->getName(), $langTemp) )
-				{
+		foreach ($langList as $langTemp) {
+			if ($langTemp != 'all' && $langTemp != $currentLang) {
+				if (PageList::getInstance()->exist($page->getName(), $langTemp)) {
 					$output .= '<li><a href="'
-						. \Flea::getBuildUtil()->getAbsUrlByNameLang( $page->getName(), $langTemp )
-						. '" hreflang="' . $langTemp . '">'
-						. $langTemp . '</a></li>';
-				}
-				else
-				{
+							. \Flea::getBuildUtil()->getAbsUrlByNameLang($page->getName(), $langTemp)
+							. '" hreflang="' . $langTemp . '">'
+							. $langTemp . '</a></li>';
+				} else {
 					$output .= '<li><a href="'
-						. \Flea::getBuildUtil()->getAbsUrlByNameLang( PageList::getInstance()->getDefaultPage( $langTemp )->getName(), $langTemp )
-						. '" hreflang="' . $langTemp . '">'
-						. $langTemp . '</a></li>';
+							. \Flea::getBuildUtil()->getAbsUrlByNameLang(PageList::getInstance()->getDefaultPage($langTemp)->getName(), $langTemp)
+							. '" hreflang="' . $langTemp . '">'
+							. $langTemp . '</a></li>';
 				}
 			}
 		}
 		$output .= '</ul>';
-		
+
 		return $output;
 	}
-	
+
 	/**
 	 * Simple method to create an img
 	 * 
@@ -157,21 +147,21 @@ class TagUtil
 	 * @param type $attInImg	Additionnal attribute to the tag <img/>
 	 * @return type				Tag img with : alt, width, height and $attInImg
 	 */
-	public function getImg( $fileName, $alt = '', $attInImg = '' )
-	{
-		if ( !is_file($fileName) )
-		{
-			return '<img src="'.$fileName.'" alt="'.$alt.'" '.$attInImg.'/>';
+	public function getImg($fileName, $alt = '', $attInImg = '') {
+		if (!is_file($fileName)) {
+			return '<img src="' . $fileName . '" alt="' . $alt . '" ' . $attInImg . '/>';
 		}
 		list( $width, $height, $type, $attr ) = getimagesize($filename);
-		
-		$img = '<img src="'.$fileName.'" width="'.$width.'" height="'.$height.'"';
-		if ( $alt != '' ) $img.= ' alt="'.$alt.'"';
-		if ( $attInImg != '' ) $img.= ' '.$attInImg;
+
+		$img = '<img src="' . $fileName . '" width="' . $width . '" height="' . $height . '"';
+		if ($alt != '')
+			$img.= ' alt="' . $alt . '"';
+		if ($attInImg != '')
+			$img.= ' ' . $attInImg;
 		$img .= '/>';
-		return  $img;
+		return $img;
 	}
-	
+
 	/**
 	 * Simple method to get breadcrump of the current page.
 	 * It have microdatas.
@@ -181,37 +171,31 @@ class TagUtil
 	 * @param string $delimiter		String between the links
 	 * @return string				Tag of the breadcrump
 	 */
-	public function getBreadcrump( $metaTitle, Page $currentPage = null, $delimiter = '' )
-	{
-		if ( $currentPage === null )
-		{
-			if ( _DEBUG && !General::getInstance()->isPagesInitialized() )
-			{
-				Debug::getInstance()->addError( 'All pages must be initialised after use TagUtil::getBreadcrump( $argument ) method without argument' );
+	public function getBreadcrump($metaTitle, Page $currentPage = null, $delimiter = '') {
+		if ($currentPage === null) {
+			if (_DEBUG && !General::getInstance()->isPagesInitialized()) {
+				Debug::getInstance()->addError('All pages must be initialised after use TagUtil::getBreadcrump( $argument ) method without argument');
 			}
 			$currentPage = General::getInstance()->getCurrentPage();
 		}
-		
-		$path = explode('/', $currentPage->getPageUrl() ) ;
+
+		$path = explode('/', $currentPage->getPageUrl());
 		$lang = $currentPage->getLang();
 		$numParentsPages = count($path);
 		$output = '';
-		
-		if ( $numParentsPages > 1 )
-		{
+
+		if ($numParentsPages > 1) {
 			$output = '<nav class="breadcrumb"><ul>';
-			foreach ($path as $l => $url)
-			{
+			foreach ($path as $l => $url) {
 				$url = $path[0];
-				for( $i = 1; $i <= $l ; $i++ )
-				{
-					$url .= '/'.$path[$i];
+				for ($i = 1; $i <= $l; $i++) {
+					$url .= '/' . $path[$i];
 				}
 				$temp = '<li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">';
-				$temp .= '<a href="'.\Flea::getBuildUtil()->getAbsUrlByPageUrl($url).'" '
-						. 'hreflang="'.$lang.'" '
+				$temp .= '<a href="' . \Flea::getBuildUtil()->getAbsUrlByPageUrl($url) . '" '
+						. 'hreflang="' . $lang . '" '
 						. 'itemprop="url">';
-				$temp .= '<span itemprop="title">'.PageList::getInstance()->getByUrl($url)->getMetas()->getValue($metaTitle).'</span>';
+				$temp .= '<span itemprop="title">' . PageList::getInstance()->getByUrl($url)->getMetas()->getValue($metaTitle) . '</span>';
 				$temp .= '</a></li>';
 				$output .= ( $l > 0 ) ? $delimiter : '';
 				$output .= $temp;
@@ -220,22 +204,22 @@ class TagUtil
 		}
 		return $output;
 	}
-	
-	private function __clone() { }
-	
+
+	private function __clone() {
+		
+	}
+
 	/**
 	 * Get the instance of TagUtil
 	 * 
 	 * @return TagUtil		TagUtil instancied
 	 */
-	public static function getInstance()
-	{
-		if ( !isset(self::$_INSTANCE) )
-		{
+	public static function getInstance() {
+		if (!isset(self::$_INSTANCE)) {
 			self::$_INSTANCE = new self();
 		}
 
 		return self::$_INSTANCE;
 	}
-	
+
 }
