@@ -39,33 +39,32 @@ include_once _SYSTEM_DIRECTORY . 'init/loadPages.php';
 	</head>
 	<body>
 
-<?php
-$request = \Flea\SqlQuery::getTemp(\Flea\SqlQuery::$TYPE_SELECT);
-$request->setWhere('(_visible > -1 OR _visible < 0) AND _cachable = 1');
-$pages = Flea\PageList::getInstance()->getAll($request);
-?>
+		<?php
+		$request = \Flea\SqlQuery::getTemp(\Flea\SqlQuery::$TYPE_SELECT);
+		$request->setWhere('(_visible > -1 OR _visible < 0) AND _cachable = 1');
+		$pages = Flea\PageList::getInstance()->getAll($request);
+		?>
 
 		<h1>Load all pages to cache there (<?= count($pages); ?> pages)</h1>
 		<p>Wait until all pages are loaded before leaving this page</p>
 
-<?php
-foreach ($pages as $page) {
-	$absUrl = \Flea\BuildUtil::getInstance()->getAbsUrlByPage($page);
-	?>
+		<?php
+		foreach ($pages as $page) {
+			$absUrl = \Flea\BuildUtil::getInstance()->getAbsUrlByPage($page);
+			?>
 
 			<div style="float:left; width:320px;">
 				<div>
 					<a href="<?= $absUrl ?>"><?= $page->getPageUrl() ?></a><br>
-			<?= $page->getName() . ' (' . $page->getLang() . ')' ?>
+					<?= $page->getName() . ' (' . $page->getLang() . ')' ?>
 				</div>
 				<iframe src="<?= $absUrl ?>" width="320" height="420"></iframe>
 			</div>
 
-				<?php } ?>
+		<?php } ?>
 
 	</body>
 </html>
 
-		<?php
-		unlink('cache.php');
-		
+<?php
+unlink('cache.php');

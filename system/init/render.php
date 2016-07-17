@@ -52,7 +52,6 @@ if (_CACHE) {
 	if ($cache->isWrited($urlStr)) {
 		$cache->echoSaved($urlStr);
 		if (_DEBUG) {
-			//echo '<!--'.Debug::getInstance()->getTimes('load cache time').'-->';
 			Debug::getInstance()->dispatchErrors();
 		}
 	} else {
@@ -65,8 +64,8 @@ if (_CACHE) {
 
 		if ($cache->isPageCachable($page)) {
 			if (_GZIP_CSS_JS) {
-				// GZIP ALL CSS AND JS FILES
 
+				// GZIP ALL CSS AND JS FILES
 				$regex = '#(href|src)="(' . _ROOT_URL . '[^"]+(\.js|\.css))"#i';
 				preg_match_all($regex, $html, $out);
 				for ($i = 0; $i < count($out[2]); $i++) {
@@ -102,7 +101,6 @@ if (_CACHE) {
 		echo $html;
 
 		if (_DEBUG) {
-			//echo '<!--'.Debug::getInstance()->getTimes('render page time').'-->';
 			Debug::getInstance()->dispatchErrors();
 		}
 	}
@@ -117,6 +115,5 @@ $page = General::getInstance()->getCurrentPage();
 echo $page->render();
 
 if (_DEBUG) {
-	//echo '<!--'.Debug::getInstance()->getTimes('execute PHP time').'-->';
 	Debug::getInstance()->dispatchErrors();
 }

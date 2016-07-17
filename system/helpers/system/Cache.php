@@ -101,7 +101,6 @@ class Cache {
 	 * Echo the file (with the function readfile)
 	 */
 	public function echoSaved($url) {
-		//$query = 'SELECT * FROM `'.$this->_tableName.'` WHERE url LIKE \''.$url.'\'';
 		$query = SqlQuery::getTemp(SqlQuery::$TYPE_SELECT);
 		$where = array('url' => $url);
 		$sign = array('LIKE');
@@ -115,12 +114,8 @@ class Cache {
 			// GZIP
 			if (strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== false) {
 				$gzip = $row[0]['gzip'];
-				//header('Content-Type: application/x-download');
-				header('Content-Encoding: gzip'); #
-				header('Content-Length: ' . strlen($gzip)); #
-				//header('Content-Disposition: attachment; filename="myfile.html"');
-				//header('Cache-Control: no-cache, no-store, max-age=0, must-revalidate');
-				//header('Pragma: no-cache');
+				header('Content-Encoding: gzip');
+				header('Content-Length: ' . strlen($gzip));
 				echo $gzip;
 			} else {
 				echo $row[0]['content'];
@@ -150,21 +145,6 @@ class Cache {
 	 * Start to save the communication (echo...)
 	 */
 	public function startSave() {
-		/* if( !file_exists(_CACHE_DIRECTORY) )
-		  {
-		  mkdir( _CACHE_DIRECTORY, 0777 );
-		  }
-
-		  if( !file_exists(_CACHE_DIRECTORY.'.htaccess') )
-		  {
-		  $htaccess = fopen( _CACHE_DIRECTORY.'.htaccess' , "w" );
-		  $htaccessContent = 'deny from all
-		  <Files ../index.php>
-		  allow from all
-		  </Files>';
-		  fwrite($htaccess, $htaccessContent);
-		  fclose($htaccess);
-		  } */
 		ob_start();
 	}
 
@@ -211,25 +191,4 @@ class Cache {
 		return $this->_db->count($query);
 	}
 
-	/* private static function getNumFilesRecurs( $dir )
-	  {
-	  $num = 0;
-	  if ( !file_exists($dir) ) return $num;
-
-	  $MyDirectory = opendir($dir);
-	  while ( $Entry = @readdir($MyDirectory) )
-	  {
-	  if ( is_dir($dir.'/'.$Entry) && $Entry != '.' && $Entry != '..' )
-	  {
-	  $num += self::getNumFilesRecurs($dir.'/'.$Entry);
-	  }
-	  elseif ( substr($Entry, 0, 1) != '.' )
-	  {
-	  $num++;
-	  }
-	  }
-	  closedir($MyDirectory);
-
-	  return $num;
-	  } */
 }
