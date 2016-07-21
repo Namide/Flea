@@ -163,6 +163,33 @@ class TagUtil {
 	}
 
 	/**
+	 * Return an array of Page of the breadcrump
+	 */
+	public function getBreadcrumpPages(Page $currentPage = null) {
+		if ($currentPage === null) {
+			if (_DEBUG && !General::getInstance()->isPagesInitialized()) {
+				Debug::getInstance()->addError('All pages must be initialised after use TagUtil::getBreadcrump( $argument ) method without argument');
+			}
+			$currentPage = General::getInstance()->getCurrentPage();
+		}
+
+		$path = explode('/', $currentPage->getPageUrl());
+		$numParentsPages = count($path);
+		$output = array();
+
+		if ($numParentsPages > 1) {
+			foreach ($path as $l => $url) {
+				$url = $path[0];
+				for ($i = 1; $i <= $l; $i++) {
+					$url .= '/' . $path[$i];
+				}
+				$output[] = PageList::getInstance()->getByUrl($url);
+			}
+		}
+		return $output;
+	}
+	
+	/**
 	 * Simple method to get breadcrump of the current page.
 	 * It have microdatas.
 	 * 
