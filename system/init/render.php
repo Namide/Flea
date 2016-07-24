@@ -69,7 +69,8 @@ if (_CACHE) {
 				$regex = '#(href|src)="(' . _ROOT_URL . '[^"]+(\.js|\.css))"#i';
 				preg_match_all($regex, $html, $out);
 				for ($i = 0; $i < count($out[2]); $i++) {
-					$url = $out[2][$i];
+					
+					$url = str_replace(_ROOT_URL, './', $out[2][$i]);
 					$newUrl = str_replace(_ROOT_URL, '', $url) . '.gz';
 					if (!$cache->isWrited($newUrl)) {
 						$type = substr(strrchr($url, '.'), 1);
