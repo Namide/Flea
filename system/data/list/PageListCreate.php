@@ -95,6 +95,8 @@ class PageListCreate {
 							break;
 						case 'date': $page->setDate($row);
 							break;
+                                                case 'format': if (!empty($row)) { $page->setFormat($row); }
+							break;
 
 						case 'tags':
 

@@ -236,7 +236,7 @@ class Page {
 	/**
 	 * Format of the page
 	 * 
-	 * @return string		Foramt of the page
+	 * @return string		Format of the page
 	 */
 	public function getFormat() {
 		return $this->_format;
