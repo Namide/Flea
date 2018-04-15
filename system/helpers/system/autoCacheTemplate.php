@@ -1,6 +1,5 @@
 <?php
-
-/* 
+/*
  * The MIT License
  *
  * Copyright 2015 damien.
@@ -25,13 +24,12 @@
  */
 
 include_once( 'config.php' );
-include_once _SYSTEM_DIRECTORY.'init/checkDir.php';
-include_once _SYSTEM_DIRECTORY.'init/import.php';
-include_once _SYSTEM_DIRECTORY.'init/loadPages.php';
+include_once _SYSTEM_DIRECTORY . 'init/checkDir.php';
+include_once _SYSTEM_DIRECTORY . 'init/import.php';
+include_once _SYSTEM_DIRECTORY . 'init/loadPages.php';
 
 \Flea::getUrlUtil()->reset();
 \Flea::getBuildUtil()->reset();
-
 ?>
 
 <html>
@@ -39,37 +37,33 @@ include_once _SYSTEM_DIRECTORY.'init/loadPages.php';
 		<title>Load all pages to cache there</title>
 		<meta charset="utf-8">
 	</head>
-<body>
+	<body>
 
-<?php
+		<?php
+		$request = \Flea\SqlQuery::getTemp(\Flea\SqlQuery::$TYPE_SELECT);
+		$request->setWhere('(_visible > -1 OR _visible < 0) AND _cachable = 1');
+		$pages = Flea\PageList::getInstance()->getAll($request);
+		?>
 
-	$request = \Flea\SqlQuery::getTemp( \Flea\SqlQuery::$TYPE_SELECT );
-	$request->setWhere('(_visible > -1 OR _visible < 0) AND _cachable = 1');
-	$pages = Flea\PageList::getInstance()->getAll($request);
-	
-?>
+		<h1>Load all pages to cache there (<?= count($pages); ?> pages)</h1>
+		<p>Wait until all pages are loaded before leaving this page</p>
 
-<h1>Load all pages to cache there (<?= count($pages); ?> pages)</h1>
-<p>Wait until all pages are loaded before leaving this page</p>
+		<?php
+		foreach ($pages as $page) {
+			$absUrl = \Flea\BuildUtil::getInstance()->getAbsUrlByPage($page);
+			?>
 
-<?php
+			<div style="float:left; width:320px;">
+				<div>
+					<a href="<?= $absUrl ?>"><?= $page->getPageUrl() ?></a><br>
+					<?= $page->getName() . ' (' . $page->getLang() . ')' ?>
+				</div>
+				<iframe src="<?= $absUrl ?>" width="320" height="420"></iframe>
+			</div>
 
-	foreach ($pages as $page) {
-		$absUrl = \Flea\BuildUtil::getInstance()->getAbsUrlByPage($page);
-	
-?>
+		<?php } ?>
 
-<div style="float:left; width:320px;">
-	<div>
-		<a href="<?= $absUrl ?>"><?= $page->getPageUrl() ?></a><br>
-		<?= $page->getName().' ('.$page->getLang().')' ?>
-	</div>
-	<iframe src="<?= $absUrl ?>" width="320" height="420"></iframe>
-</div>
-
-<?php } ?>
-
-</body>
+	</body>
 </html>
 
 <?php

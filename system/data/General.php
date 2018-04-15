@@ -31,182 +31,161 @@ namespace Flea;
  *
  * @author Namide
  */
-class General
-{
-	private static $_INSTANCE;
+class General {
 
+	private static $_INSTANCE;
 	private $_pagesInitialised = false;
-	
+
 	/**
 	 * All page initialised
 	 * 
 	 * @return bool		true if the pages are initialised, otherwise false
 	 */
-	public function isPagesInitialized() { return $this->_pagesInitialised; }
-	
+	public function isPagesInitialized() {
+		return $this->_pagesInitialised;
+	}
+
 	/**
 	 * Database of the pages initialized
 	 * 
 	 * @return bool		true if the databases are initialised, otherwise false
 	 */
-	public function isDBInitialized()
-	{
-		return DataBase::getInstance( _DB_DSN_PAGE )->exist( DataBase::objectToTableName(Page::getEmptyPage() ) );
+	public function isDBInitialized() {
+		return DataBase::getInstance(_DB_DSN_PAGE)->exist(DataBase::objectToTableName(Page::getEmptyPage()));
 	}
-	
+
 	/**
 	 * All page initialised
 	 */
-	public function initializesPages()
-	{
-		if (file_exists(_CONTENT_DIRECTORY.'initBegin.php') )
-		{
-			include _CONTENT_DIRECTORY.'initBegin.php';
+	public function initializesPages() {
+		if (file_exists(_CONTENT_DIRECTORY . 'initBegin.php')) {
+			include _CONTENT_DIRECTORY . 'initBegin.php';
 		}
 
-		if (file_exists(_CONTENT_DIRECTORY.'initLang.php') )
-		{
-			include _CONTENT_DIRECTORY.'initLang.php';
+		if (file_exists(_CONTENT_DIRECTORY . 'initLang.php')) {
+			include _CONTENT_DIRECTORY . 'initLang.php';
+		} elseif (_DEBUG) {
+			Debug::getInstance()->addError('The file: ' . _CONTENT_DIRECTORY . 'initLang.php don\'t exist');
 		}
-		elseif ( _DEBUG )
-		{
-			Debug::getInstance()->addError( 'The file: '._CONTENT_DIRECTORY.'initLang.php don\'t exist' );
-		}
-		
-		if ( !$this->isDBInitialized() )
-		{
-			include_once _SYSTEM_DIRECTORY.'data/list/PageListCreate.php';
+
+		if (!$this->isDBInitialized()) {
+			include_once _SYSTEM_DIRECTORY . 'data/list/PageListCreate.php';
 			//PageListCreate::getInstance()->addPagesByDir(_CONTENT_DIRECTORY);
 			PageListCreate::getInstance()->addPagesByCSV(_CONTENT_DIRECTORY);
-			
-			if (file_exists(_CONTENT_DIRECTORY.'initDB.php') )
-			{
-				PageListCreate::getInstance()->commands(_CONTENT_DIRECTORY.'initDB.php');
+
+			if (file_exists(_CONTENT_DIRECTORY . 'initDB.php')) {
+				PageListCreate::getInstance()->commands(_CONTENT_DIRECTORY . 'initDB.php');
 			}
 		}
-		
+
 		$this->_pagesInitialised = true;
 	}
-	
+
 	private $_currentPageName;
-	
+
 	/**
 	 * Name of the current page
 	 * 
 	 * @return string	Current page name
 	 */
-	public function getCurrentPageName()
-	{
-		if ( _DEBUG && !General::getInstance()->isPagesInitialized() )
-		{
-			Debug::getInstance()->addError( 'You can\'t access to the current '
-				. 'page name if the pages isn\'tinitialised' );
+	public function getCurrentPageName() {
+		if (_DEBUG && !General::getInstance()->isPagesInitialized()) {
+			Debug::getInstance()->addError('You can\'t access to the current '
+					. 'page name if the pages isn\'tinitialised');
 		}
 		return $this->_currentPageName;
 	}
-	
+
 	private $_currentPage;
-	
+
 	/**
 	 * Current page
 	 * 
 	 * @return Page		Current page
 	 */
-	public function getCurrentPage()
-	{
-		if ( _DEBUG && !General::getInstance()->isPagesInitialized() )
-		{
-			Debug::getInstance()->addError( 'You can\'t access to the current '
-				. 'page if the pages isn\'tinitialised' );
+	public function getCurrentPage() {
+		if (_DEBUG && !General::getInstance()->isPagesInitialized()) {
+			Debug::getInstance()->addError('You can\'t access to the current '
+					. 'page if the pages isn\'tinitialised');
 		}
 		return $this->_currentPage;
 	}
-	
+
 	private $_currentLang;
-	
+
 	/**
 	 * Current language
 	 * 
 	 * @return string		Current language
 	 */
-	public function getCurrentLang()
-	{
-		if ( _DEBUG && !General::getInstance()->isPagesInitialized() )
-		{
-			Debug::getInstance()->addError( 'You can\'t access to the current '
-				. 'language if the pages isn\'tinitialised' );
+	public function getCurrentLang() {
+		if (_DEBUG && !General::getInstance()->isPagesInitialized()) {
+			Debug::getInstance()->addError('You can\'t access to the current '
+					. 'language if the pages isn\'tinitialised');
 		}
 		return $this->_currentLang;
 	}
-	
+
 	private $_currentGetUrl;
-	
+
 	/**
 	 * Current $_GET
 	 * 
 	 * @return array		GET variables
 	 */
-	public function getCurrentGetUrl()
-	{
-		if ( _DEBUG && !General::getInstance()->isPagesInitialized() )
-		{
-			Debug::getInstance()->addError( 'You can\'t access to the current '
-				. 'global variable GET if the pages isn\'tinitialised' );
+	public function getCurrentGetUrl() {
+		if (_DEBUG && !General::getInstance()->isPagesInitialized()) {
+			Debug::getInstance()->addError('You can\'t access to the current '
+					. 'global variable GET if the pages isn\'tinitialised');
 		}
 		return $this->_currentGetUrl;
 	}
-	
+
 	private $_currentPostUrl = null;
-	
+
 	/**
 	 * Current $_POST
 	 * 
 	 * @return array		POST variables
 	 */
-	public function getCurrentPostUrl()
-	{
-		if ( $this->_currentPostUrl === null )
-		{
+	public function getCurrentPostUrl() {
+		if ($this->_currentPostUrl === null) {
 			$this->_currentPostUrl = array();
-			foreach ( $_POST as $key => $value )
-			{
-				$this->_currentPostUrl[$key] = filter_input( INPUT_POST, $key, FILTER_SANITIZE_STRING );
+			foreach ($_POST as $key => $value) {
+				$this->_currentPostUrl[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_STRING);
 			}
 		}
-		
+
 		return $this->_currentPostUrl;
 	}
-	
+
 	private $_currentPageUrl;
-	
+
 	/**
 	 * Current page URL
 	 * 
 	 * @return string		Current page URL
 	 */
-	public function getCurrentPageUrl()
-	{
-		if ( _DEBUG && !General::getInstance()->isPagesInitialized() )
-		{
-			Debug::getInstance()->addError( 'You can\'t access to the current '
-				. 'language if the pages isn\'tinitialised' );
+	public function getCurrentPageUrl() {
+		if (_DEBUG && !General::getInstance()->isPagesInitialized()) {
+			Debug::getInstance()->addError('You can\'t access to the current '
+					. 'language if the pages isn\'tinitialised');
 		}
 		return $this->_currentPageUrl;
 	}
-	
+
 	/**
 	 * Change the current page
 	 * 
 	 * @param Page $page	Current page
 	 */
-	public function setCurrentPage( &$page )
-	{
+	public function setCurrentPage(&$page) {
 		$this->_currentPage = $page;
 		$this->_currentLang = $page->getLang();
 		$this->_currentPageName = $page->getName();
 		$this->_pagesInitialised = true;
 	}
-	
+
 	/**
 	 * Change the current URL
 	 * 
@@ -214,39 +193,37 @@ class General
 	 * @param array $getUrl		List of the global variables GET
 	 * @param array $postUrl	List of the global variables POST
 	 */
-	public function setCurrentUrl( $pageUrl,
-									array $getUrl = null,
-									array $postUrl = null )
-	{
-		if ( $getUrl === null )
-		{
+	public function setCurrentUrl($pageUrl, array $getUrl = null, array $postUrl = null) {
+		if ($getUrl === null) {
 			$getUrl = array();
 		}
-		if ( $postUrl === null )
-		{
+		if ($postUrl === null) {
 			$postUrl = array();
 		}
-		
+
 		$this->_currentPageUrl = $pageUrl;
 		$this->_currentGetUrl = $getUrl;
 	}
-	
-	private function __construct() { }
-	
-	private function __clone() { }
+
+	private function __construct() {
+		
+	}
+
+	private function __clone() {
+		
+	}
 
 	/**
 	 * Get the instance of General
 	 * 
 	 * @return General		Object instancied
 	 */
-	public static function getInstance()
-	{
-		if ( !isset(self::$_INSTANCE) )
-		{
+	public static function getInstance() {
+		if (!isset(self::$_INSTANCE)) {
 			self::$_INSTANCE = new self();
 		}
 
 		return self::$_INSTANCE;
 	}
+
 }

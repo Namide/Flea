@@ -31,68 +31,64 @@ namespace Flea;
  *
  * @author Namide
  */
-class UrlUtil
-{
-	private static $_INSTANCE = null;
+class UrlUtil {
 
+	private static $_INSTANCE = null;
 	private static $_arg = '_u';
+
 	/**
 	 * Label of the variable GET that content the URL.
 	 * If you change it, change to the root .htaccess
 	 * 
 	 * @return string
 	 */
-    //public function getPageGetArg() { return self::$_arg; }
-	
+	//public function getPageGetArg() { return self::$_arg; }
+
 	private $_basePageUrl;
-	
-    final private function __construct()
-    {
-    	//$this->reset();
-    }
+
+	final private function __construct() {
+		//$this->reset();
+	}
 
 	/**
 	 * Reload the URL.
 	 * This state compose the global GET and computes the currentPage
 	 */
-	public function reset()
-	{
-		if( _DEBUG && !General::getInstance()->isPagesInitialized() )
-		{
-			Debug::getInstance()->addError( 'All pages must be initialised after use UrlUtil class' );
+	public function reset() {
+		if (_DEBUG && !General::getInstance()->isPagesInitialized()) {
+			Debug::getInstance()->addError('All pages must be initialised after use UrlUtil class');
 		}
-		$this->_basePageUrl = 'index.php?'.self::$_arg.'=';
-		
+		$this->_basePageUrl = 'index.php?' . self::$_arg . '=';
+
 		$navigatorGets = self::getNavigatorGets();
 		$relURL = '';
 		$pageGet = array();
-		foreach ($navigatorGets as $key => $value)
-		{
-			if ( $key === self::$_arg ) { $relURL = $value; }
-			else { $pageGet[$key] = $value; }
+		foreach ($navigatorGets as $key => $value) {
+			if ($key === self::$_arg) {
+				$relURL = $value;
+			} else {
+				$pageGet[$key] = $value;
+			}
 		}
-		
-		$page = PageList::getInstance()->getByUrl( $relURL );
-		$pageUrl = $this->dynamicPageUrlToPageUrl( $page, $relURL, $pageGet );
-		
+
+		$page = PageList::getInstance()->getByUrl($relURL);
+		$pageUrl = $this->dynamicPageUrlToPageUrl($page, $relURL, $pageGet);
+
 		General::getInstance()->setCurrentUrl($pageUrl, $pageGet);
 		General::getInstance()->setCurrentPage($page);
 	}
-	
-	private static function getNavigatorGets()
-	{
+
+	private static function getNavigatorGets() {
 		$navigatorGets = array();
-		foreach ($_GET as $key => $value)
-		{
-			$navigatorGets[$key] = filter_input( INPUT_GET, $key, FILTER_SANITIZE_STRING );
+		foreach ($_GET as $key => $value) {
+			$navigatorGets[$key] = filter_input(INPUT_GET, $key, FILTER_SANITIZE_STRING);
 			// hack for integer $key
-			if ( $navigatorGets[$key] == null )
-			{
-				$navigatorGets[$key] = filter_var( $value, FILTER_SANITIZE_STRING );
+			if ($navigatorGets[$key] == null) {
+				$navigatorGets[$key] = filter_var($value, FILTER_SANITIZE_STRING);
 			}
 		}
-		
-		
+
+
 		return $navigatorGets;
 	}
 
@@ -101,81 +97,72 @@ class UrlUtil
 	 * 
 	 * @return string		Language
 	 */
-	public static function getNavigatorRelUrl()
-	{
+	public static function getNavigatorRelUrl() {
 		$navigatorGets = self::getNavigatorGets();
 		$relURL = '';
 		$pageGet = array();
-		foreach ($navigatorGets as $key => $value)
-		{
-			if ( $key === self::$_arg ) { $relURL = $value; }
-			else { $pageGet[$key] = $value; }
+		foreach ($navigatorGets as $key => $value) {
+			if ($key === self::$_arg) {
+				$relURL = $value;
+			} else {
+				$pageGet[$key] = $value;
+			}
 		}
-		foreach ($pageGet as $key => $value)
-		{
-			$relURL .= '/'.$key.'/'.$value;
+		foreach ($pageGet as $key => $value) {
+			$relURL .= '/' . $key . '/' . $value;
 		}
-		
+
 		return $relURL;
 	}
-	
-	private function dynamicPageUrlToPageUrl(Page &$page, $relUrl, array &$pageGet)
-	{
+
+	private function dynamicPageUrlToPageUrl(Page &$page, $relUrl, array &$pageGet) {
 		$pageUrl = $page->getPageUrl();
-		if( strlen($relUrl) - strlen($pageUrl) > 1 &&
-			$page->getGetEnabled() )
-		{
-			$restUrl = substr($relUrl, strlen($pageUrl) );
-			if ( $restUrl{0} == '/' )
-			{
+		if (strlen($relUrl) - strlen($pageUrl) > 1 &&
+				$page->getGetEnabled()) {
+			$restUrl = substr($relUrl, strlen($pageUrl));
+			if ($restUrl{0} == '/') {
 				$restUrl = substr($restUrl, 1);
 			}
-			$this->explodeDynamicUrlToGet( $restUrl, $pageGet, $page->getGetExplicit() );
+			$this->explodeDynamicUrlToGet($restUrl, $pageGet, $page->getGetExplicit());
 		}
-		
+
 		return $pageUrl;
 	}
-	
-	private function explodeDynamicUrlToGet( $restUrl, array &$pageGet, $isExplicit )
-	{
-		
-		$getTemp = explode( '/', $restUrl );
-		if ( $isExplicit )
-		{
-			$l = count( $getTemp ) - 1;
-			
-			for ( $i = 0; $i<$l; $i+=2 )
-			{
-				$pageGet[$getTemp[$i]] = $getTemp[$i+1];
+
+	private function explodeDynamicUrlToGet($restUrl, array &$pageGet, $isExplicit) {
+
+		$getTemp = explode('/', $restUrl);
+		if ($isExplicit) {
+			$l = count($getTemp) - 1;
+
+			for ($i = 0; $i < $l; $i+=2) {
+				$pageGet[$getTemp[$i]] = $getTemp[$i + 1];
 			}
-		}
-		else
-		{
-			$pageGet = array_merge( $pageGet, $getTemp );
+		} else {
+			$pageGet = array_merge($pageGet, $getTemp);
 		}
 	}
-	
-	private static function getCleanGets( &$gets )
-	{
-		/*$getsStr = implode('&', $gets);
-		$getsStr = str_replace('?', '&', $getsStr);
-		$getsStr = str_replace('&&', '&', $getsStr);
-		
-		$getsExpl = explode('&', $getsStr);
-		
-		$gets = array();
-		foreach ($getsExpl as $getStr)
-		{
-			$get = explode( '=', $getStr );
-			if ( count($get) === 2 )
-			{
-				$gets[$get[0]] = $get[1];
-			}
-		}*/
-		
+
+	private static function getCleanGets(&$gets) {
+		/* $getsStr = implode('&', $gets);
+		  $getsStr = str_replace('?', '&', $getsStr);
+		  $getsStr = str_replace('&&', '&', $getsStr);
+
+		  $getsExpl = explode('&', $getsStr);
+
+		  $gets = array();
+		  foreach ($getsExpl as $getStr)
+		  {
+		  $get = explode( '=', $getStr );
+		  if ( count($get) === 2 )
+		  {
+		  $gets[$get[0]] = $get[1];
+		  }
+		  } */
+
 		return $gets;
 	}
-	
+
 	/**
 	 * Relative URL of the page
 	 * 
@@ -183,13 +170,12 @@ class UrlUtil
 	 * @param array $getUrl		List of GETs (optional)
 	 * @return string			Relative URL of the page
 	 */
-	public function getRelUrlByIdLang( Page &$page/*, $lang*/, array $getUrl = null )
-    {
-		$url = $this->getRelUrlByPageUrl( $page->getPageUrl(), $getUrl, $page->getGetExplicit() );
-		
+	public function getRelUrlByIdLang(Page &$page/* , $lang */, array $getUrl = null) {
+		$url = $this->getRelUrlByPageUrl($page->getPageUrl(), $getUrl, $page->getGetExplicit());
+
 		return $url;
-    }
-	
+	}
+
 	/**
 	 * PageUrl to relative URL
 	 * 
@@ -198,39 +184,31 @@ class UrlUtil
 	 * @param bool $explicitGet		GETs list is explicit or not
 	 * @return string				Relative URL of the page
 	 */
-	public function getRelUrlByPageUrl( $pageUrl, array $getUrl = null, $explicitGet = true )
-	{
-		if ( $getUrl === null ) { $getUrl = array(); }
-		
+	public function getRelUrlByPageUrl($pageUrl, array $getUrl = null, $explicitGet = true) {
+		if ($getUrl === null) {
+			$getUrl = array();
+		}
+
 		$url = '';
-		if ( !_URL_REWRITING )
-		{
+		if (!_URL_REWRITING) {
 			$url .= $this->_basePageUrl;
 		}
 		$url .= $pageUrl;
-		
-		if ( count($getUrl)>0 )
-		{
-			foreach ($getUrl as $key => $value)
-			{
-				if ( _URL_REWRITING && $explicitGet )
-				{
-					$url .= '/'.urlencode($key).'/'.urlencode($value);
-				}
-				elseif ( _URL_REWRITING && !$explicitGet )
-				{
-					$url .= '/'.urlencode($value);
-				}
-				else
-				{
-					$url .= '&'.urlencode($key).'='.urlencode($value);
+
+		if (count($getUrl) > 0) {
+			foreach ($getUrl as $key => $value) {
+				if (_URL_REWRITING && $explicitGet) {
+					$url .= '/' . urlencode($key) . '/' . urlencode($value);
+				} elseif (_URL_REWRITING && !$explicitGet) {
+					$url .= '/' . urlencode($value);
+				} else {
+					$url .= '&' . urlencode($key) . '=' . urlencode($value);
 				}
 			}
 		}
-		
+
 		return $url;
 	}
-
 
 	/**
 	 * Converts an URL of page to an hash string
@@ -239,55 +217,52 @@ class UrlUtil
 	 * @param array $getUrl		List of GETs (optional)
 	 * @return string			Hash string of the URL
 	 */
-	public static function urlPageToStr( $pageUrl, array $getUrl = null )
-	{
-		if ( $getUrl === null )	{ $getUrl = array(); }
-		
-		$urlStr = $pageUrl;
-		if( count($getUrl) > 0 )
-		{
-			$urlStr .= '&'.implode('&', $getUrl);
+	public static function urlPageToStr($pageUrl, array $getUrl = null) {
+		if ($getUrl === null) {
+			$getUrl = array();
 		}
-		
-		/*$invalid = array( '\\'=>'-', ':'=>'-', '"'=>'-', '*'=>'-', '<'=>'-', '>'=>'-', '|'=>'-' );
-		$urlStr = str_replace(array_keys($invalid), array_values($invalid), htmlentities( $urlStr ) );
 
-		$invalid = array( '&'=>'/', '?'=>'/' );
-		$urlStr = str_replace(array_keys($invalid), array_values($invalid), htmlentities( $urlStr ) );
+		$urlStr = $pageUrl;
+		if (count($getUrl) > 0) {
+			$urlStr .= '&' . implode('&', $getUrl);
+		}
 
-		$ext = strtolower( substr( strrchr( $urlStr, '.' ), 1 ) );
-		if ( strpos( $ext, '/' ) == false )
-		{
-			if( substr($urlStr,strlen($urlStr)) !== '/' )
-			{
-				$urlStr .= '/';
-			}
-			$urlStr .= 'index.html';
-		}*/
-		
+		/* $invalid = array( '\\'=>'-', ':'=>'-', '"'=>'-', '*'=>'-', '<'=>'-', '>'=>'-', '|'=>'-' );
+		  $urlStr = str_replace(array_keys($invalid), array_values($invalid), htmlentities( $urlStr ) );
+
+		  $invalid = array( '&'=>'/', '?'=>'/' );
+		  $urlStr = str_replace(array_keys($invalid), array_values($invalid), htmlentities( $urlStr ) );
+
+		  $ext = strtolower( substr( strrchr( $urlStr, '.' ), 1 ) );
+		  if ( strpos( $ext, '/' ) == false )
+		  {
+		  if( substr($urlStr,strlen($urlStr)) !== '/' )
+		  {
+		  $urlStr .= '/';
+		  }
+		  $urlStr .= 'index.html';
+		  } */
+
 		return $urlStr;
 	}
-	
-	final private function __clone()
-    {
-        if ( _DEBUG )
-		{
-			Debug::getInstance()->addError( 'You can\'t clone a singleton' );
+
+	final private function __clone() {
+		if (_DEBUG) {
+			Debug::getInstance()->addError('You can\'t clone a singleton');
 		}
-    }
- 
+	}
+
 	/**
 	 * Instance of the object UrlUtil
 	 * 
 	 * @return UrlUtil		UrlUtil object instancied
 	 */
-    final public static function getInstance()
-    {
-        if(!isset(self::$_INSTANCE))
-        {
-            self::$_INSTANCE = new self();
-        }
- 
-        return self::$_INSTANCE;
-    }
+	final public static function getInstance() {
+		if (!isset(self::$_INSTANCE)) {
+			self::$_INSTANCE = new self();
+		}
+
+		return self::$_INSTANCE;
+	}
+
 }

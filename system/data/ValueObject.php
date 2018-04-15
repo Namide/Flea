@@ -32,8 +32,8 @@ namespace Flea;
  *
  * @author namide.com
  */
-class ValueObject
-{
+class ValueObject {
+
 	/**
 	 * If true, an error has occurred.
 	 * Check the error list to find your error.
@@ -41,38 +41,35 @@ class ValueObject
 	 * @var bool	If false, check the return in the propertie content
 	 */
 	public $error = false;
-	
+
 	/**
 	 * All the errors who have occurred.
 	 * 
 	 * @var array	List of the errors
 	 */
 	public $errorList;
-	
+
 	/**
 	 * Return of the method.
 	 * 
 	 * @var type	Before recover this one, check the errors
 	 */
 	public $content;
-	
+
 	/**
 	 * Construct the reponse of a function with this object.
 	 * 
 	 * @param type $content		Return of the function
 	 * @param type $error		True if an error has occurred
 	 */
-	public function __construct( $content, $error = false, $errorList = null )
-    {
+	public function __construct($content, $error = false, $errorList = null) {
 		$this->error = $error;
 		$this->content = $content;
-		if ( $errorList !== null )
-		{
+		if ($errorList !== null) {
 			$this->errorList = $errorList;
-		}
-		else
-		{
+		} else {
 			$this->errorList = array();
 		}
-    }
+	}
+
 }

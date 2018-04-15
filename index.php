@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * The MIT License
  *
  * Copyright 2014 Damien Doussaud (namide.com).
@@ -25,4 +25,4 @@
  */
 
 include_once( 'config.php' );
-include_once( _SYSTEM_DIRECTORY.'init/render.php' );
+include_once( _SYSTEM_DIRECTORY . 'init/render.php' );

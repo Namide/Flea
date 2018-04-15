@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * The MIT License
  *
  * Copyright 2014 Damien Doussaud (namide.com).
@@ -28,7 +28,6 @@ namespace Flea;
 
 General::getInstance()->initializesPages();
 
-if ( _DEBUG )
-{
+if (_DEBUG) {
 	Debug::getInstance()->addTimeMark('init pages');
 }

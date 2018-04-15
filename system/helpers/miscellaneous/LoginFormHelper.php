@@ -31,173 +31,150 @@ namespace Flea;
  * 
  * @author Namide
  */
-class LoginFormHelper
-{
+class LoginFormHelper {
+
 	private $_login;
-	
+
 	/**
 	 * To use this class you must to push the login corresponding
 	 * @param Login $login
 	 */
-	public function __construct( $login )
-	{
+	public function __construct($login) {
 		$this->_login = $login;
 	}
-	
+
 	/**
 	 * Test if the POST variables add a user and return a form to add a user.
 	 * 
 	 * @return string
 	 */
-	public function getFormRegisterUser( $role = 1 )
-	{
+	public function getFormRegisterUser($role = 1) {
 		$build = \Flea::getBuildUtil();
 		$gen = \Flea::getGeneral();
 		$post = $gen->getCurrentPostUrl();
 		$error = '';
-		if (	isset($post['addUserEmail']) &&
-				isset($post['addUserPass']) )
-		{
-			$vo = $this->_login->registerUser( $post['addUserEmail'], $post['addUserPass'], $role );
-			if( $vo->content )
-			{
-				$currentUrl = $build->getAbsUrl( $gen->getCurrentPage()->getName() );
-				header('Location: '.$currentUrl);
-			}
-			else if ( count($vo->errorList) > 0 )
-			{
+		if (isset($post['addUserEmail']) &&
+				isset($post['addUserPass'])) {
+			$vo = $this->_login->registerUser($post['addUserEmail'], $post['addUserPass'], $role);
+			if ($vo->content) {
+				$currentUrl = $build->getAbsUrl($gen->getCurrentPage()->getName());
+				header('Location: ' . $currentUrl);
+			} else if (count($vo->errorList) > 0) {
 				$error .= '<strong class="error">';
-				foreach ($vo->errorList as $e)
-				{
+				foreach ($vo->errorList as $e) {
 					$error .= $e . ' ';
 				}
 				$error .= '</strong>';
 			}
 		}
 
-		$currentUrl = $build->getAbsUrl( $gen->getCurrentPage()->getName() );
-		$form = '<form method="post" action="'.$currentUrl.'">
-					'.$error.'
+		$currentUrl = $build->getAbsUrl($gen->getCurrentPage()->getName());
+		$form = '<form method="post" action="' . $currentUrl . '">
+					' . $error . '
 					<input class="field" type="text" name="addUserEmail" placeholder="E-mail" value="" required="required" pattern="^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"/>
 					<input class="field" type="password" name="addUserPass" placeholder="Password" value="" required="required"/>
 					<input type="submit" name="add" value="add">
 				</form>';
 		return $form;
 	}
-	
+
 	/**
 	 * Test if the POST variables add a user and return a form to add a user.
 	 * 
 	 * @return string
 	 */
-	public function getFormAddUser()
-	{
+	public function getFormAddUser() {
 		$build = \Flea::getBuildUtil();
 		$gen = \Flea::getGeneral();
 		$post = $gen->getCurrentPostUrl();
 		$error = '';
-		if (	isset($post['addUserEmail']) &&
-				isset($post['addUserPass']) )
-		{
-			$vo = $this->_login->addUser( $post['addUserEmail'], $post['addUserPass'] );
-			if( $vo->content )
-			{
-				$currentUrl = $build->getAbsUrl( $gen->getCurrentPage()->getName() );
-				header('Location: '.$currentUrl);
-			}
-			else if ( count($vo->errorList) > 0 )
-			{
+		if (isset($post['addUserEmail']) &&
+				isset($post['addUserPass'])) {
+			$vo = $this->_login->addUser($post['addUserEmail'], $post['addUserPass']);
+			if ($vo->content) {
+				$currentUrl = $build->getAbsUrl($gen->getCurrentPage()->getName());
+				header('Location: ' . $currentUrl);
+			} else if (count($vo->errorList) > 0) {
 				$error .= '<strong class="error">';
-				foreach ($vo->errorList as $e)
-				{
+				foreach ($vo->errorList as $e) {
 					$error .= $e . ' ';
 				}
 				$error .= '</strong>';
 			}
 		}
 
-		$currentUrl = $build->getAbsUrl( $gen->getCurrentPage()->getName() );
-		$form = '<form method="post" action="'.$currentUrl.'">
-					'.$error.'
+		$currentUrl = $build->getAbsUrl($gen->getCurrentPage()->getName());
+		$form = '<form method="post" action="' . $currentUrl . '">
+					' . $error . '
 					<input class="field" type="text" name="addUserEmail" placeholder="E-mail" value="" required="required" pattern="^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"/>
 					<input class="field" type="password" name="addUserPass" placeholder="Password" value="" required="required"/>
 					<input type="submit" name="add" value="add">
 				</form>';
 		return $form;
 	}
-	
+
 	/**
 	 * Test if the POST variables connect a user and return a form to connect a user.
 	 *
 	 * @return string
 	 */
-	public function getFormConnectUser()
-	{
+	public function getFormConnectUser() {
 		$build = \Flea::getBuildUtil();
 		$gen = \Flea\General::getInstance();
 		$post = $gen->getCurrentPostUrl();
 		$error = '';
-		if (	isset($post['connectUserEmail']) &&
-				isset($post['connectUserPass']) )
-		{
-			$vo = $this->_login->connect( $post['connectUserEmail'], $post['connectUserPass'] );
-			if( $vo->content )
-			{
+		if (isset($post['connectUserEmail']) &&
+				isset($post['connectUserPass'])) {
+			$vo = $this->_login->connect($post['connectUserEmail'], $post['connectUserPass']);
+			if ($vo->content) {
 				//return '<script>location.reload();</script>';
-				$currentUrl = $build->getAbsUrl( $gen->getCurrentPage()->getName() );
-				header('Location: '.$currentUrl);
-			}
-			else if ( count($vo->errorList) > 0 )
-			{
+				$currentUrl = $build->getAbsUrl($gen->getCurrentPage()->getName());
+				header('Location: ' . $currentUrl);
+			} else if (count($vo->errorList) > 0) {
 				$error .= '<strong class="error">';
-				foreach ($vo->errorList as $e)
-				{
+				foreach ($vo->errorList as $e) {
 					$error .= $e . ' ';
 				}
 				$error .= '</strong>';
 			}
-			
 		}
 
-		$currentUrl = $build->getAbsUrl( $gen->getCurrentPage()->getName() );
+		$currentUrl = $build->getAbsUrl($gen->getCurrentPage()->getName());
 
-		$form = '<form method="post" action="'.$currentUrl.'">
-					'.$error.'
+		$form = '<form method="post" action="' . $currentUrl . '">
+					' . $error . '
 					<input class="field" type="text" name="connectUserEmail" placeholder="E-mail" value="" required="required"/>
 					<input class="field" type="password" name="connectUserPass" placeholder="Password" value="" required="required"/>
 					<input type="submit" name="connect" value="connect">
 				</form>';
 		return $form;
 	}
-	
+
 	/**
 	 * Test if the POST variables disconnect a user and return a form to disconnect a user.
 	 * 
 	 * @return string
 	 */
-	public function getFormDisconnectUser()
-	{
+	public function getFormDisconnectUser() {
 		$buil = \Flea::getBuildUtil();
 		$gen = \Flea\General::getInstance();
 		$post = $gen->getCurrentPostUrl();
-		if ( isset($post['disconnectUser']) )
-		{
-			if( $this->_login->disconnect() )
-			{
+		if (isset($post['disconnectUser'])) {
+			if ($this->_login->disconnect()) {
 				//return '<script>location.reload();</script>';
-				$currentUrl = $buil->getAbsUrl( $gen->getCurrentPage()->getName() );
-				header('Location: '.$currentUrl);
+				$currentUrl = $buil->getAbsUrl($gen->getCurrentPage()->getName());
+				header('Location: ' . $currentUrl);
 			}
 		}
 
-		$currentUrl = $buil->getAbsUrl( $gen->getCurrentPage()->getName() );
-		$form = '<form method="post" action="'.$currentUrl.'">
+		$currentUrl = $buil->getAbsUrl($gen->getCurrentPage()->getName());
+		$form = '<form method="post" action="' . $currentUrl . '">
 					<input type="hidden" name="disconnectUser" value="1">
 					<input type="submit" name="disconnect" value="disconnect">
 				</form>';
 		return $form;
 	}
-	
+
 	/**
 	 * Return a list of the user corresponding of the pair key:value
 	 * 
@@ -205,31 +182,25 @@ class LoginFormHelper
 	 * @param string $value		A value to filter like 'gamer' (optional)
 	 * @return string			The list of users corresponding to the pair
 	 */
-	public function getUserList( $key = null, $value = null )
-	{
-		$vo = $this->_login->getUserList( $key, $value );
+	public function getUserList($key = null, $value = null) {
+		$vo = $this->_login->getUserList($key, $value);
 		$error = '';
-		if ( $vo->error && count($vo->errorList) > 0 )
-		{
+		if ($vo->error && count($vo->errorList) > 0) {
 			$error .= '<strong class="error">';
-			foreach ($vo->errorList as $e)
-			{
+			foreach ($vo->errorList as $e) {
 				$error .= $e . ' ';
 			}
 			$error .= '</strong>';
 		}
 
 		$list = $vo->content;
-		$output = $error.'<ul>';
-		if ( is_array($list) )
-		{
-			foreach ($list as $userMail => $userDatas)
-			{
-				$output .= '<li>'.$userMail;
-				$output .= '<ul>role: '.$userDatas->getRole();
-				foreach ($userDatas->getDatas() as $dataKey => $dataValue )
-				{
-					$output .= '<li>'.$dataKey.': '.$dataValue.'</li>';
+		$output = $error . '<ul>';
+		if (is_array($list)) {
+			foreach ($list as $userMail => $userDatas) {
+				$output .= '<li>' . $userMail;
+				$output .= '<ul>role: ' . $userDatas->getRole();
+				foreach ($userDatas->getDatas() as $dataKey => $dataValue) {
+					$output .= '<li>' . $dataKey . ': ' . $dataValue . '</li>';
 				}
 				$output .= '</ul>';
 				$output .= '</li>';
@@ -238,5 +209,5 @@ class LoginFormHelper
 		$output .= '</ul>';
 		return $output;
 	}
-	
+
 }
